@@ -50,7 +50,18 @@ python3 -m http.server 8000
 
 ## 🚀 部署
 
-仓库已配置 GitHub Pages（main 分支根目录）。每次 `git push` 之后约 1 分钟自动更新线上版本。
+- 仓库地址：https://github.com/Aspen-Lab/skyler-portfolio
+- 线上网址：**https://aspen-lab.github.io/skyler-portfolio/**
+
+已配置 GitHub Pages（main 分支根目录）。每次 `git push` 之后约 1 分钟自动更新线上版本：
+
+```bash
+git add -A
+git commit -m "更新作品"
+git push
+```
+
+不熟悉命令行的话，也可以直接在 GitHub 网页上进入仓库 → 点开文件 → ✏️ 编辑 `js/data.js`，或把图片拖进 `assets/works/` 文件夹上传，保存（Commit）后同样会自动发布。
 
 ---
 
