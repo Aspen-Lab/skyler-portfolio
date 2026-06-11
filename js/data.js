@@ -97,7 +97,7 @@ const FANART = [
    ABOUT ME — avatar 留空会显示扫描动画占位
    ------------------------------------------------------------ */
 const ABOUT = {
-  avatar: "",
+  avatar: "assets/avatar.jpg",
   // 主简介（英文，页面主要内容）
   bio:
     "Illustration student with a concentration in Concept Design, passionate about character design and narrative-driven visual storytelling for games. Experienced in concept art production for live-service mobile titles at Garena, with strengths in style adaptation, iterative visual development, and cross-team collaboration.",
