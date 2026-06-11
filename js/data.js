@@ -31,7 +31,7 @@ const PROJECTS = [
       { title: "CHARACTER LINEUP", src: "assets/works/p01/03-lineup.jpg" },
       { title: "UNIT Y", src: "assets/works/p01/04-unit-y.jpg" },
       { title: "UNIT Z", src: "assets/works/p01/05-unit-z.jpg" },
-      { title: "LINEUP — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg" },
+      { title: "UNIT Z — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg" },
       { title: "ARCH-72", src: "assets/works/p01/07-arch-72.jpg" },
       { title: "PROP DESIGN — OVERVIEW", src: "assets/works/p01/08-prop-design.jpg" },
       { title: "PROP — WHITE ECHO", src: "assets/works/p01/09-white-echo.jpg" },
