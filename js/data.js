@@ -9,7 +9,7 @@ const SITE = {
   name: "SKYLER",
   heroName: "SECAL72", // 主页大标题（留空则用 name）
   alias: "SKYLER",
-  zhName: "潘",
+  zhName: "ZHIYI PAN", // 署名行（显示在 hero 标签里）
   tagline: "VISUAL ARCHIVE ✳ ILLUSTRATION ✳ FANART",
   est: "EST. 2026",
 };
@@ -22,7 +22,7 @@ const PROJECTS = [
   {
     id: "P-01",
     title: "LAST ORDER",
-    zh: "原创世界观企划",
+    zh: "オリジナル企画", // 标题旁的日文装饰小字
     year: "SPRING 2026",
     medium: "CHARACTER / PROP / ENVIRONMENT",
     state: "ACTIVE",
@@ -46,7 +46,7 @@ const PROJECTS = [
   {
     id: "P-02",
     title: "COMMISSIONS",
-    zh: "约稿记录",
+    zh: "コミッション記録",
     year: "2025 — 2026",
     medium: "CHARACTER / COVER ART",
     state: "ONGOING",
@@ -61,7 +61,7 @@ const PROJECTS = [
   {
     id: "P-03",
     title: "SKETCH ARCHIVE",
-    zh: "草稿档案",
+    zh: "スケッチアーカイブ",
     year: "2023 — 2026",
     medium: "SKETCH / STUDY / WIP",
     state: "ARCHIVED",
@@ -98,10 +98,11 @@ const FANART = [
    ------------------------------------------------------------ */
 const ABOUT = {
   avatar: "",
-  bioZh:
-    "插画专业学生，主攻概念设计，热衷于角色设计与叙事驱动的游戏视觉叙事。曾在 Garena 参与长线运营手游的概念美术工作，擅长风格适配、迭代式视觉开发与跨团队协作。",
-  bioEn:
+  // 主简介（英文，页面主要内容）
+  bio:
     "Illustration student with a concentration in Concept Design, passionate about character design and narrative-driven visual storytelling for games. Experienced in concept art production for live-service mobile titles at Garena, with strengths in style adaptation, iterative visual development, and cross-team collaboration.",
+  // 简介下方的日文装饰行
+  bioDeco: "キャラクターデザイン ✳ ビジュアルストーリーテリング ✳ コンセプトアート",
 
   // 经历：period / company / role / tag(小徽章) / note(一行简述，可留空)
   experience: [

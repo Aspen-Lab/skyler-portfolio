@@ -302,7 +302,7 @@ a, button { cursor: crosshair; }
   letter-spacing: 0.005em;
 }
 .p-title .p-zh {
-  font-family: var(--zh); font-weight: 300;
+  font-family: var(--jp); font-weight: 300;
   font-size: 0.38em; letter-spacing: 0.3em;
   color: var(--ink-dim); margin-left: 12px;
   vertical-align: 0.35em;
@@ -547,14 +547,15 @@ a, button { cursor: crosshair; }
 .hand.h3 { animation: spin 20s linear infinite; }
 
 .about-body { max-width: 720px; }
-.bio-zh {
-  font-family: var(--zh); font-weight: 500;
-  font-size: clamp(17px, 2.4vw, 23px);
-  line-height: 1.9; letter-spacing: 0.04em;
+.bio-main {
+  font-family: var(--disp); font-weight: 500;
+  font-size: clamp(16px, 2.1vw, 21px);
+  line-height: 1.75; letter-spacing: 0.01em;
 }
-.bio-en {
-  margin-top: 16px;
-  font-size: 12.5px; line-height: 1.9; letter-spacing: 0.04em;
+.bio-deco {
+  margin-top: 14px;
+  font-family: var(--jp); font-weight: 300;
+  font-size: 11px; line-height: 1.9; letter-spacing: 0.28em;
   color: var(--ink-dim);
 }
 .ab-h {

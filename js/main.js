@@ -528,16 +528,16 @@
 
   /* ---------- about ---------- */
   function renderAbout() {
-    const bz = $("#bioZh"), be = $("#bioEn");
-    if (bz) bz.textContent = ABOUT.bioZh;
-    if (be) be.textContent = ABOUT.bioEn;
+    const bm = $("#bioMain"), bd = $("#bioDeco");
+    if (bm) bm.textContent = ABOUT.bio;
+    if (bd) bd.innerHTML = esc(ABOUT.bioDeco).replace(/✳︎?/g, AST);
 
     const av = $("#avatarFrame");
     if (av) {
       const hasAva = ABOUT.avatar && String(ABOUT.avatar).trim() !== "";
       const media = hasAva
-        ? `<img src="${esc(ABOUT.avatar)}" alt="Skyler 的头像" />`
-        : `<div class="ph-ava">NO IMAGE<br>待上传 ${AST} ${esc(SITE.name)}</div>`;
+        ? `<img src="${esc(ABOUT.avatar)}" alt="Portrait of Skyler" />`
+        : `<div class="ph-ava">NO IMAGE<br>AWAITING UPLOAD ${AST} ${esc(SITE.name)}</div>`;
       av.insertAdjacentHTML("afterbegin", media);
     }
 
