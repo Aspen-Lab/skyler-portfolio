@@ -74,14 +74,115 @@
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   if (!REDUCED) {
-    const lat = $("#statLatency"), sig = $("#statSignal"), loss = $("#pillLoss");
+    const sig = $("#statSignal");
     const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
     setInterval(() => {
-      if (lat) lat.textContent = `${ri(38, 61)}ms`;
+      const loss = document.getElementById("pillLoss"); // pill 形态切换会重建节点，每次都重新查
       if (loss) loss.textContent = `PACKET LOSS: 0.${ri(1, 6)}%`;
       if (sig && Math.random() < 0.15) sig.textContent = sig.textContent === "STRONG" ? "NOMINAL" : "STRONG";
     }, 1200);
   }
+
+  /* ---------- pill 仪表盘：点击切换形态（内容 = 简历事实） ---------- */
+  (() => {
+    const pillBtn = $("#pillBtn");
+    const stage = $("#pillStage");
+    if (!pillBtn || !stage) return;
+
+    // SMIL 旋转（不依赖 CSS transform-origin）
+    const rot = (cx, cy, dur, rev) => REDUCED ? "" :
+      `<animateTransform attributeName="transform" type="rotate" from="${rev ? 360 : 0} ${cx} ${cy}" to="${rev ? 0 : 360} ${cx} ${cy}" dur="${dur}s" repeatCount="indefinite"/>`;
+    const tap = (i) =>
+      `<text x="702" y="128" text-anchor="end" class="svgmono svgdim">TAP ⌁ 0${i}/04</text>`;
+
+    const PILL_STATES = [
+      { // 01 — IDENT / 在读状态（参考图1布局）
+        aria: "SCAD 插画专业 · Concept Design 在读 2023–2026",
+        svg: `
+          <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)"/>
+          <text x="180" y="53" class="svgmono">NODE</text>
+          <line x1="248" y1="48" x2="296" y2="48" class="ln flow" marker-end="url(#arr)"/>
+          <text x="308" y="53" class="svgmono">SCAD</text>
+          <line x1="372" y1="48" x2="600" y2="48" class="ln"/>
+          <circle cx="608" cy="48" r="4" class="ln"/>
+          <text x="64" y="92" class="svgbig">ONLINE</text>
+          <circle cx="248" cy="80" r="4" class="fillw"/>
+          <line x1="260" y1="80" x2="400" y2="80" class="ln"/>
+          <text x="412" y="86" class="svgjp">コンセプトアート</text>
+          <line x1="572" y1="80" x2="612" y2="80" class="ln"/>
+          <circle cx="660" cy="80" r="28" class="ln dotted">${rot(660, 80, 9)}</circle>
+          <line x1="600" y1="116" x2="392" y2="116" class="ln flow" marker-end="url(#arr)"/>
+          <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>
+          ${tap(1)}`,
+      },
+      { // 02 — GARENA 实习（参考图2 ECHO 布局）
+        aria: "Garena 概念美术实习：Free Fire 与 Arena of Valor，2025 年 7–9 月",
+        svg: `
+          <g class="fillw">
+            <rect x="86" y="36" width="8" height="4"/><rect x="80" y="44" width="20" height="4"/>
+            <rect x="74" y="52" width="32" height="4"/><rect x="66" y="60" width="48" height="4"/>
+            <rect x="58" y="68" width="64" height="4"/>
+          </g>
+          <text x="58" y="110" class="svgbig">GARENA</text>
+          <text x="246" y="52" class="svgmono">CONCEPT ARTIST — INTERNSHIP</text>
+          <text x="246" y="84" class="svgmono">TARGET: FREE FIRE · ARENA OF VALOR</text>
+          <text x="246" y="112" class="svgmono svgdim">STATE: SHIPPED — JUL→SEP 2025</text>
+          <circle cx="660" cy="52" r="15" class="ln"/>
+          <line x1="645" y1="52" x2="675" y2="52" class="ln"/>
+          <line x1="660" y1="37" x2="660" y2="67" class="ln"/>
+          <circle cx="660" cy="96" r="15" class="ln dotted">${rot(660, 96, 7, true)}</circle>
+          ${tap(2)}`,
+      },
+      { // 03 — Sky 光·遇 官方插画（参考图3 STATIC 布局）
+        aria: "thatgamecompany《Sky 光·遇》六周年官方插画，2025 年 6 月",
+        svg: `
+          <circle cx="76" cy="46" r="14" class="ln"/><text x="76" y="51" text-anchor="middle" class="svgmono">T</text>
+          <circle cx="110" cy="46" r="14" class="ln"/><text x="110" y="51" text-anchor="middle" class="svgmono">G</text>
+          <circle cx="144" cy="46" r="14" class="ln"/><text x="144" y="51" text-anchor="middle" class="svgmono">C</text>
+          <text x="58" y="104" class="svgbig">SKY</text>
+          <text x="58" y="124" class="svgmono svgdim">CHILDREN OF THE LIGHT</text>
+          <text x="246" y="52" class="svgmono">OFFICIAL ILLUSTRATOR</text>
+          <text x="246" y="84" class="svgmono">TARGET: 6TH ANNIVERSARY ART</text>
+          <text x="246" y="112" class="svgmono svgdim">STATE: PUBLISHED — JUN 2025</text>
+          <circle cx="660" cy="75" r="24" class="ln"/>
+          <g><line x1="660" y1="75" x2="660" y2="56" class="ln"/>${rot(660, 75, 12)}</g>
+          ${tap(3)}`,
+      },
+      { // 04 — 奖项（参考图4 SECTOR 布局）
+        aria: "Beyond the Dot 比赛一等奖×1 二等奖×2；SCAD 奖学金 Top 3% GPA",
+        svg: `
+          <rect x="58" y="40" width="70" height="70" rx="10" class="ln"/>
+          <circle cx="80" cy="62" r="3.5" class="fillw"/><circle cx="106" cy="58" r="3.5" class="ln"/>
+          <circle cx="93" cy="76" r="3.5" class="fillw"/><circle cx="78" cy="92" r="3.5" class="ln"/>
+          <circle cx="106" cy="90" r="3.5" class="fillw"/>
+          <rect x="146" y="40" width="70" height="70" rx="18" class="ln"/>
+          <path d="M181 53 L188 68 L203 75 L188 82 L181 97 L174 82 L159 75 L174 68 Z" class="fillw"/>
+          <text x="246" y="50" class="svgmono">SECTOR A — BEYOND THE DOT</text>
+          <text x="246" y="70" class="svgmono svgdim">1ST ×1 · 2ND ×2 — SCAD 2024</text>
+          <text x="246" y="98" class="svgmono">SECTOR B — MERIT SCHOLARSHIP</text>
+          <text x="246" y="118" class="svgmono svgdim">TOP 3% GPA · 8 SEMESTERS</text>
+          <circle cx="660" cy="75" r="22" class="ln dotted">${rot(660, 75, 9)}</circle>
+          ${tap(4)}`,
+      },
+    ];
+
+    let pillIdx = 0;
+    function setPillState(i, instant) {
+      pillIdx = (i + PILL_STATES.length) % PILL_STATES.length;
+      const st = PILL_STATES[pillIdx];
+      const apply = () => {
+        stage.innerHTML = st.svg;
+        pillBtn.setAttribute("aria-label", `${st.aria} — 点击切换 (${pillIdx + 1}/4)`);
+      };
+      if (instant || REDUCED) { apply(); return; }
+      const svg = $(".pill", pillBtn);
+      svg.classList.add("glitch");
+      setTimeout(apply, 110);
+      setTimeout(() => svg.classList.remove("glitch"), 280);
+    }
+    pillBtn.addEventListener("click", () => setPillState(pillIdx + 1));
+    setPillState(0, true);
+  })();
 
   /* ---------- text scramble ---------- */
   const GLYPHS = "ABCDEFGHIKLMNOPRSTUVXYZ0123456789*#/<>+=";

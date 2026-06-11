@@ -66,40 +66,39 @@
           <span class="tag-line" id="tagZh">潘 &#x2733;&#xFE0E; EST. 2026</span>
         </div>
 
-        <!-- connector pill diagram (参考图1) -->
-        <div class="pill-wrap" aria-hidden="true">
-          <svg class="pill" viewBox="0 0 760 150" fill="none" preserveAspectRatio="xMidYMid meet">
-            <rect x="6" y="10" width="748" height="130" rx="65" class="ln" />
-            <!-- top row : NODE -> B43 -->
-            <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)" />
-            <text x="180" y="53" class="svgmono">NODE</text>
-            <line x1="248" y1="48" x2="296" y2="48" class="ln flow" marker-end="url(#arr)" />
-            <text x="308" y="53" class="svgmono">B43</text>
-            <line x1="360" y1="48" x2="600" y2="48" class="ln" />
-            <circle cx="608" cy="48" r="4" class="ln" />
-            <!-- middle row : ONLINE ----- オンライン -->
-            <text x="64" y="92" class="svgbig">ONLINE</text>
-            <circle cx="248" cy="80" r="4" class="fillw" />
-            <line x1="260" y1="80" x2="420" y2="80" class="ln" />
-            <text x="432" y="86" class="svgjp">オンライン</text>
-            <line x1="540" y1="80" x2="612" y2="80" class="ln" />
-            <circle cx="660" cy="80" r="28" class="ln dotted rotor" />
-            <!-- bottom row : packet loss -->
-            <line x1="600" y1="116" x2="392" y2="116" class="ln flow" marker-end="url(#arr)" />
-            <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>
+        <!-- connector pill diagram (参考图1) — 点击切换形态，内容来自简历 -->
+        <button class="pill-wrap" id="pillBtn" type="button" aria-label="个人信息仪表盘 — 点击切换形态">
+          <svg class="pill" viewBox="0 0 760 150" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
               <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L10 5 L0 10 z" class="fillw" stroke="none" />
               </marker>
             </defs>
+            <rect x="6" y="10" width="748" height="130" rx="65" class="ln" />
+            <g id="pillStage">
+              <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)" />
+              <text x="180" y="53" class="svgmono">NODE</text>
+              <line x1="248" y1="48" x2="296" y2="48" class="ln flow" marker-end="url(#arr)" />
+              <text x="308" y="53" class="svgmono">SCAD</text>
+              <line x1="372" y1="48" x2="600" y2="48" class="ln" />
+              <circle cx="608" cy="48" r="4" class="ln" />
+              <text x="64" y="92" class="svgbig">ONLINE</text>
+              <circle cx="248" cy="80" r="4" class="fillw" />
+              <line x1="260" y1="80" x2="400" y2="80" class="ln" />
+              <text x="412" y="86" class="svgjp">コンセプトアート</text>
+              <line x1="572" y1="80" x2="612" y2="80" class="ln" />
+              <circle cx="660" cy="80" r="28" class="ln dotted rotor" />
+              <line x1="600" y1="116" x2="392" y2="116" class="ln flow" marker-end="url(#arr)" />
+              <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>
+            </g>
           </svg>
-        </div>
+        </button>
 
         <div class="hero-stats mono" aria-hidden="true">
           <span>FILES: <em id="statFiles">00</em></span>
           <span>PROJECTS: <em id="statProjects">00</em></span>
+          <span>ROLE: <em>CONCEPT ARTIST</em></span>
           <span>SIGNAL: <em id="statSignal">STRONG</em></span>
-          <span>LATENCY: <em id="statLatency">44ms</em></span>
         </div>
       </div>
 

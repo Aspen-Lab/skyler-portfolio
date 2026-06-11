@@ -222,6 +222,18 @@ a, button { cursor: crosshair; }
   width: 100%; max-width: 460px;
   justify-self: end; align-self: end;
   margin: 0;
+  /* button reset */
+  appearance: none; background: none; border: none; padding: 0;
+  display: block; text-align: left;
+}
+.pill-wrap:focus-visible { outline: 1px solid var(--acid); outline-offset: 5px; }
+.pill-wrap:hover .ln { stroke: var(--ink); }
+.pill.glitch { animation: pill-glitch 0.28s steps(3) both; }
+@keyframes pill-glitch {
+  0% { opacity: 1; }
+  25% { opacity: 0.2; transform: translateX(2px); }
+  55% { opacity: 0.7; transform: translateX(-2px); }
+  100% { opacity: 1; transform: none; }
 }
 .pill { width: 100%; height: auto; display: block; }
 .pill .ln { stroke: var(--line); stroke-width: 1.5; fill: none; }
@@ -230,6 +242,7 @@ a, button { cursor: crosshair; }
 .pill .svgmono { font-family: var(--mono); font-size: 15px; fill: var(--ink); letter-spacing: 0.08em; }
 .pill .svgbig { font-family: var(--disp); font-weight: 900; font-stretch: 110%; font-size: 38px; fill: var(--ink); letter-spacing: 0.02em; }
 .pill .svgjp { font-family: var(--jp); font-weight: 300; font-size: 15px; fill: var(--ink); letter-spacing: 0.2em; }
+.pill .svgdim { fill: var(--ink-dim); }
 .pill .rotor {
   animation: spin 9s linear infinite;
   transform-origin: 660px 80px;
