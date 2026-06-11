@@ -4,10 +4,12 @@
    ============================================================ */
 
 :root {
+  color-scheme: dark;
   --bg: #070707;
   --bg-2: #0c0c0c;
   --ink: #ededed;
   --ink-dim: #7e7e7e;
+  --ink-soft: #565656; /* 最暗可读层：用于次级文字（--ink-faint 只用于线框） */
   --ink-faint: #2e2e2e;
   /* 全站 monochrome：强调色 = 白 */
   --acid: #ededed;
@@ -35,7 +37,11 @@ body {
   min-height: 100vh;
 }
 
-a, button { cursor: crosshair; }
+a, button, .card.is-link, #lbImg {
+  cursor: crosshair;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 
 .skip-link {
   position: fixed; top: -100%; left: 12px; z-index: 300;
@@ -82,7 +88,10 @@ a, button { cursor: crosshair; }
   background: var(--bg);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.55s cubic-bezier(0.85, 0, 0.15, 1);
+  /* 纯 CSS 保险：JS 挂掉时 5s 后自动隐藏（正常流程 ~2.2s 内已被 JS 移除） */
+  animation: boot-failsafe 0s 5s forwards;
 }
+@keyframes boot-failsafe { to { visibility: hidden; pointer-events: none; } }
 #boot.done { transform: translateY(-101%); }
 #boot.killed { display: none; }
 .boot-inner { font-size: clamp(11px, 1.6vw, 14px); color: var(--ink-dim); }
@@ -357,7 +366,7 @@ a, button { cursor: crosshair; }
   color: var(--ink-dim);
   font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
   padding: 4px 12px; min-height: 24px;
-  transition: all 0.2s;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
 .strip-toggle:hover { border-color: var(--line); color: var(--ink); }
 .strip-toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
@@ -466,7 +475,7 @@ a, button { cursor: crosshair; }
   color: var(--ink-dim);
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
   padding: 6px 16px;
-  transition: all 0.2s;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
 .fbtn { min-height: 36px; }
 .fbtn:hover { border-color: var(--line); color: var(--ink); }
@@ -510,16 +519,21 @@ a, button { cursor: crosshair; }
   font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
   color: var(--ink-dim); text-align: center; line-height: 2;
 }
+/* 满高图层 + translateY：合成器动画，不触发布局 */
 .scanline {
-  position: absolute; left: 0; right: 0; height: 1px;
+  position: absolute; inset: 0;
+  pointer-events: none;
+  animation: scan 3.2s ease-in-out infinite;
+}
+.scanline::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
   background: var(--acid);
   box-shadow: 0 0 12px var(--acid);
   opacity: 0.6;
-  animation: scan 3.2s ease-in-out infinite;
 }
 @keyframes scan {
-  0%, 100% { top: 8%; }
-  50% { top: 92%; }
+  0%, 100% { transform: translateY(8%); }
+  50% { transform: translateY(92%); }
 }
 .spec { margin-top: 16px; font-size: 11px; letter-spacing: 0.1em; }
 .spec > div {
@@ -610,7 +624,7 @@ a, button { cursor: crosshair; }
   font-size: 11px; letter-spacing: 0.12em;
   padding: 9px 18px;
   position: relative;
-  transition: all 0.2s;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
 .links a::after { content: " ↗"; color: var(--ink-faint); transition: color 0.2s; }
 .links a:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -655,10 +669,11 @@ footer .ast { color: var(--ink-dim); }
   border: 1px solid var(--line-dim);
   color: var(--ink);
   font-size: 13px; padding: 10px 14px;
-  transition: all 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 .lb-close { position: absolute; top: 18px; right: 18px; font-size: 11px; letter-spacing: 0.1em; }
-.lb-close:hover, .lb-prev:hover, .lb-next:hover { background: var(--ink); color: var(--bg); }
+.lb-close:hover, .lb-prev:hover, .lb-next:hover,
+.lb-close:active, .lb-prev:active, .lb-next:active { background: var(--ink); color: var(--bg); }
 .lb-prev:focus-visible, .lb-next:focus-visible, .lb-close:focus-visible { outline: 1px solid var(--acid); }
 
 /* ---------- responsive ---------- */
