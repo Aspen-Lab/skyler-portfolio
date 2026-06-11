@@ -4,15 +4,15 @@
    ============================================================ */
 
 :root {
-  --bg: #060807;
-  --bg-2: #0a0d0b;
-  --ink: #edefe8;
-  --ink-dim: #79847c;
-  --ink-faint: #2c332e;
-  --acid: #b7ff2e;
-  --line: rgba(237, 239, 232, 0.85);
-  --line-dim: rgba(237, 239, 232, 0.22);
-  --glow-green: rgba(46, 92, 51, 0.35);
+  --bg: #070707;
+  --bg-2: #0c0c0c;
+  --ink: #ededed;
+  --ink-dim: #7e7e7e;
+  --ink-faint: #2e2e2e;
+  /* 全站 monochrome：强调色 = 白 */
+  --acid: #ededed;
+  --line: rgba(237, 237, 237, 0.85);
+  --line-dim: rgba(237, 237, 237, 0.22);
   --mono: "IBM Plex Mono", "Courier New", monospace;
   --disp: "Archivo", "Helvetica Neue", sans-serif;
   --jp: "Noto Sans JP", sans-serif;
@@ -35,15 +35,6 @@ body {
   min-height: 100vh;
 }
 
-/* 夜路绿光固定在视口上，长页面滚动时也保持参考片的氛围 */
-body::before {
-  content: ""; position: fixed; inset: 0;
-  z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(ellipse 40% 60% at 0% 40%, var(--glow-green), transparent 70%),
-    radial-gradient(ellipse 35% 55% at 100% 65%, rgba(40, 84, 46, 0.28), transparent 70%);
-}
-
 a, button { cursor: crosshair; }
 
 .skip-link {
@@ -64,18 +55,20 @@ a, button { cursor: crosshair; }
 
 /* ---------- atmosphere ---------- */
 .grain {
-  position: fixed; inset: -50%;
+  position: fixed; inset: -140px;
   pointer-events: none; z-index: 80;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.05;
-  animation: grain-shift 0.9s steps(4) infinite;
+  /* 140px 原生尺寸平铺 + 去色：细颗粒胶片噪点，不会被拉伸成粗块 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: 0.055;
+  animation: grain-shift 0.8s steps(4) infinite;
 }
 @keyframes grain-shift {
   0% { transform: translate(0, 0); }
-  25% { transform: translate(-2%, 1%); }
-  50% { transform: translate(1%, -2%); }
-  75% { transform: translate(-1%, 2%); }
-  100% { transform: translate(2%, 1%); }
+  25% { transform: translate(-35px, 18px); }
+  50% { transform: translate(20px, -30px); }
+  75% { transform: translate(-18px, 32px); }
+  100% { transform: translate(34px, 15px); }
 }
 .vignette {
   position: fixed; inset: 0;
@@ -111,7 +104,7 @@ a, button { cursor: crosshair; }
   height: var(--bar-h);
   display: flex; align-items: center; gap: clamp(10px, 3vw, 40px);
   padding: 0 var(--pad);
-  background: rgba(6, 8, 7, 0.82);
+  background: rgba(7, 7, 7, 0.82);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line-dim);
@@ -471,7 +464,7 @@ a, button { cursor: crosshair; }
   border: 1px solid var(--line-dim);
   padding: 18px;
   position: sticky; top: calc(var(--bar-h) + 20px);
-  background: rgba(10, 13, 11, 0.5);
+  background: rgba(12, 12, 12, 0.5);
 }
 .avatar-frame {
   position: relative;
@@ -600,7 +593,7 @@ footer .ast { color: var(--ink-dim); }
 /* ---------- lightbox ---------- */
 #lightbox {
   position: fixed; inset: 0; z-index: 150;
-  background: rgba(4, 5, 4, 0.93);
+  background: rgba(5, 5, 5, 0.93);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center; gap: 18px;
