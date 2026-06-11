@@ -94,12 +94,10 @@
     // SMIL 旋转（不依赖 CSS transform-origin）
     const rot = (cx, cy, dur, rev) => REDUCED ? "" :
       `<animateTransform attributeName="transform" type="rotate" from="${rev ? 360 : 0} ${cx} ${cy}" to="${rev ? 0 : 360} ${cx} ${cy}" dur="${dur}s" repeatCount="indefinite"/>`;
-    const tap = (i) =>
-      `<text x="702" y="128" text-anchor="end" class="svgmono svgdim">TAP ⌁ 0${i}/04</text>`;
 
     const PILL_STATES = [
       { // 01 — IDENT / 在读状态（参考图1布局）
-        aria: "SCAD 插画专业 · Concept Design 在读 2023–2026",
+        aria: "SCAD Illustration, Concept Design concentration, 2023–2026",
         svg: `
           <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)"/>
           <text x="180" y="53" class="svgmono">NODE</text>
@@ -114,11 +112,10 @@
           <line x1="572" y1="80" x2="612" y2="80" class="ln"/>
           <circle cx="660" cy="80" r="28" class="ln dotted">${rot(660, 80, 9)}</circle>
           <line x1="600" y1="116" x2="392" y2="116" class="ln flow" marker-end="url(#arr)"/>
-          <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>
-          ${tap(1)}`,
+          <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>`,
       },
       { // 02 — GARENA 实习（参考图2 ECHO 布局）
-        aria: "Garena 概念美术实习：Free Fire 与 Arena of Valor，2025 年 7–9 月",
+        aria: "Garena concept art internship: Free Fire and Arena of Valor, Jul–Sep 2025",
         svg: `
           <g class="fillw">
             <rect x="86" y="36" width="8" height="4"/><rect x="80" y="44" width="20" height="4"/>
@@ -132,11 +129,10 @@
           <circle cx="660" cy="52" r="15" class="ln"/>
           <line x1="645" y1="52" x2="675" y2="52" class="ln"/>
           <line x1="660" y1="37" x2="660" y2="67" class="ln"/>
-          <circle cx="660" cy="96" r="15" class="ln dotted">${rot(660, 96, 7, true)}</circle>
-          ${tap(2)}`,
+          <circle cx="660" cy="96" r="15" class="ln dotted">${rot(660, 96, 7, true)}</circle>`,
       },
       { // 03 — Sky 光·遇 官方插画（参考图3 STATIC 布局）
-        aria: "thatgamecompany《Sky 光·遇》六周年官方插画，2025 年 6 月",
+        aria: "thatgamecompany Sky: Children of the Light 6th-anniversary official illustration, Jun 2025",
         svg: `
           <circle cx="76" cy="46" r="14" class="ln"/><text x="76" y="51" text-anchor="middle" class="svgmono">T</text>
           <circle cx="110" cy="46" r="14" class="ln"/><text x="110" y="51" text-anchor="middle" class="svgmono">G</text>
@@ -147,11 +143,10 @@
           <text x="246" y="84" class="svgmono">TARGET: 6TH ANNIVERSARY ART</text>
           <text x="246" y="112" class="svgmono svgdim">STATE: PUBLISHED — JUN 2025</text>
           <circle cx="660" cy="75" r="24" class="ln"/>
-          <g><line x1="660" y1="75" x2="660" y2="56" class="ln"/>${rot(660, 75, 12)}</g>
-          ${tap(3)}`,
+          <g><line x1="660" y1="75" x2="660" y2="56" class="ln"/>${rot(660, 75, 12)}</g>`,
       },
       { // 04 — 奖项（参考图4 SECTOR 布局）
-        aria: "Beyond the Dot 比赛一等奖×1 二等奖×2；SCAD 奖学金 Top 3% GPA",
+        aria: "Beyond the Dot: one 1st prize, two 2nd prizes; SCAD merit scholarship, top 3% GPA",
         svg: `
           <rect x="58" y="40" width="70" height="70" rx="10" class="ln"/>
           <circle cx="80" cy="62" r="3.5" class="fillw"/><circle cx="106" cy="58" r="3.5" class="ln"/>
@@ -163,18 +158,22 @@
           <text x="246" y="70" class="svgmono svgdim">1ST ×1 · 2ND ×2 — SCAD 2024</text>
           <text x="246" y="98" class="svgmono">SECTOR B — MERIT SCHOLARSHIP</text>
           <text x="246" y="118" class="svgmono svgdim">TOP 3% GPA · 8 SEMESTERS</text>
-          <circle cx="660" cy="75" r="22" class="ln dotted">${rot(660, 75, 9)}</circle>
-          ${tap(4)}`,
+          <circle cx="660" cy="75" r="22" class="ln dotted">${rot(660, 75, 9)}</circle>`,
       },
     ];
 
     let pillIdx = 0;
+    const pillHint = $("#pillHint");
+    const pillLive = $("#pillLive");
     function setPillState(i, instant) {
       pillIdx = (i + PILL_STATES.length) % PILL_STATES.length;
       const st = PILL_STATES[pillIdx];
       const apply = () => {
         stage.innerHTML = st.svg;
-        pillBtn.setAttribute("aria-label", `${st.aria} — 点击切换 (${pillIdx + 1}/4)`);
+        pillBtn.setAttribute("aria-label", `${st.aria} — click to cycle (${pillIdx + 1}/4)`);
+        if (pillHint) pillHint.textContent = `TAP · 0${pillIdx + 1}/04`;
+        // aria-label 变更 VoiceOver 不播报，用 live region 主动播
+        if (pillLive && !instant) pillLive.textContent = `${st.aria} (${pillIdx + 1}/4)`;
       };
       if (instant || REDUCED) { apply(); return; }
       const svg = $(".pill", pillBtn);

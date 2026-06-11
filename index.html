@@ -73,7 +73,9 @@
         </div>
 
         <!-- connector pill diagram (参考图1) — 点击切换形态，内容来自简历 -->
-        <button class="pill-wrap" id="pillBtn" type="button" aria-label="个人信息仪表盘 — 点击切换形态">
+        <div class="pill-box">
+          <div class="pill-scroll">
+            <button class="pill-wrap" id="pillBtn" type="button" aria-label="Resume dashboard — click to cycle">
           <svg class="pill" viewBox="0 0 760 150" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
               <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -98,7 +100,11 @@
               <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>
             </g>
           </svg>
-        </button>
+            </button>
+          </div>
+          <span class="pill-hint mono" id="pillHint" aria-hidden="true">TAP &middot; 01/04</span>
+          <span class="sr-only" id="pillLive" aria-live="polite"></span>
+        </div>
 
         <div class="hero-stats mono" aria-hidden="true">
           <span>FILES: <em id="statFiles">00</em></span>

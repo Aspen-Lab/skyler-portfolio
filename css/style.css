@@ -58,6 +58,11 @@ a, button, .card.is-link, #lbImg {
 .mono { font-family: var(--mono); }
 .jp { font-family: var(--jp); font-weight: 300; }
 .ok { color: var(--acid); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* ---------- atmosphere ---------- */
 .grain {
@@ -181,7 +186,7 @@ a, button, .card.is-link, #lbImg {
   padding: clamp(20px, 3.5vh, 36px) 0 16px;
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 460px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 520px);
   grid-template-areas:
     "readout pill"
     "title   pill"
@@ -231,14 +236,24 @@ a, button, .card.is-link, #lbImg {
   width: 12px; height: 1px; background: var(--ink-dim);
 }
 
-.pill-wrap {
+.pill-box {
   grid-area: pill;
-  width: 100%; max-width: 460px;
+  width: 100%; max-width: 520px;
   justify-self: end; align-self: end;
+}
+.pill-scroll { width: 100%; }
+.pill-wrap {
+  width: 100%;
   margin: 0;
   /* button reset */
   appearance: none; background: none; border: none; padding: 0;
   display: block; text-align: left;
+}
+.pill-hint {
+  display: block; text-align: right;
+  margin-top: 6px;
+  font-size: 10px; letter-spacing: 0.16em;
+  color: var(--ink-dim);
 }
 .pill-wrap:focus-visible { outline: 1px solid var(--acid); outline-offset: 5px; }
 .pill-wrap:hover .ln { stroke: var(--ink); }
@@ -253,9 +268,9 @@ a, button, .card.is-link, #lbImg {
 .pill .ln { stroke: var(--line); stroke-width: 1.5; fill: none; }
 .pill .fillw { fill: var(--line); }
 .pill .dotted { stroke-dasharray: 2 7; }
-.pill .svgmono { font-family: var(--mono); font-size: 15px; fill: var(--ink); letter-spacing: 0.08em; }
+.pill .svgmono { font-family: var(--mono); font-size: 17px; fill: var(--ink); letter-spacing: 0.08em; }
 .pill .svgbig { font-family: var(--disp); font-weight: 900; font-stretch: 110%; font-size: 38px; fill: var(--ink); letter-spacing: 0.02em; }
-.pill .svgjp { font-family: var(--jp); font-weight: 300; font-size: 15px; fill: var(--ink); letter-spacing: 0.2em; }
+.pill .svgjp { font-family: var(--jp); font-weight: 300; font-size: 17px; fill: var(--ink); letter-spacing: 0.2em; }
 .pill .svgdim { fill: var(--ink-dim); }
 .pill .rotor {
   animation: spin 9s linear infinite;
@@ -728,7 +743,8 @@ footer .ast { color: var(--ink-dim); }
     grid-template-columns: 1fr;
     grid-template-areas: "readout" "title" "tags" "pill" "stats";
   }
-  .pill-wrap { justify-self: start; margin-top: 16px; }
+  .pill-box { justify-self: start; margin-top: 16px; }
+  .pill-hint { text-align: left; }
   .hero-stats { justify-self: start; justify-content: flex-start; }
   .about-grid { grid-template-columns: minmax(0, 1fr); }
   .about-card { position: static; max-width: min(420px, 100%); }
@@ -753,9 +769,14 @@ footer .ast { color: var(--ink-dim); }
   .p-title .p-zh { display: block; margin: 6px 0 0; }
   .avatar-frame { max-width: 240px; margin-inline: auto; }
   .clocks { display: none; }
-  /* pill 图横向滚动而不是缩成糊：保持文字可读 */
-  .pill-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .pill-wrap::-webkit-scrollbar { display: none; }
+  /* pill 图横向滚动而不是缩成糊：保持文字可读。滚动容器在按钮外层 +
+     右缘渐隐提示还有内容可滑 */
+  .pill-scroll {
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  }
+  .pill-scroll::-webkit-scrollbar { display: none; }
   .pill { min-width: 560px; }
   /* 灯箱：prev/next 换行到图片下方，保持可点 */
   #lightbox { flex-wrap: wrap; align-content: center; row-gap: 12px; }
