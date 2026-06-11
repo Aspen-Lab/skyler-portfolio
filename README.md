@@ -1,4 +1,4 @@
-# SKYLER ✳ SECAL72 — VISUAL ARCHIVE
+# SKYLER ✳ VISUAL ARCHIVE
 
 Skyler 的个人作品集网站。黑底 · 文字与线 · FUI/HUD 风格。
 

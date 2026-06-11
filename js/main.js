@@ -1,5 +1,5 @@
 /* ============================================================
-   SECAL72 — main.js
+   SKYLER — main.js
    渲染逻辑：一般不需要改这里，改 data.js 就够了。
    ============================================================ */
 (() => {
@@ -20,12 +20,12 @@
   const boot = $("#boot");
   const killBoot = () => boot && boot.classList.add("killed");
   if (boot) {
-    if (REDUCED || sessionStorage.getItem("secal72-booted")) {
+    if (REDUCED || sessionStorage.getItem("skyler-booted")) {
       killBoot();
     } else {
       const dismiss = () => {
         boot.classList.add("done");
-        sessionStorage.setItem("secal72-booted", "1");
+        sessionStorage.setItem("skyler-booted", "1");
         setTimeout(killBoot, 650);
       };
       setTimeout(dismiss, 1500);
@@ -251,7 +251,7 @@
   function renderTicker() {
     const t = $("#tickerTrack");
     if (!t) return;
-    const words = [SITE.tagline, "文字与線の融合", SITE.est, `${SITE.name} = ${SITE.alias}`, "SIGNAL: STRONG", "アーカイブ更新中"];
+    const words = [SITE.tagline, "文字与線の融合", SITE.est, SITE.name, "SIGNAL: STRONG", "アーカイブ更新中"];
     const seq = words.map((w) => `<span><span class="ast">✳</span> ${esc(w)}</span>`).join("");
     t.innerHTML = seq + seq; // 两份 → translateX(-50%) 无缝
   }
@@ -302,7 +302,7 @@
       const hasAva = ABOUT.avatar && String(ABOUT.avatar).trim() !== "";
       const media = hasAva
         ? `<img src="${esc(ABOUT.avatar)}" alt="Skyler 的头像" />`
-        : `<div class="ph-ava">NO IMAGE<br>待上传 ✳ SECAL72</div>`;
+        : `<div class="ph-ava">NO IMAGE<br>待上传 ✳ SKYLER</div>`;
       av.insertAdjacentHTML("afterbegin", media);
     }
 

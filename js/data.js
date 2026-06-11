@@ -1,5 +1,5 @@
 /* ============================================================
-   SECAL72 — 站点数据
+   SKYLER — 站点数据
    ✳ Skyler 只需要改这个文件就能更新网站内容。
    ✳ 图片放进 assets/works/ 文件夹，然后把文件名填到 src 里。
    ✳ src 留空 ("") 时会显示好看的占位图，不会报错。
@@ -7,7 +7,7 @@
 
 const SITE = {
   name: "SKYLER",
-  alias: "SECAL72",
+  alias: "SKYLER",
   zhName: "潘",
   tagline: "VISUAL ARCHIVE ✳ ILLUSTRATION ✳ FANART",
   est: "EST. 2026",
