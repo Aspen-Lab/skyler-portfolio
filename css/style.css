@@ -368,7 +368,19 @@ a, button, .card.is-link, #lbImg {
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes marquee-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 .strip:hover .track, .strip:focus-within .track,
-.strip.is-paused .track { animation-play-state: paused; }
+.strip.is-paused .track, .strip.is-offview .track { animation-play-state: paused; }
+
+/* 键盘焦点模式：停掉位移，改为可滚动容器，保证焦点卡片可见 */
+.strip.kb { overflow-x: auto; scrollbar-width: none; }
+.strip.kb::-webkit-scrollbar { display: none; }
+.strip.kb .track { animation: none; }
+
+/* 纯触屏：不跑 marquee，作品条直接手动滑动 */
+@media (hover: none) and (pointer: coarse) {
+  .track { animation: none; }
+  .strip { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .strip::-webkit-scrollbar { display: none; }
+}
 
 .strip-toggle {
   appearance: none; background: none;
@@ -384,7 +396,7 @@ a, button, .card.is-link, #lbImg {
   .strip-toggle { position: relative; }
   .strip-toggle::before { content: ""; position: absolute; inset: -10px; border-radius: 99px; }
 }
-.strip-toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.strip-toggle.is-on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 .strip-toggle:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
 
 /* ---------- cards ---------- */

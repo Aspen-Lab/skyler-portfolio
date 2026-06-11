@@ -6,6 +6,8 @@
   "use strict";
 
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // 纯触屏设备：作品条不跑 marquee，改为手动横向滑动
+  const TOUCH = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
@@ -373,7 +375,7 @@
     return true;
   }
   function setupMarquees() {
-    if (REDUCED) { marqueesDone = true; return; }
+    if (REDUCED || TOUCH) { marqueesDone = true; return; }
     let ok = true;
     $$("#projects .strip").forEach((s) => { if (!fillStrip(s)) ok = false; });
     marqueesDone = ok;
@@ -385,7 +387,12 @@
   let resizeT = 0;
   window.addEventListener("resize", () => {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => { if (!REDUCED && portfolioVisible()) setupMarquees(); }, 250);
+    resizeT = setTimeout(() => {
+      if (REDUCED || TOUCH) return;
+      // 视图隐藏时测不了宽度：标记为脏，等切回 portfolio 再重测
+      if (portfolioVisible()) setupMarquees();
+      else marqueesDone = false;
+    }, 250);
   });
 
   /* ---------- portfolio render ---------- */
@@ -407,8 +414,8 @@
       }).join("");
       galleries[`p-${pi}`] = gallery;
 
-      const pauseBtn = REDUCED ? "" :
-        `<button class="strip-toggle mono" type="button" aria-pressed="false" aria-label="暂停滚动">PAUSE</button>`;
+      const pauseBtn = (REDUCED || TOUCH) ? "" :
+        `<button class="strip-toggle mono" type="button" aria-label="Pause scrolling">PAUSE</button>`;
 
       // 有真实作品的项目放大展示；纯占位的项目压缩，让真作品主导首页
       const hasArt = p.works.some((w) => w.src && String(w.src).trim() !== "");
@@ -433,7 +440,7 @@
       </article>`;
     }).join("");
 
-    // 暂停按钮 + 触屏按住暂停 + 焦点滚动复位
+    // 暂停按钮 + 触屏按住暂停 + 键盘焦点滚动模式
     $$(".project", wrap).forEach((art) => {
       const strip = $(".strip", art);
       const btn = $(".strip-toggle", art);
@@ -442,12 +449,13 @@
       if (btn) {
         btn.addEventListener("click", () => {
           pinned = !pinned;
-          btn.setAttribute("aria-pressed", String(pinned));
+          btn.classList.toggle("is-on", pinned);
           btn.textContent = pinned ? "PLAY" : "PAUSE";
-          btn.setAttribute("aria-label", pinned ? "继续滚动" : "暂停滚动");
+          btn.setAttribute("aria-label", pinned ? "Resume scrolling" : "Pause scrolling");
           strip.classList.toggle("is-paused", pinned);
         });
       }
+      if (TOUCH) return; // 触屏：条本身可滑动，无需按住暂停/焦点复位
       let touchT = 0;
       strip.addEventListener("pointerdown", (e) => {
         if (e.pointerType === "mouse") return;
@@ -461,14 +469,37 @@
       };
       strip.addEventListener("pointerup", release, { passive: true });
       strip.addEventListener("pointercancel", release, { passive: true });
-      strip.addEventListener("focusin", () => { strip.scrollLeft = 0; });
+      // Tab 进入：停掉位移动画、把焦点卡片滚进视野；移出后复位
+      strip.addEventListener("focusin", (e) => {
+        if (!e.target.matches(":focus-visible")) return;
+        strip.classList.add("kb");
+        e.target.scrollIntoView({ block: "nearest", inline: "nearest" });
+      });
+      strip.addEventListener("focusout", (e) => {
+        if (strip.contains(e.relatedTarget)) return;
+        strip.classList.remove("kb");
+        strip.scrollLeft = 0;
+      });
     });
+
+    // 离屏的条暂停动画，省合成开销
+    if (!REDUCED && !TOUCH && "IntersectionObserver" in window) {
+      const stripIO = new IntersectionObserver(
+        (es) => es.forEach((en) => en.target.classList.toggle("is-offview", !en.isIntersecting)),
+        { rootMargin: "60px" }
+      );
+      $$(".strip", wrap).forEach((s) => stripIO.observe(s));
+    }
 
     // 图片加载完成后重新测量（load 不冒泡，用捕获）
     let loadT = 0;
     wrap.addEventListener("load", () => {
       clearTimeout(loadT);
-      loadT = setTimeout(() => { if (!REDUCED && portfolioVisible()) setupMarquees(); }, 200);
+      loadT = setTimeout(() => {
+        if (REDUCED || TOUCH) return;
+        if (portfolioVisible()) setupMarquees();
+        else marqueesDone = false;
+      }, 200);
     }, true);
 
     // stats
@@ -622,7 +653,7 @@
     window.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" });
     const title = $(`#view-${name} [data-scramble]`);
     if (title) scramble(title);
-    if (name === "portfolio" && !REDUCED && !marqueesDone) requestAnimationFrame(setupMarquees);
+    if (name === "portfolio" && !REDUCED && !TOUCH && !marqueesDone) requestAnimationFrame(setupMarquees);
     observeReveals();
   }
   $$(".tab").forEach((t) => t.addEventListener("click", () => switchView(t.dataset.view)));
