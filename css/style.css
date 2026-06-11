@@ -149,6 +149,9 @@ a, button, .card.is-link, #lbImg {
   height: 100%;
   transition: color 0.2s, background 0.2s;
   position: relative;
+  /* tab 是 <a>：填满栏高、去下划线 */
+  display: inline-flex; align-items: center;
+  text-decoration: none;
 }
 .tab:last-child { border-right: 1px solid var(--line-dim); }
 .tab .t-num { color: var(--ink-soft); margin-right: 4px; transition: color 0.2s; }

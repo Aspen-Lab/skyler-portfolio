@@ -53,12 +53,16 @@
       killBoot();
     } else {
       const dismiss = () => {
+        document.removeEventListener("keydown", onKey);
         boot.classList.add("done");
         storeSet("skyler-booted", "1");
         setTimeout(killBoot, 650);
       };
+      // 键盘也能跳过开机动画
+      const onKey = (e) => { if (e.key === "Enter" || e.key === " " || e.key === "Escape") dismiss(); };
       setTimeout(dismiss, 1500);
       boot.addEventListener("click", dismiss, { once: true });
+      document.addEventListener("keydown", onKey);
     }
   }
 
@@ -191,6 +195,8 @@
     if (REDUCED || !el) return;
     if (!el.dataset.original) el.dataset.original = el.textContent;
     const original = el.dataset.original;
+    // SR 始终读完整标题，不读动画中的乱码帧
+    el.setAttribute("aria-label", original);
     if (el._scrTimer) clearInterval(el._scrTimer);
     const len = original.length;
     let frame = 0;
@@ -584,9 +590,28 @@
         lbIndex = gallery.length;
         gallery.push({ src: w.src, cap: `${w.title} / ${w.fandom}` });
       }
-      return cardHTML({ title: `${w.title} ⌁ ${w.fandom}`, src: w.src }, fileId, "fan", lbIndex);
+      return cardHTML({ title: `${w.title} / ${w.fandom}`, src: w.src }, fileId, "fan", lbIndex);
     }).join("");
     galleries["fan"] = gallery;
+    // 筛选结果播报给 SR
+    const st = $("#fanartStatus");
+    if (st) st.textContent = fanFilter === "ALL" ? `All · ${list.length} works` : `${fanFilter} · ${list.length} works`;
+  }
+  // hash 参数 → 筛选状态（#fanart/FANDOM%20B 深链接、前进后退）
+  function syncFanFilter(param) {
+    const valid = new Set(FANART.map((w) => w.fandom));
+    const next = param && valid.has(param) ? param : "ALL";
+    if (next === fanFilter) return;
+    fanFilter = next;
+    const bar = $("#fanartFilters");
+    if (bar) {
+      $$(".fbtn", bar).forEach((x) => {
+        const on = x.dataset.f === fanFilter;
+        x.classList.toggle("is-on", on);
+        x.setAttribute("aria-pressed", String(on));
+      });
+    }
+    renderFanart();
   }
   function renderFanartFilters() {
     const bar = $("#fanartFilters");
@@ -598,6 +623,8 @@
     $$(".fbtn", bar).forEach((b) =>
       b.addEventListener("click", () => {
         fanFilter = b.dataset.f;
+        // 筛选进 URL（replaceState 不污染历史、不触发 hashchange）
+        history.replaceState(null, "", fanFilter === "ALL" ? "#fanart" : "#fanart/" + encodeURIComponent(fanFilter));
         // 原地切换状态，不重建按钮 —— 保住键盘焦点
         $$(".fbtn", bar).forEach((x) => {
           const on = x === b;
@@ -690,6 +717,7 @@
   function switchView(name, push = true) {
     if (!VIEWS.includes(name)) name = "portfolio";
     if (name === currentView) return;
+    const isInitial = currentView === null;
     currentView = name;
     $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === `view-${name}`));
     $$(".tab").forEach((t) => {
@@ -699,15 +727,35 @@
       else t.removeAttribute("aria-current");
     });
     if (push && location.hash.slice(1) !== name) location.hash = name;
-    window.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" });
+    document.title = name === "portfolio"
+      ? `${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`
+      : `${name.toUpperCase()} — ${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`;
+    // 切换后把焦点放到新视图标题：SR 收到上下文，Tab 从头开始
+    if (!isInitial) {
+      const target = $(`#view-${name} [data-scramble]`) || $(`#view-${name} h1`) || $(`#view-${name}`);
+      if (target) {
+        target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      }
+    }
+    window.scrollTo({ top: 0, behavior: REDUCED || isInitial ? "auto" : "smooth" });
     const title = $(`#view-${name} [data-scramble]`);
     if (title) scramble(title);
     if (name === "portfolio" && !REDUCED && !TOUCH && !marqueesDone) requestAnimationFrame(setupMarquees);
     observeReveals();
   }
-  $$(".tab").forEach((t) => t.addEventListener("click", () => switchView(t.dataset.view)));
+  // hash 是唯一路由来源：tab 是真链接，点击只改 hash，这里统一处理。
+  // 非视图 hash（如 skip-link 的 #main）交还浏览器原生锚点行为。
+  function applyHash() {
+    const [view, param] = location.hash.slice(1).split("/");
+    if (!VIEWS.includes(view)) return false;
+    if (lb && !lb.hidden) lbClose(); // 前进/后退时先关灯箱
+    if (view === "fanart") syncFanFilter(param ? decodeURIComponent(param) : "");
+    switchView(view, false);
+    return true;
+  }
   $(".brand").addEventListener("click", (e) => { e.preventDefault(); switchView("portfolio"); });
-  window.addEventListener("hashchange", () => switchView(location.hash.slice(1), false));
+  window.addEventListener("hashchange", applyHash);
 
   /* ---------- scroll reveals ---------- */
   let revealObserver = null;
@@ -733,5 +781,5 @@
   renderFanartFilters();
   renderFanart();
   renderAbout();
-  switchView(location.hash.slice(1) || "portfolio", false);
+  if (!applyHash()) switchView("portfolio", false);
 })();
