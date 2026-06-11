@@ -17,10 +17,12 @@ Skyler 的个人作品集网站。黑底 · 文字与线 · FUI/HUD 风格。
 
 ```js
 works: [
-  { title: "我的新作品", src: "assets/works/p01/new-work.jpg" },
+  { title: "我的新作品", src: "assets/works/p01/new-work.jpg", w: 1914, h: 1074 },
   { title: "还没画完的", src: "" },   // src 留空 = 显示占位图，不会报错
 ],
 ```
+
+- `w` / `h` 填图片的像素宽高（可不填，但填了页面加载时不会跳动）
 
 - 有 `src` 的作品可以点击放大（自动进入查看器，支持 ← → 切换）
 - `src` 留空会显示 HUD 风格占位块，网站不会显得空
@@ -32,10 +34,12 @@ works: [
 ### 3. Fanart
 
 改 `FANART` 数组，`fandom` 字段会自动生成顶部的筛选按钮。
+筛选状态会进网址（如 `#fanart/圈名`），可以直接把筛选后的链接分享给别人。
 
 ### 4. About Me
 
-改 `ABOUT` —— 中英文简介、技能条（0–100）、社交链接、头像（`avatar` 填图片路径）。
+改 `ABOUT` —— 简介、经历 `experience`、学历 `education`、奖项 `awards`、
+能力标签 `skills`、社交链接 `links`、头像（`avatar` 填图片路径）。
 
 ---
 
