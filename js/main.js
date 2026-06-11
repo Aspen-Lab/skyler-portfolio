@@ -440,14 +440,51 @@
       av.insertAdjacentHTML("afterbegin", media);
     }
 
-    const sState = (v) => (v >= 85 ? "PRIMARY" : v >= 65 ? "ACTIVE" : "TRAINING");
+    const xl = $("#xpList");
+    if (xl) {
+      xl.innerHTML = ABOUT.experience.map((x) =>
+        `<div class="xp">
+          <div class="xp-row mono">
+            <span class="xp-period">${esc(x.period)}</span>
+            <span class="xp-co">${esc(x.company)}</span>
+            <span class="xp-role">${esc(x.role)}</span>
+            ${x.tag ? `<span class="chip">${esc(x.tag)}</span>` : ""}
+          </div>
+          ${x.note ? `<p class="xp-note mono">${esc(x.note)}</p>` : ""}
+        </div>`
+      ).join("");
+    }
+
+    const ed = $("#eduBlock");
+    if (ed && ABOUT.education) {
+      const e = ABOUT.education;
+      ed.innerHTML = `<div class="xp">
+        <div class="xp-row mono">
+          <span class="xp-period">${esc(e.period)}</span>
+          <span class="xp-co">${esc(e.school)}</span>
+          <span class="xp-role">${esc(e.degree)}</span>
+        </div>
+      </div>`;
+    }
+
+    const aw = $("#awardList");
+    if (aw) {
+      aw.innerHTML = ABOUT.awards.map((a) =>
+        `<div class="xp">
+          <div class="xp-row mono">
+            <span class="xp-co">${esc(a.title)}</span>
+            <span class="xp-role">${esc(a.sub)}</span>
+            ${a.detail ? `<span class="chip is-active">${esc(a.detail)}</span>` : ""}
+          </div>
+          ${a.note ? `<p class="xp-note mono">${esc(a.note)}</p>` : ""}
+        </div>`
+      ).join("");
+    }
+
     const sl = $("#skillList");
     if (sl) {
-      sl.innerHTML = ABOUT.skills.map(([name, v]) =>
-        `<div class="skill">
-          <div class="s-row"><span>${esc(name)}</span><em>STATE: ${sState(Number(v) || 0)}</em></div>
-          <div class="s-bar"><div class="s-fill" data-v="${Number(v) || 0}"></div></div>
-        </div>`
+      sl.innerHTML = ABOUT.skills.map((s) =>
+        `<span class="skill-chip mono">${esc(s)}</span>`
       ).join("");
     }
 
@@ -461,11 +498,6 @@
         return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`;
       }).join("");
     }
-  }
-  function animateSkills() {
-    $$("#skillList .s-fill").forEach((f, i) => {
-      setTimeout(() => { f.style.width = `${f.dataset.v}%`; }, 80 + i * 90);
-    });
   }
 
   /* ---------- view switching (窄bar切换) ---------- */
@@ -486,7 +518,6 @@
     window.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" });
     const title = $(`#view-${name} [data-scramble]`);
     if (title) scramble(title);
-    if (name === "about") animateSkills();
     if (name === "portfolio" && !REDUCED && !marqueesDone) requestAnimationFrame(setupMarquees);
     observeReveals();
   }

@@ -98,16 +98,75 @@ const FANART = [
    ------------------------------------------------------------ */
 const ABOUT = {
   avatar: "",
-  // ✳ 把下面这段换成你自己的中文自我介绍
   bioZh:
-    "插画师 / 同人创作者，喜欢文字与线条的融合，正在持续记录自己的审美积累。",
+    "插画专业学生，主攻概念设计，热衷于角色设计与叙事驱动的游戏视觉叙事。曾在 Garena 参与长线运营手游的概念美术工作，擅长风格适配、迭代式视觉开发与跨团队协作。",
   bioEn:
-    "Illustrator & fan artist. Collecting aesthetics where type meets line. This archive logs everything in transit.",
+    "Illustration student with a concentration in Concept Design, passionate about character design and narrative-driven visual storytelling for games. Experienced in concept art production for live-service mobile titles at Garena, with strengths in style adaptation, iterative visual development, and cross-team collaboration.",
+
+  // 经历：period / company / role / tag(小徽章) / note(一行简述，可留空)
+  experience: [
+    {
+      period: "JUL — SEP 2025",
+      company: "GARENA",
+      role: "CONCEPT ARTIST",
+      tag: "INTERNSHIP",
+      note: "Concept designs for Free Fire & Arena of Valor. IP collaborations (Detective Conan, Jujutsu Kaisen). AI-assisted ideation pipeline.",
+    },
+    {
+      period: "JUN 2025",
+      company: "SKY: CHILDREN OF THE LIGHT",
+      role: "OFFICIAL ILLUSTRATOR",
+      tag: "TGC 6TH ANNIV.",
+      note: "Official 6th-anniversary event illustration for thatgamecompany, published across anniversary channels.",
+    },
+    {
+      period: "AUG 2021 — FEB 2022",
+      company: "XING ART",
+      role: "TEST ILLUSTRATOR",
+      tag: "AIGC",
+      note: "Core test illustrator in product prototype phase; project secured $300K early-stage funding from Miracle Plus.",
+    },
+    {
+      period: "JUN 2020 — JUL 2021",
+      company: "SCAD",
+      role: "CHARACTER & VISUAL LEAD",
+      tag: "IN-CLASS",
+      note: "Led the character design team on game world-building course projects.",
+    },
+  ],
+
+  education: {
+    period: "2023 — 2026",
+    school: "SAVANNAH COLLEGE OF ART AND DESIGN",
+    degree: "B.F.A. ILLUSTRATION · CONCEPT DESIGN",
+  },
+
+  awards: [
+    {
+      title: "BEYOND THE DOT",
+      sub: "SCAD ILLUSTRATION COMPETITION · 2024",
+      detail: "1ST ×1 · 2ND ×2",
+      note: "First student in SCAD history with three works simultaneously shortlisted & awarded.",
+    },
+    {
+      title: "SCAD MERIT SCHOLARSHIP",
+      sub: "8 SEMESTERS · TOP 3% GPA",
+      detail: "",
+      note: "",
+    },
+  ],
+
+  // 能力标签（FUI 芯片，不打分）
   skills: [
-    ["ILLUSTRATION", 92],
-    ["CHARACTER DESIGN", 86],
-    ["TYPOGRAPHY", 74],
-    ["ANIMATION", 58],
+    "CHARACTER DESIGN",
+    "VISUAL STORYTELLING",
+    "NARRATIVE ILLUSTRATION",
+    "COMPOSITION",
+    "COLOR THEORY",
+    "PROCREATE",
+    "PHOTOSHOP",
+    "CLIP STUDIO PAINT",
+    "WATERCOLOR",
   ],
   // 链接：url 填完整网址（https:// 开头）；E-MAIL 改成 mailto:你的邮箱
   // url 留 "#" 或留空会显示成灰色不可点击的占位；不用的链接整行删掉
