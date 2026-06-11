@@ -305,7 +305,7 @@ a, button, .card.is-link, #lbImg {
   white-space: nowrap;
   font-size: 11px; letter-spacing: 0.22em;
   color: var(--ink-dim);
-  animation: ticker-run 30s linear infinite;
+  animation: ticker-run 60s linear infinite; /* 4 份词条、速度与 2 份 30s 等价 */
   will-change: transform;
 }
 .ticker-track span { padding: 0 18px; }

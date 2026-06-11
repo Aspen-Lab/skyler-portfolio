@@ -27,7 +27,7 @@
 
   /* ---------- site identity (data.js 驱动) ---------- */
   function applySite() {
-    document.title = `${SITE.name} ${AST} VISUAL ARCHIVE`;
+    document.title = `${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`;
     const hero = $("#heroTitle");
     if (hero) {
       const n = String(SITE.heroName || SITE.name).trim();
@@ -42,7 +42,7 @@
     set("footName", SITE.name);
     set("footCopy", SITE.name);
     set("tagId", `ID: ${SITE.alias}`);
-    set("tagZh", `${SITE.zhName} ${AST} ${SITE.est}`);
+    set("tagZh", `${SITE.displayName} ${AST} ${SITE.est}`);
   }
 
   /* ---------- boot overlay ---------- */
@@ -78,6 +78,8 @@
   }
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
+  const logEl = $("#footLog");
+  if (logEl) logEl.textContent = `LOG_${new Date().getFullYear()}.TXT`;
 
   if (!REDUCED) {
     const sig = $("#statSignal");
@@ -246,10 +248,12 @@
   }
 
   /* ---------- card builder ---------- */
-  function cardHTML(work, fileId, lbGroup, lbIndex) {
+  function cardHTML(work, fileId, lbGroup, lbIndex, eager) {
     const hasImg = work.src && String(work.src).trim() !== "";
+    const dims = work.w && work.h ? ` width="${Number(work.w)}" height="${Number(work.h)}"` : "";
+    const load = eager ? ` loading="eager" fetchpriority="high"` : ` loading="lazy"`;
     const inner = hasImg
-      ? `<img src="${esc(work.src)}" alt="${esc(work.title)}" loading="lazy" />`
+      ? `<img src="${esc(work.src)}" alt="${esc(work.title)}"${dims} decoding="async"${load} />`
       : phHTML(lbIndex, fileId);
     const linkAttrs = hasImg
       ? ` tabindex="0" role="button" aria-label="View ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}"`
@@ -465,7 +469,8 @@
           lbIndex = gallery.length;
           gallery.push({ src: w.src, cap: `${w.title} / ${p.title}` });
         }
-        return cardHTML(w, fileId, `p-${pi}`, lbIndex);
+        // 第一个项目的前几张在首屏：立刻加载，其余懒加载
+        return cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0 && wi < 4);
       }).join("");
       galleries[`p-${pi}`] = gallery;
 
@@ -478,7 +483,7 @@
       return `<article class="project reveal${hasArt ? " has-art" : " is-empty"}" id="${esc(p.id)}">
         <header class="project-head">
           <span class="p-index mono">[${esc(p.id)}]</span>
-          <h2 class="p-title">${esc(p.title)}<span class="p-zh">${esc(p.zh)}</span></h2>
+          <h2 class="p-title">${esc(p.title)}<span class="p-zh" lang="ja">${esc(p.ja)}</span></h2>
           <div class="p-meta mono">
             <span>${esc(p.year)}</span><span>${AST}</span>
             <span>${esc(p.medium)}</span><span>${AST}</span>
@@ -568,11 +573,12 @@
   function renderTicker() {
     const t = $("#tickerTrack");
     if (!t) return;
-    const words = [SITE.tagline, "文字と線の融合", SITE.est, SITE.name, "SIGNAL: STRONG", "LOG_2026.TXT — WRITING", "アーカイブ更新中"];
+    // 不与 hero 标签/统计行重复的词条（EST/SIGNAL 已在上方出现过）
+    const words = [SITE.tagline, "文字と線の融合", SITE.name, "TEXT & LINE", `LOG_${new Date().getFullYear()}.TXT — WRITING`, "アーカイブ更新中"];
     const seq = words.map((w) =>
       `<span><span class="ast">${AST}</span> ${esc(w).replace(/✳︎?/g, AST)}</span>`
     ).join("");
-    t.innerHTML = seq + seq; // 两份 → translateX(-50%) 无缝
+    t.innerHTML = seq.repeat(4); // 偶数份 → translateX(-50%) 落在整数倍上无缝；4 份覆盖 ~2.7k 宽屏
   }
 
   /* ---------- fanart ---------- */
@@ -683,6 +689,7 @@
       aw.innerHTML = ABOUT.awards.map((a) =>
         `<div class="xp">
           <div class="xp-row mono">
+            <span class="xp-period">${esc(a.period || "")}</span>
             <span class="xp-co">${esc(a.title)}</span>
             <span class="xp-role">${esc(a.sub)}</span>
             ${a.detail ? `<span class="chip is-active">${esc(a.detail)}</span>` : ""}
@@ -704,7 +711,7 @@
       ll.innerHTML = ABOUT.links.map((l) => {
         const u = String(l.url || "").trim();
         if (!u || u === "#") {
-          return `<span class="dead" title="链接待填写">${esc(l.label)}</span>`;
+          return `<span class="dead" title="Link coming soon">${esc(l.label)}</span>`;
         }
         return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`;
       }).join("");

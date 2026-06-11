@@ -9,7 +9,7 @@ const SITE = {
   name: "SKYLER",
   heroName: "SECAL72", // 主页大标题（留空则用 name）
   alias: "SKYLER",
-  zhName: "ZHIYI PAN", // 署名行（显示在 hero 标签里）
+  displayName: "ZHIYI PAN", // 署名行（显示在 hero 标签里）
   tagline: "VISUAL ARCHIVE ✳ ILLUSTRATION ✳ FANART",
   est: "EST. 2026",
 };
@@ -22,31 +22,32 @@ const PROJECTS = [
   {
     id: "P-01",
     title: "LAST ORDER",
-    zh: "オリジナル企画", // 标题旁的日文装饰小字
+    ja: "オリジナル企画", // 标题旁的日文装饰小字
     year: "SPRING 2026",
     medium: "CHARACTER / PROP / ENVIRONMENT",
     state: "ACTIVE",
     works: [
-      { title: "LAST ORDER — COVER", src: "assets/works/p01/01-cover.jpg" },
-      { title: "CHARACTER LINEUP", src: "assets/works/p01/03-lineup.jpg" },
-      { title: "UNIT Y", src: "assets/works/p01/04-unit-y.jpg" },
-      { title: "UNIT Z", src: "assets/works/p01/05-unit-z.jpg" },
-      { title: "UNIT Z — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg" },
-      { title: "ARCH-72", src: "assets/works/p01/07-arch-72.jpg" },
-      { title: "PROP DESIGN — OVERVIEW", src: "assets/works/p01/08-prop-design.jpg" },
-      { title: "PROP — WHITE ECHO", src: "assets/works/p01/09-white-echo.jpg" },
-      { title: "PROP — ABYSSAL ECHO", src: "assets/works/p01/10-abyssal-echo.jpg" },
-      { title: "PROP 3 — WEAPON", src: "assets/works/p01/11-prop-3.jpg" },
-      { title: "PROP 3 + VFX", src: "assets/works/p01/12-prop-3-vfx.jpg" },
-      { title: "ENVIRONMENT — CONCEPT ART", src: "assets/works/p01/13-env-concept.jpg" },
-      { title: "ENVIRONMENT — BLUEPRINT", src: "assets/works/p01/14-env-blueprint.jpg" },
-      { title: "STYLE FRAME", src: "assets/works/p01/15-style-frame.jpg" },
+      // w/h = 图片像素尺寸：加载前就能算出卡片宽度，避免布局跳动
+      { title: "LAST ORDER — COVER", src: "assets/works/p01/01-cover.jpg", w: 1914, h: 1074 },
+      { title: "CHARACTER LINEUP", src: "assets/works/p01/03-lineup.jpg", w: 1914, h: 1074 },
+      { title: "UNIT Y", src: "assets/works/p01/04-unit-y.jpg", w: 1910, h: 1071 },
+      { title: "UNIT Z", src: "assets/works/p01/05-unit-z.jpg", w: 1910, h: 1071 },
+      { title: "UNIT Z — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg", w: 1914, h: 1074 },
+      { title: "ARCH-72", src: "assets/works/p01/07-arch-72.jpg", w: 1910, h: 1071 },
+      { title: "PROP DESIGN — OVERVIEW", src: "assets/works/p01/08-prop-design.jpg", w: 1914, h: 1074 },
+      { title: "PROP — WHITE ECHO", src: "assets/works/p01/09-white-echo.jpg", w: 1912, h: 1071 },
+      { title: "PROP — ABYSSAL ECHO", src: "assets/works/p01/10-abyssal-echo.jpg", w: 1912, h: 1071 },
+      { title: "PROP 3 — WEAPON", src: "assets/works/p01/11-prop-3.jpg", w: 1914, h: 1074 },
+      { title: "PROP 3 + VFX", src: "assets/works/p01/12-prop-3-vfx.jpg", w: 1914, h: 1074 },
+      { title: "ENVIRONMENT — CONCEPT ART", src: "assets/works/p01/13-env-concept.jpg", w: 1914, h: 1074 },
+      { title: "ENVIRONMENT — BLUEPRINT", src: "assets/works/p01/14-env-blueprint.jpg", w: 1910, h: 1071 },
+      { title: "STYLE FRAME", src: "assets/works/p01/15-style-frame.jpg", w: 1914, h: 1074 },
     ],
   },
   {
     id: "P-02",
     title: "COMMISSIONS",
-    zh: "コミッション記録",
+    ja: "コミッション記録",
     year: "2025 — 2026",
     medium: "CHARACTER / COVER ART",
     state: "ONGOING",
@@ -61,7 +62,7 @@ const PROJECTS = [
   {
     id: "P-03",
     title: "SKETCH ARCHIVE",
-    zh: "スケッチアーカイブ",
+    ja: "スケッチアーカイブ",
     year: "2023 — 2026",
     medium: "SKETCH / STUDY / WIP",
     state: "ARCHIVED",
@@ -144,12 +145,14 @@ const ABOUT = {
 
   awards: [
     {
+      period: "2024",
       title: "BEYOND THE DOT",
-      sub: "SCAD ILLUSTRATION COMPETITION · 2024",
+      sub: "SCAD ILLUSTRATION COMPETITION",
       detail: "1ST ×1 · 2ND ×2",
       note: "First student in SCAD history with three works simultaneously shortlisted & awarded.",
     },
     {
+      period: "2023 — 2026",
       title: "SCAD MERIT SCHOLARSHIP",
       sub: "8 SEMESTERS · TOP 3% GPA",
       detail: "",
