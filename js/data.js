@@ -70,6 +70,8 @@ const PROJECTS = [
 
 /* ------------------------------------------------------------
    FANART — fandom 是作品所属的圈子/标签，会自动生成筛选按钮
+   ✳ 注意：fandom 名字会原样显示在页面上，发布前记得把
+     FANDOM A/B/C 换成真实的圈名。
    ------------------------------------------------------------ */
 const FANART = [
   { title: "FA_001", fandom: "FANDOM A", src: "" },
@@ -87,8 +89,9 @@ const FANART = [
    ------------------------------------------------------------ */
 const ABOUT = {
   avatar: "",
+  // ✳ 把下面这段换成你自己的中文自我介绍
   bioZh:
-    "这里写中文自我介绍。比如：插画师 / 同人创作者，喜欢文字与线条的融合，正在持续记录自己的审美积累。",
+    "插画师 / 同人创作者，喜欢文字与线条的融合，正在持续记录自己的审美积累。",
   bioEn:
     "Illustrator & fan artist. Collecting aesthetics where type meets line. This archive logs everything in transit.",
   skills: [
@@ -97,10 +100,12 @@ const ABOUT = {
     ["TYPOGRAPHY", 74],
     ["ANIMATION", 58],
   ],
+  // 链接：url 填完整网址（https:// 开头）；E-MAIL 改成 mailto:你的邮箱
+  // url 留 "#" 或留空会显示成灰色不可点击的占位；不用的链接整行删掉
   links: [
     { label: "小红书 RED", url: "#" },
     { label: "X / TWITTER", url: "#" },
     { label: "PIXIV", url: "#" },
-    { label: "E-MAIL", url: "mailto:hello@example.com" },
+    { label: "E-MAIL", url: "" },
   ],
 };
