@@ -167,7 +167,17 @@ a, button { cursor: crosshair; }
 .hero {
   padding: clamp(20px, 3.5vh, 36px) 0 16px;
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 460px);
+  grid-template-areas:
+    "readout pill"
+    "title   pill"
+    "tags    stats";
+  column-gap: clamp(24px, 6vw, 90px);
 }
+.hero-readout { grid-area: readout; }
+.hero-title { grid-area: title; align-self: end; }
+.hero-tags { grid-area: tags; align-self: center; }
 .hero-readout {
   display: flex; gap: 22px; flex-wrap: wrap;
   font-size: 11px; letter-spacing: 0.14em;
@@ -180,7 +190,7 @@ a, button { cursor: crosshair; }
   font-family: var(--disp);
   font-weight: 900;
   font-stretch: 125%;
-  font-size: clamp(44px, 8.5vw, 118px);
+  font-size: clamp(44px, 9vw, 128px);
   line-height: 0.88;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -207,7 +217,12 @@ a, button { cursor: crosshair; }
   width: 12px; height: 1px; background: var(--ink-dim);
 }
 
-.pill-wrap { max-width: 520px; margin: clamp(16px, 2.5vh, 26px) 0 0; }
+.pill-wrap {
+  grid-area: pill;
+  width: 100%; max-width: 460px;
+  justify-self: end; align-self: end;
+  margin: 0;
+}
 .pill { width: 100%; height: auto; display: block; }
 .pill .ln { stroke: var(--line); stroke-width: 1.5; fill: none; }
 .pill .fillw { fill: var(--line); }
@@ -223,8 +238,11 @@ a, button { cursor: crosshair; }
 @keyframes dashflow { to { stroke-dashoffset: -22; } }
 
 .hero-stats {
-  display: flex; gap: clamp(16px, 4vw, 40px); flex-wrap: wrap;
-  margin-top: clamp(14px, 2vh, 22px);
+  grid-area: stats;
+  justify-self: end; align-self: center;
+  display: flex; gap: clamp(14px, 2vw, 28px); flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 12px;
   font-size: 11px; letter-spacing: 0.12em; color: var(--ink-dim);
 }
 .hero-stats em { font-style: normal; color: var(--ink); }
@@ -622,6 +640,13 @@ footer .ast { color: var(--ink-dim); }
 /* ---------- responsive ---------- */
 @media (max-width: 860px) {
   .bar-meta .ver { display: none; }
+  /* hero 回到单列堆叠 */
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-areas: "readout" "title" "tags" "pill" "stats";
+  }
+  .pill-wrap { justify-self: start; margin-top: 16px; }
+  .hero-stats { justify-self: start; justify-content: flex-start; }
   .about-grid { grid-template-columns: 1fr; }
   .about-card { position: static; max-width: 420px; }
   .p-meta { margin-left: 0; width: 100%; }
