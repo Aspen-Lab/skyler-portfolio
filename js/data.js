@@ -20,18 +20,26 @@ const SITE = {
 const PROJECTS = [
   {
     id: "P-01",
-    title: "ORIGINAL WORKS",
-    zh: "原创作品",
-    year: "2024 — 2026",
-    medium: "DIGITAL ILLUSTRATION",
+    title: "LAST ORDER",
+    zh: "原创世界观企划",
+    year: "SPRING 2026",
+    medium: "CHARACTER / PROP / ENVIRONMENT",
     state: "ACTIVE",
     works: [
-      { title: "UNTITLED_01", src: "" },
-      { title: "UNTITLED_02", src: "" },
-      { title: "UNTITLED_03", src: "" },
-      { title: "UNTITLED_04", src: "" },
-      { title: "UNTITLED_05", src: "" },
-      { title: "UNTITLED_06", src: "" },
+      { title: "LAST ORDER — COVER", src: "assets/works/p01/01-cover.jpg" },
+      { title: "CHARACTER LINEUP", src: "assets/works/p01/03-lineup.jpg" },
+      { title: "UNIT Y", src: "assets/works/p01/04-unit-y.jpg" },
+      { title: "UNIT Z", src: "assets/works/p01/05-unit-z.jpg" },
+      { title: "LINEUP — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg" },
+      { title: "ARCH-72", src: "assets/works/p01/07-arch-72.jpg" },
+      { title: "PROP DESIGN — OVERVIEW", src: "assets/works/p01/08-prop-design.jpg" },
+      { title: "PROP — WHITE ECHO", src: "assets/works/p01/09-white-echo.jpg" },
+      { title: "PROP — ABYSSAL ECHO", src: "assets/works/p01/10-abyssal-echo.jpg" },
+      { title: "PROP 3 — WEAPON", src: "assets/works/p01/11-prop-3.jpg" },
+      { title: "PROP 3 + VFX", src: "assets/works/p01/12-prop-3-vfx.jpg" },
+      { title: "ENVIRONMENT — CONCEPT ART", src: "assets/works/p01/13-env-concept.jpg" },
+      { title: "ENVIRONMENT — BLUEPRINT", src: "assets/works/p01/14-env-blueprint.jpg" },
+      { title: "STYLE FRAME", src: "assets/works/p01/15-style-frame.jpg" },
     ],
   },
   {
@@ -103,9 +111,9 @@ const ABOUT = {
   // 链接：url 填完整网址（https:// 开头）；E-MAIL 改成 mailto:你的邮箱
   // url 留 "#" 或留空会显示成灰色不可点击的占位；不用的链接整行删掉
   links: [
+    { label: "ARTSTATION", url: "https://www.artstation.com/secal72" },
+    { label: "INSTAGRAM", url: "https://www.instagram.com/secal_072" },
     { label: "小红书 RED", url: "#" },
-    { label: "X / TWITTER", url: "#" },
-    { label: "PIXIV", url: "#" },
-    { label: "E-MAIL", url: "" },
+    { label: "E-MAIL", url: "mailto:secal72art@gmail.com" },
   ],
 };
