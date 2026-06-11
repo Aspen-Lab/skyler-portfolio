@@ -194,17 +194,17 @@
   </footer>
 
   <!-- ======== LIGHTBOX ======== -->
-  <div id="lightbox" role="dialog" aria-modal="true" aria-label="作品查看器" hidden>
-    <button class="lb-close mono" aria-label="关闭">[ ✕ ]</button>
-    <button class="lb-prev mono" aria-label="上一张">&larr;</button>
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer" hidden>
+    <button class="lb-close mono" aria-label="Close">[ ✕ ]</button>
+    <button class="lb-prev mono" aria-label="Previous image">&larr;</button>
     <figure class="lb-stage">
       <div class="lb-frame">
         <img id="lbImg" alt="" />
         <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
       </div>
-      <figcaption class="mono" id="lbCap"></figcaption>
+      <figcaption class="mono" id="lbCap" aria-live="polite" aria-atomic="true"></figcaption>
     </figure>
-    <button class="lb-next mono" aria-label="下一张">&rarr;</button>
+    <button class="lb-next mono" aria-label="Next image">&rarr;</button>
   </div>
 
   <script src="js/data.js"></script>

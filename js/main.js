@@ -246,7 +246,7 @@
       ? `<img src="${esc(work.src)}" alt="${esc(work.title)}" loading="lazy" />`
       : phHTML(lbIndex, fileId);
     const linkAttrs = hasImg
-      ? ` tabindex="0" role="button" aria-label="查看 ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}"`
+      ? ` tabindex="0" role="button" aria-label="View ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}"`
       : "";
     return `<figure class="card${hasImg ? " is-link" : ""}"${linkAttrs}>
       <div class="frame">${inner}
@@ -266,9 +266,15 @@
   function lbOpen(group, index) {
     const items = galleries[group];
     if (!items || !items.length) return;
-    lbState = { group, index, lastFocus: document.activeElement };
+    lbState = { group, index, lastFocus: document.activeElement, scrollY: window.scrollY };
     lbRender();
     lb.hidden = false;
+    // iOS 也锁得住的滚动锁：body 定格 + 记录位置，关闭时还原
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${lbState.scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
     document.body.style.overflow = "hidden";
     $(".lb-close", lb).focus();
   }
@@ -282,20 +288,48 @@
   function lbNav(dir) {
     const items = galleries[lbState.group];
     if (!items) return;
-    lbState.index = (lbState.index + dir + items.length) % items.length;
+    // 跳过加载失败的死项
+    let i = lbState.index;
+    for (let n = 0; n < items.length; n++) {
+      i = (i + dir + items.length) % items.length;
+      if (!items[i].dead) break;
+    }
+    if (!items[i] || items[i].dead) return;
+    lbState.index = i;
     lbRender();
   }
   function lbClose() {
     lb.hidden = true;
     lbImg.src = "";
-    document.body.style.overflow = "";
-    if (lbState.lastFocus) lbState.lastFocus.focus();
+    ["position", "top", "left", "right", "width", "overflow"].forEach((p) => { document.body.style[p] = ""; });
+    // html 有 scroll-behavior:smooth，必须 instant 否则还原会变成滚动动画
+    window.scrollTo({ top: lbState.scrollY || 0, left: 0, behavior: "instant" });
+    const f = lbState.lastFocus;
+    if (f && f.isConnected && f.offsetParent !== null) f.focus({ preventScroll: true });
+    else { const t = $(".tab.is-active"); if (t) t.focus({ preventScroll: true }); }
   }
   if (lb) {
     $(".lb-close", lb).addEventListener("click", lbClose);
     $(".lb-prev", lb).addEventListener("click", () => lbNav(-1));
     $(".lb-next", lb).addEventListener("click", () => lbNav(1));
-    lbImg.addEventListener("click", () => lbNav(1));
+    // 触屏滑动翻页；滑动后吞掉随之而来的合成 click，避免翻两页
+    const stage = $(".lb-stage", lb);
+    let swipeX = null, swiped = false;
+    stage.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse") return;
+      swipeX = e.clientX; swiped = false;
+    }, { passive: true });
+    stage.addEventListener("pointerup", (e) => {
+      if (swipeX === null) return;
+      const dx = e.clientX - swipeX;
+      swipeX = null;
+      if (Math.abs(dx) > 40) { swiped = true; lbNav(dx < 0 ? 1 : -1); }
+    }, { passive: true });
+    stage.addEventListener("pointercancel", () => { swipeX = null; }, { passive: true });
+    lbImg.addEventListener("click", () => {
+      if (swiped) { swiped = false; return; }
+      lbNav(1);
+    });
     lb.addEventListener("click", (e) => { if (e.target === lb) lbClose(); });
     document.addEventListener("keydown", (e) => {
       if (lb.hidden) return;
@@ -314,6 +348,22 @@
       else if (e.key === "ArrowRight") lbNav(1);
     });
   }
+  // 图片 404：换成占位卡并撤销链接语义，灯箱里也跳过（error 不冒泡，用捕获）
+  document.addEventListener("error", (e) => {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement)) return;
+    const card = img.closest(".card");
+    if (!card) return;
+    const grp = card.dataset.lbGroup, idx = Number(card.dataset.lbIndex);
+    if (grp && galleries[grp] && galleries[grp][idx]) galleries[grp][idx].dead = true;
+    const fid = $(".fid", card) ? $(".fid", card).textContent : "ERR";
+    const tmp = document.createElement("div");
+    tmp.innerHTML = phHTML(2, fid);
+    img.replaceWith(tmp.firstElementChild);
+    card.classList.remove("is-link");
+    ["tabindex", "role", "aria-label", "data-lb-group", "data-lb-index"].forEach((a) => card.removeAttribute(a));
+  }, true);
+
   // delegated open (works for portfolio + fanart)
   document.addEventListener("click", (e) => {
     const card = e.target.closest("[data-lb-group]");
