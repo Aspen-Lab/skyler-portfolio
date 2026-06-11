@@ -142,7 +142,7 @@ a, button, .card.is-link, #lbImg {
   position: relative;
 }
 .tab:last-child { border-right: 1px solid var(--line-dim); }
-.tab .t-num { color: var(--ink-faint); margin-right: 4px; transition: color 0.2s; }
+.tab .t-num { color: var(--ink-soft); margin-right: 4px; transition: color 0.2s; }
 .tab:hover { color: var(--ink); }
 .tab.is-active { color: var(--bg); background: var(--ink); font-weight: 700; }
 .tab.is-active .t-num { color: var(--bg); }
@@ -181,7 +181,8 @@ a, button, .card.is-link, #lbImg {
   grid-template-areas:
     "readout pill"
     "title   pill"
-    "tags    stats";
+    "tags    pill"
+    "stats   stats";
   column-gap: clamp(24px, 6vw, 90px);
 }
 .hero-readout { grid-area: readout; }
@@ -295,7 +296,8 @@ a, button, .card.is-link, #lbImg {
 .project { margin-bottom: clamp(44px, 9vh, 96px); }
 
 .project-head {
-  display: flex; align-items: baseline; gap: clamp(12px, 2.5vw, 28px);
+  display: flex; align-items: baseline;
+  column-gap: clamp(12px, 2.5vw, 28px); row-gap: 0;
   flex-wrap: wrap;
   margin-bottom: 18px;
 }
@@ -316,9 +318,13 @@ a, button, .card.is-link, #lbImg {
   color: var(--ink-dim); margin-left: 12px;
   vertical-align: 0.35em;
 }
+/* meta 固定为标题下的第二行：右对齐 + 细线，避免随意折行漂浮 */
 .p-meta {
-  margin-left: auto;
+  margin-left: 0; width: 100%;
   display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  justify-content: flex-end;
+  border-top: 1px solid var(--line-dim);
+  padding-top: 7px; margin-top: 10px;
   font-size: 10.5px; letter-spacing: 0.12em; color: var(--ink-dim);
 }
 .chip {
@@ -404,7 +410,7 @@ a, button, .card.is-link, #lbImg {
   font-size: 10px; letter-spacing: 0.12em;
   color: var(--ink-dim);
 }
-.card figcaption .fid { color: var(--ink-faint); }
+.card figcaption .fid { color: var(--ink-soft); }
 
 /* corner brackets */
 .corner {
@@ -444,7 +450,11 @@ a, button, .card.is-link, #lbImg {
 .ph-c { aspect-ratio: 4 / 3; }
 
 /* ---------- view heads (fanart / about) ---------- */
-.view-head { padding: clamp(40px, 7vh, 76px) 0 10px; }
+.view-head {
+  padding: clamp(40px, 7vh, 76px) var(--pad) 16px;
+  margin: 0 calc(-1 * var(--pad));
+  border-bottom: 1px solid var(--line-dim);
+}
 .vh-readout {
   display: flex; gap: 12px; align-items: center;
   font-size: 11px; letter-spacing: 0.16em; color: var(--ink-dim);
@@ -574,12 +584,12 @@ a, button, .card.is-link, #lbImg {
 }
 .ab-h {
   margin: clamp(30px, 5vh, 48px) 0 16px;
-  font-size: 11px; letter-spacing: 0.2em; color: var(--ink);
+  font-size: 13px; letter-spacing: 0.2em; color: var(--ink);
   border-bottom: 1px solid var(--line-dim);
   padding-bottom: 8px;
   display: flex; justify-content: space-between;
 }
-.ab-h .jp { color: var(--ink-faint); letter-spacing: 0.3em; }
+.ab-h .jp { color: var(--ink-soft); font-size: 11px; letter-spacing: 0.3em; }
 
 /* 经历 / 学历 / 奖项 — 日志行 */
 .xp {
@@ -592,7 +602,7 @@ a, button, .card.is-link, #lbImg {
   font-size: 11px; letter-spacing: 0.1em;
 }
 .xp-period { color: var(--ink-dim); min-width: 150px; }
-.xp-co { color: var(--ink); font-weight: 700; }
+.xp-co { color: var(--ink); font-weight: 700; font-size: 13px; }
 .xp-role { color: var(--ink-dim); }
 .xp-note {
   margin-top: 7px;
@@ -626,7 +636,7 @@ a, button, .card.is-link, #lbImg {
   position: relative;
   transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
-.links a::after { content: " ↗"; color: var(--ink-faint); transition: color 0.2s; }
+.links a::after { content: " ↗"; color: var(--ink-soft); transition: color 0.2s; }
 .links a:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .links a:hover::after { color: var(--bg); }
 .links a:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
@@ -688,7 +698,7 @@ footer .ast { color: var(--ink-dim); }
   .hero-stats { justify-self: start; justify-content: flex-start; }
   .about-grid { grid-template-columns: 1fr; }
   .about-card { position: static; max-width: 420px; }
-  .p-meta { margin-left: 0; width: 100%; }
+  .p-meta { justify-content: flex-start; }
 }
 @media (max-width: 640px) {
   #topbar { gap: 10px; padding: 0 12px; }
