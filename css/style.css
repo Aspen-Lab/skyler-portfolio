@@ -458,6 +458,17 @@ a, button, .card.is-link, #lbImg {
 .ph-b { aspect-ratio: 1 / 1; }
 .ph-c { aspect-ratio: 4 / 3; }
 
+/* 作品 vs 占位：真作品放大（仅桌面，640px 以下仍走 150px 移动规则） */
+@media (min-width: 641px) {
+  .project.has-art .card .frame { height: clamp(220px, 36vh, 400px); }
+}
+/* 纯占位项目整体压缩，让位给真实作品 */
+.project.is-empty .p-title { font-size: clamp(20px, 3.8vw, 40px); }
+.project.is-empty .card .frame { height: clamp(110px, 15vh, 150px); }
+.project.is-empty .ph { padding: 0 14px; gap: 8px; }
+.project.is-empty .ph svg { width: 32px; height: 32px; }
+.project.is-empty .ph-label { font-size: 8.5px; letter-spacing: 0.1em; }
+
 /* ---------- view heads (fanart / about) ---------- */
 .view-head {
   padding: clamp(40px, 7vh, 76px) var(--pad) 16px;

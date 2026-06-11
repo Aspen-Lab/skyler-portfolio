@@ -410,7 +410,10 @@
       const pauseBtn = REDUCED ? "" :
         `<button class="strip-toggle mono" type="button" aria-pressed="false" aria-label="暂停滚动">PAUSE</button>`;
 
-      return `<article class="project reveal" id="${esc(p.id)}">
+      // 有真实作品的项目放大展示；纯占位的项目压缩，让真作品主导首页
+      const hasArt = p.works.some((w) => w.src && String(w.src).trim() !== "");
+
+      return `<article class="project reveal${hasArt ? " has-art" : " is-empty"}" id="${esc(p.id)}">
         <header class="project-head">
           <span class="p-index mono">[${esc(p.id)}]</span>
           <h2 class="p-title">${esc(p.title)}<span class="p-zh">${esc(p.zh)}</span></h2>
