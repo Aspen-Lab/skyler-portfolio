@@ -28,8 +28,10 @@
     document.title = `${SITE.name} ${AST} VISUAL ARCHIVE`;
     const hero = $("#heroTitle");
     if (hero) {
-      const n = String(SITE.name).trim();
-      const cut = Math.ceil(n.length / 2);
+      const n = String(SITE.heroName || SITE.name).trim();
+      // 有数字时在数字处切分（SECAL|72），否则对半切
+      const m = n.match(/^(.+?)(\d.*)$/);
+      const cut = m ? m[1].length : Math.ceil(n.length / 2);
       hero.innerHTML = `<span class="solid">${esc(n.slice(0, cut))}</span><span class="hollow">${esc(n.slice(cut))}</span>`;
     }
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };

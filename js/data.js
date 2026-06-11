@@ -7,6 +7,7 @@
 
 const SITE = {
   name: "SKYLER",
+  heroName: "SECAL72", // 主页大标题（留空则用 name）
   alias: "SKYLER",
   zhName: "潘",
   tagline: "VISUAL ARCHIVE ✳ ILLUSTRATION ✳ FANART",
