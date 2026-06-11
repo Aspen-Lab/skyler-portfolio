@@ -165,7 +165,7 @@ a, button { cursor: crosshair; }
 
 /* ---------- hero ---------- */
 .hero {
-  padding: clamp(40px, 8vh, 90px) 0 26px;
+  padding: clamp(20px, 3.5vh, 36px) 0 16px;
   position: relative;
 }
 .hero-readout {
@@ -180,7 +180,7 @@ a, button { cursor: crosshair; }
   font-family: var(--disp);
   font-weight: 900;
   font-stretch: 125%;
-  font-size: clamp(64px, 16.5vw, 230px);
+  font-size: clamp(44px, 8.5vw, 118px);
   line-height: 0.88;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -197,7 +197,7 @@ a, button { cursor: crosshair; }
 
 .hero-tags {
   display: flex; gap: clamp(14px, 4vw, 44px); flex-wrap: wrap;
-  margin-top: 18px;
+  margin-top: 12px;
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--ink-dim);
 }
@@ -207,7 +207,7 @@ a, button { cursor: crosshair; }
   width: 12px; height: 1px; background: var(--ink-dim);
 }
 
-.pill-wrap { max-width: 720px; margin: clamp(28px, 5vh, 54px) 0 0; }
+.pill-wrap { max-width: 520px; margin: clamp(16px, 2.5vh, 26px) 0 0; }
 .pill { width: 100%; height: auto; display: block; }
 .pill .ln { stroke: var(--line); stroke-width: 1.5; fill: none; }
 .pill .fillw { fill: var(--line); }
@@ -224,7 +224,7 @@ a, button { cursor: crosshair; }
 
 .hero-stats {
   display: flex; gap: clamp(16px, 4vw, 40px); flex-wrap: wrap;
-  margin-top: clamp(24px, 4vh, 40px);
+  margin-top: clamp(14px, 2vh, 22px);
   font-size: 11px; letter-spacing: 0.12em; color: var(--ink-dim);
 }
 .hero-stats em { font-style: normal; color: var(--ink); }
@@ -250,7 +250,7 @@ a, button { cursor: crosshair; }
 @keyframes ticker-run { to { transform: translateX(-50%); } }
 
 /* ---------- project rows ---------- */
-#projects { padding-top: clamp(30px, 6vh, 64px); }
+#projects { padding-top: clamp(18px, 3vh, 32px); }
 
 .project { margin-bottom: clamp(44px, 9vh, 96px); }
 
