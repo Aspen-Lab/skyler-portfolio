@@ -136,18 +136,37 @@
       <div id="projects"><!-- rendered by main.js --></div>
     </section>
 
-    <!-- ======== VIEW: FANART ======== -->
-    <section id="view-fanart" class="view" aria-label="Fanart">
+    <!-- ======== VIEW: ARCHIVE (sketch archive + fan art & commission) ======== -->
+    <section id="view-fanart" class="view" aria-label="Sketch archive, fan art &amp; commission">
       <div class="view-head">
         <div class="vh-readout mono" aria-hidden="true">
           <span>MODULE-F2</span><span class="chip-idle">LOADED</span>
         </div>
-        <h1 class="view-title" data-scramble>FANART</h1>
-        <p class="vh-sub mono">TRANSMISSIONS FROM OTHER WORLDS &#x2733;&#xFE0E; <span class="jp" lang="ja">ファンアート</span></p>
+        <h1 class="view-title" data-scramble>ARCHIVE</h1>
+        <p class="vh-sub mono">SKETCH &#x2733;&#xFE0E; FAN ART &#x2733;&#xFE0E; COMMISSION &#x2733;&#xFE0E; <span class="jp" lang="ja">スケッチ＆ファンアート</span></p>
       </div>
-      <div class="filterbar mono" id="fanartFilters" role="group" aria-label="Filter by fandom"></div>
-      <p class="sr-only" id="fanartStatus" role="status"></p>
-      <div class="fan-grid" id="fanartGrid"><!-- rendered --></div>
+
+      <!-- A-01 / SKETCH ARCHIVE -->
+      <div class="arc-sec">
+        <header class="arc-head">
+          <span class="arc-index mono">[A-01]</span>
+          <h2 class="arc-title" data-scramble-io>SKETCH ARCHIVE<span class="arc-ja jp" lang="ja" id="sketchJa"></span></h2>
+          <div class="arc-meta mono" id="sketchMeta"><!-- rendered --></div>
+        </header>
+        <div class="fan-grid" id="sketchGrid"><!-- rendered --></div>
+      </div>
+
+      <!-- A-02 / FAN ART & COMMISSION -->
+      <div class="arc-sec">
+        <header class="arc-head">
+          <span class="arc-index mono">[A-02]</span>
+          <h2 class="arc-title" data-scramble-io>FAN ART &amp; COMMISSION<span class="arc-ja jp" lang="ja">ファンアート＆コミッション</span></h2>
+          <div class="arc-meta mono" id="fanMeta"><!-- rendered --></div>
+        </header>
+        <div class="filterbar mono" id="fanartFilters" role="group" aria-label="Filter by fandom"></div>
+        <p class="sr-only" id="fanartStatus" role="status"></p>
+        <div class="fan-grid" id="fanartGrid"><!-- rendered --></div>
+      </div>
     </section>
 
     <!-- ======== VIEW: ABOUT ======== -->
@@ -229,7 +248,7 @@
         <img id="lbImg" alt="" />
         <div class="lens" id="lbLens" aria-hidden="true">
           <div class="lens-glass" id="lbLensGlass"></div>
-          <span class="lens-tag mono">2.5&times;</span>
+          <span class="lens-tag mono">3.5&times;</span>
         </div>
       </div>
     </figure>

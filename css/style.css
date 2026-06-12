@@ -69,25 +69,32 @@ a, button, .card.is-link, #lbImg {
 }
 
 /* ---------- atmosphere ---------- */
-/* 背景微点阵：1.2px 小点常亮 + 两团反向漫游的光斑点亮经过的点。
+/* 背景微点阵：1.2px 小点 + 自上而下渐隐的梯度（顶部清晰、向下溶解），
+   两团反向漫游的光斑经过时点亮局部。
    z-index:-1 → 只出现在页面留白处，被卡片/图片自然遮住 */
 .dotgrid {
   position: fixed; inset: 0;
   z-index: -1; pointer-events: none;
-  /* 基础点阵直接画在本层（被下面的 mask 切成点） */
-  background: rgba(237, 237, 237, 0.16);
+  /* 基础点阵 = 顶部聚光的径向渐变，被 mask 切成点 → 点阵自带渐变衰减 */
+  background: radial-gradient(
+    ellipse 130% 95% at 50% -12%,
+    rgba(237, 237, 237, 0.13) 0%,
+    rgba(237, 237, 237, 0.055) 48%,
+    rgba(237, 237, 237, 0.018) 78%,
+    transparent 100%
+  );
   -webkit-mask-image: radial-gradient(circle, #000 1.2px, transparent 1.7px);
   -webkit-mask-size: 26px 26px;
   mask-image: radial-gradient(circle, #000 1.2px, transparent 1.7px);
   mask-size: 26px 26px;
 }
-/* 漫游光斑 ×2：transform-only，合成器动画 */
+/* 漫游光斑 ×2：transform-only，合成器动画（光斑本身也是柔渐变） */
 .dotgrid::after {
   content: ""; position: absolute;
   width: 64vmax; height: 64vmax;
   left: -32vmax; top: -32vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(237, 237, 237, 0.34), transparent 62%);
+  background: radial-gradient(circle, rgba(237, 237, 237, 0.22), rgba(237, 237, 237, 0.07) 38%, transparent 62%);
   animation: dot-roam 26s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -96,7 +103,7 @@ a, button, .card.is-link, #lbImg {
   width: 38vmax; height: 38vmax;
   left: -19vmax; top: -19vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(237, 237, 237, 0.26), transparent 60%);
+  background: radial-gradient(circle, rgba(237, 237, 237, 0.16), rgba(237, 237, 237, 0.05) 40%, transparent 60%);
   animation: dot-roam 21s ease-in-out infinite alternate-reverse;
   will-change: transform;
 }
@@ -944,7 +951,7 @@ footer .ast { color: var(--ink-dim); }
    内层 .lens-glass 承担玻璃质感与出现/消失动画 */
 .lens {
   position: absolute; top: 0; left: 0; z-index: 3;
-  width: 170px; height: 170px;
+  width: 260px; height: 260px;
   pointer-events: none;
   will-change: transform;
 }

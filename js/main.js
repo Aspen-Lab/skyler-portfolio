@@ -490,7 +490,7 @@
     if (!lbFrame || !lens || !loupeBtn) return;
 
     const glass = $("#lbLensGlass");
-    const Z = 2.5, R = 85; // 镜片半径 85px（直径 170）
+    const Z = 3.5, R = 130; // 镜片半径 130px（直径 260），3.5× 放大
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
@@ -803,8 +803,8 @@
       }, 200);
     }, true);
 
-    // stats
-    const files = PROJECTS.reduce((n, p) => n + p.works.length, 0);
+    // stats（FILES = 作品集 + 速写档案 + fanart/委托，整站文件数）
+    const files = PROJECTS.reduce((n, p) => n + p.works.length, 0) + SKETCHES.works.length + FANART.length;
     const sf = $("#statFiles"), sp = $("#statProjects");
     if (sf) sf.textContent = pad2(files);
     if (sp) sp.textContent = pad2(PROJECTS.length);
@@ -822,7 +822,30 @@
     t.innerHTML = seq.repeat(4); // 偶数份 → translateX(-50%) 落在整数倍上无缝；4 份覆盖 ~2.7k 宽屏
   }
 
-  /* ---------- fanart ---------- */
+  /* ---------- sketch archive（ARCHIVE 页上半部分） ---------- */
+  function renderSketches() {
+    const grid = $("#sketchGrid");
+    if (!grid) return;
+    const gallery = [];
+    grid.innerHTML = SKETCHES.works.map((w, i) => {
+      const fileId = `SK-${pad2(i + 1)}`;
+      const hasImg = w.src && String(w.src).trim() !== "";
+      let lbIndex = i;
+      if (hasImg) {
+        lbIndex = gallery.length;
+        gallery.push({ src: w.src, cap: `${w.title} / SKETCH ARCHIVE` });
+      }
+      return cardHTML(w, fileId, "sk", lbIndex);
+    }).join("");
+    galleries["sk"] = gallery;
+    const ja = $("#sketchJa");
+    if (ja) ja.textContent = SKETCHES.ja || "";
+    const meta = $("#sketchMeta");
+    if (meta) meta.innerHTML =
+      `<span>${esc(SKETCHES.year)}</span><span>${AST}</span><span>${esc(SKETCHES.medium)}</span><span>${AST}</span><span>${pad2(SKETCHES.works.length)} FILES</span>`;
+  }
+
+  /* ---------- fan art & commission（ARCHIVE 页下半部分） ---------- */
   let fanFilter = "ALL";
   function renderFanart() {
     const grid = $("#fanartGrid");
@@ -864,6 +887,9 @@
     const bar = $("#fanartFilters");
     if (!bar) return;
     const fandoms = ["ALL", ...new Set(FANART.map((w) => w.fandom))];
+    const meta = $("#fanMeta");
+    if (meta) meta.innerHTML =
+      `<span>${fandoms.length - 1} TAGS</span><span>${AST}</span><span>${pad2(FANART.length)} FILES</span>`;
     bar.innerHTML = fandoms.map((f) =>
       `<button class="fbtn${f === fanFilter ? " is-on" : ""}" aria-pressed="${f === fanFilter}" data-f="${esc(f)}">${esc(f)}</button>`
     ).join("");
