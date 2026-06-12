@@ -58,27 +58,31 @@ const PROJECTS = [
       { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg", w: 1920, h: 1242 },
     ],
   },
-  {
-    id: "P-03",
-    title: "SKETCH ARCHIVE",
-    ja: "スケッチアーカイブ",
-    year: "2023 — 2026",
-    medium: "SKETCH / STUDY / WIP",
-    state: "ARCHIVED",
-    works: [
-      { title: "SKETCH_01", src: "" },
-      { title: "SKETCH_02", src: "" },
-      { title: "SKETCH_03", src: "" },
-      { title: "SKETCH_04", src: "" },
-      { title: "SKETCH_05", src: "" },
-      { title: "SKETCH_06", src: "" },
-      { title: "SKETCH_07", src: "" },
-    ],
-  },
 ];
 
 /* ------------------------------------------------------------
-   FANART — fandom 是作品所属的圈子/标签，会自动生成筛选按钮
+   SKETCH ARCHIVE — ARCHIVE 页上半部分（速写/习作/WIP）
+   ✳ 和别处一样：src 留空 ("") 显示占位图。
+   ------------------------------------------------------------ */
+const SKETCHES = {
+  ja: "スケッチアーカイブ",
+  year: "2023 — 2026",
+  medium: "SKETCH / STUDY / WIP",
+  works: [
+    { title: "SKETCH_01", src: "" },
+    { title: "SKETCH_02", src: "" },
+    { title: "SKETCH_03", src: "" },
+    { title: "SKETCH_04", src: "" },
+    { title: "SKETCH_05", src: "" },
+    { title: "SKETCH_06", src: "" },
+    { title: "SKETCH_07", src: "" },
+  ],
+};
+
+/* ------------------------------------------------------------
+   FAN ART & COMMISSION — ARCHIVE 页下半部分
+   ✳ fandom 是作品所属的圈子/标签，会自动生成筛选按钮；
+     委托作品用 fandom: "COMMISSION"。
    ✳ 注意：fandom 名字会原样显示在页面上，发布前记得把
      FANDOM A/B/C 换成真实的圈名。
    ------------------------------------------------------------ */
@@ -91,6 +95,9 @@ const FANART = [
   { title: "FA_006", fandom: "FANDOM A", src: "" },
   { title: "FA_007", fandom: "FANDOM C", src: "" },
   { title: "FA_008", fandom: "FANDOM B", src: "" },
+  { title: "CM_001", fandom: "COMMISSION", src: "" },
+  { title: "CM_002", fandom: "COMMISSION", src: "" },
+  { title: "CM_003", fandom: "COMMISSION", src: "" },
 ];
 
 /* ------------------------------------------------------------
