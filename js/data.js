@@ -27,21 +27,19 @@ const PROJECTS = [
     medium: "CHARACTER / PROP / ENVIRONMENT",
     state: "ACTIVE",
     works: [
-      // w/h = 图片像素尺寸：加载前就能算出卡片宽度，避免布局跳动
-      { title: "LAST ORDER — COVER", src: "assets/works/p01/01-cover.jpg", w: 1914, h: 1074 },
-      { title: "CHARACTER LINEUP", src: "assets/works/p01/03-lineup.jpg", w: 1914, h: 1074 },
-      { title: "UNIT Y", src: "assets/works/p01/04-unit-y.jpg", w: 1910, h: 1071 },
-      { title: "UNIT Z", src: "assets/works/p01/05-unit-z.jpg", w: 1910, h: 1071 },
-      { title: "UNIT Z — TURNAROUND", src: "assets/works/p01/06-turnaround.jpg", w: 1914, h: 1074 },
-      { title: "ARCH-72", src: "assets/works/p01/07-arch-72.jpg", w: 1910, h: 1071 },
-      { title: "PROP DESIGN — OVERVIEW", src: "assets/works/p01/08-prop-design.jpg", w: 1914, h: 1074 },
-      { title: "PROP — WHITE ECHO", src: "assets/works/p01/09-white-echo.jpg", w: 1912, h: 1071 },
-      { title: "PROP — ABYSSAL ECHO", src: "assets/works/p01/10-abyssal-echo.jpg", w: 1912, h: 1071 },
-      { title: "PROP 3 — WEAPON", src: "assets/works/p01/11-prop-3.jpg", w: 1914, h: 1074 },
-      { title: "PROP 3 + VFX", src: "assets/works/p01/12-prop-3-vfx.jpg", w: 1914, h: 1074 },
-      { title: "ENVIRONMENT — CONCEPT ART", src: "assets/works/p01/13-env-concept.jpg", w: 1914, h: 1074 },
-      { title: "ENVIRONMENT — BLUEPRINT", src: "assets/works/p01/14-env-blueprint.jpg", w: 1910, h: 1071 },
-      { title: "STYLE FRAME", src: "assets/works/p01/15-style-frame.jpg", w: 1914, h: 1074 },
+      { title: "LAST ORDER — KEY VISUAL",   src: "assets/works/p01/01-cover.jpg",        featured: true, w: 1920, h: 1222 },
+      { title: "CHARACTER LINEUP",          src: "assets/works/p01/03-lineup.jpg",        w: 1920, h: 1080 },
+      { title: "UNIT Y — SKETCHES",         src: "assets/works/p01/04-unit-y.jpg",        w: 1920, h: 1080 },
+      { title: "UNIT Z — SKETCHES",         src: "assets/works/p01/05-unit-z.jpg",        w: 1920, h: 1080 },
+      { title: "UNIT Z — TURNAROUND",       src: "assets/works/p01/06-turnaround.jpg",    w: 1920, h: 1080 },
+      { title: "PROP DESIGN",               src: "assets/works/p01/08-prop-design.jpg",   w: 1920, h: 1080 },
+      { title: "PROP 01 — WHITE ECHO",      src: "assets/works/p01/09-white-echo.jpg",    w: 1920, h: 1080 },
+      { title: "PROP 02 — ABYSSAL ECHO",    src: "assets/works/p01/10-abyssal-echo.jpg",  w: 1920, h: 1080 },
+      { title: "PROP 03 — WEAPON",          src: "assets/works/p01/11-prop-3.jpg",        w: 1920, h: 1080 },
+      { title: "PROP 03 + VFX",             src: "assets/works/p01/12-prop-3-vfx.jpg",    w: 1920, h: 1080 },
+      { title: "ENVIRONMENT — CONCEPT ART", src: "assets/works/p01/13-env-concept.jpg",   w: 1920, h: 1080 },
+      { title: "ENVIRONMENT — DESIGN",      src: "assets/works/p01/14-env-blueprint.jpg", w: 1920, h: 1080 },
+      { title: "STYLE FRAME",               src: "assets/works/p01/15-style-frame.jpg",   w: 1920, h: 1080 },
     ],
   },
   {
@@ -52,11 +50,11 @@ const PROJECTS = [
     medium: "CHARACTER DESIGN · WORLDBUILDING",
     state: "ACTIVE",
     works: [
-      { title: "BAIZE — BOOK SPREAD", src: "assets/works/p02/02-baize-spread.jpg", featured: true },
-      { title: "BAIZE — CHARACTER SHEET",  src: "assets/works/p02/01-baize.jpg" },
-      { title: "LEPTAILURUS PAVONINUS",    src: "assets/works/p02/03-leptailurus.jpg" },
-      { title: "OVIS CAMELOPARDALIS",      src: "assets/works/p02/04-ovis.jpg" },
-      { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg" },
+      { title: "BAIZE — BOOK SPREAD", src: "assets/works/p02/02-baize-spread.jpg", featured: true, w: 1920, h: 1242 },
+      { title: "BAIZE — CHARACTER SHEET",  src: "assets/works/p02/01-baize.jpg", w: 1920, h: 1242 },
+      { title: "LEPTAILURUS PAVONINUS",    src: "assets/works/p02/03-leptailurus.jpg", w: 1920, h: 1242 },
+      { title: "OVIS CAMELOPARDALIS",      src: "assets/works/p02/04-ovis.jpg", w: 1920, h: 1242 },
+      { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg", w: 1920, h: 1242 },
     ],
   },
   {
@@ -104,6 +102,22 @@ const ABOUT = {
     "Illustration student with a concentration in Concept Design, passionate about character design and narrative-driven visual storytelling for games. Experienced in concept art production for live-service mobile titles at Garena, with strengths in style adaptation, iterative visual development, and cross-team collaboration.",
   // 简介下方的日文装饰行
   bioDeco: "キャラクターデザイン ✳ ビジュアルストーリーテリング ✳ コンセプトアート",
+
+  // bio 里要点亮的关键短语（必须与 bio 原文逐字一致；亮白显示，其余文字灰）
+  bioHighlights: [
+    "Concept Design",
+    "character design",
+    "narrative-driven visual storytelling",
+    "Garena",
+  ],
+
+  // About 页数据带：大字焦点块（n 大字 / label 小注），3–4 个最佳
+  highlights: [
+    { n: "GARENA",  label: "FREE FIRE · AOV — SHIPPED" },
+    { n: "TGC",     label: "SKY 6TH ANNIV. OFFICIAL ART" },
+    { n: "1ST ×1",  label: "BEYOND THE DOT · 2024" },
+    { n: "TOP 3%",  label: "GPA · 8 SEMESTERS" },
+  ],
 
   // 经历：period / company / role / tag(小徽章) / note(一行简述，可留空)
   experience: [

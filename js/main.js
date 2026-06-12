@@ -797,10 +797,45 @@
   }
 
   /* ---------- about ---------- */
+  // 档案日志块：period 左轨 | 主体（大字标题/角色/简述）| 幽灵编号右侧
+  function logRowHTML(r, i) {
+    const d = Math.min(i * 70, 350);
+    return `<article class="xp reveal" style="--d:${d}ms">
+      <div class="xp-when mono">
+        <span class="xp-period">${esc(r.period || "")}</span>
+        ${r.chip ? `<span class="chip${r.chipCls || ""}">${esc(r.chip)}</span>` : ""}
+      </div>
+      <div class="xp-main">
+        <h3 class="xp-co">${esc(r.title)}</h3>
+        ${r.sub ? `<p class="xp-role mono">${esc(r.sub)}</p>` : ""}
+        ${r.note ? `<p class="xp-note mono">${esc(r.note)}</p>` : ""}
+      </div>
+      <span class="xp-num" aria-hidden="true">${pad2(i + 1)}</span>
+    </article>`;
+  }
+
   function renderAbout() {
     const bm = $("#bioMain"), bd = $("#bioDeco");
-    if (bm) bm.textContent = ABOUT.bio;
+    if (bm) {
+      // 关键短语点亮：基调灰 + 亮白焦点（先转义再替换，短语本身不含特殊字符时安全）
+      let html = esc(ABOUT.bio);
+      (ABOUT.bioHighlights || []).forEach((p) => {
+        const e = esc(p);
+        html = html.split(e).join(`<em class="hi">${e}</em>`);
+      });
+      bm.innerHTML = html;
+    }
     if (bd) bd.innerHTML = esc(ABOUT.bioDeco).replace(/✳︎?/g, AST);
+
+    const sb = $("#statBand");
+    if (sb && ABOUT.highlights && ABOUT.highlights.length) {
+      sb.innerHTML = ABOUT.highlights.map((h, i) =>
+        `<div class="stat reveal" style="--d:${i * 80}ms">
+          <span class="stat-n" data-scramble-io>${esc(h.n)}</span>
+          <span class="stat-l mono">${esc(h.label)}</span>
+        </div>`
+      ).join("");
+    }
 
     const av = $("#avatarFrame");
     if (av) {
@@ -813,50 +848,28 @@
 
     const xl = $("#xpList");
     if (xl) {
-      xl.innerHTML = ABOUT.experience.map((x) =>
-        `<div class="xp">
-          <div class="xp-row mono">
-            <span class="xp-period">${esc(x.period)}</span>
-            <span class="xp-co">${esc(x.company)}</span>
-            <span class="xp-role">${esc(x.role)}</span>
-            ${x.tag ? `<span class="chip">${esc(x.tag)}</span>` : ""}
-          </div>
-          ${x.note ? `<p class="xp-note mono">${esc(x.note)}</p>` : ""}
-        </div>`
+      xl.innerHTML = ABOUT.experience.map((x, i) =>
+        logRowHTML({ period: x.period, chip: x.tag, title: x.company, sub: x.role, note: x.note }, i)
       ).join("");
     }
 
     const ed = $("#eduBlock");
     if (ed && ABOUT.education) {
       const e = ABOUT.education;
-      ed.innerHTML = `<div class="xp">
-        <div class="xp-row mono">
-          <span class="xp-period">${esc(e.period)}</span>
-          <span class="xp-co">${esc(e.school)}</span>
-          <span class="xp-role">${esc(e.degree)}</span>
-        </div>
-      </div>`;
+      ed.innerHTML = logRowHTML({ period: e.period, title: e.school, sub: e.degree }, 0);
     }
 
     const aw = $("#awardList");
     if (aw) {
-      aw.innerHTML = ABOUT.awards.map((a) =>
-        `<div class="xp">
-          <div class="xp-row mono">
-            <span class="xp-period">${esc(a.period || "")}</span>
-            <span class="xp-co">${esc(a.title)}</span>
-            <span class="xp-role">${esc(a.sub)}</span>
-            ${a.detail ? `<span class="chip is-active">${esc(a.detail)}</span>` : ""}
-          </div>
-          ${a.note ? `<p class="xp-note mono">${esc(a.note)}</p>` : ""}
-        </div>`
+      aw.innerHTML = ABOUT.awards.map((a, i) =>
+        logRowHTML({ period: a.period, chip: a.detail, chipCls: " is-active", title: a.title, sub: a.sub, note: a.note }, i)
       ).join("");
     }
 
     const sl = $("#skillList");
     if (sl) {
-      sl.innerHTML = ABOUT.skills.map((s) =>
-        `<span class="skill-chip mono">${esc(s)}</span>`
+      sl.innerHTML = ABOUT.skills.map((s, i) =>
+        `<span class="skill-chip mono reveal" style="--d:${Math.min(i * 45, 400)}ms">${esc(s)}</span>`
       ).join("");
     }
 
@@ -904,6 +917,7 @@
     if (title) scramble(title);
     if (name === "portfolio" && !REDUCED && !TOUCH && !marqueesDone) requestAnimationFrame(setupMarquees);
     observeReveals();
+    observeScrambles();
   }
   // hash 是唯一路由来源：tab 是真链接，点击只改 hash，这里统一处理。
   // 非视图 hash（如 skip-link 的 #main）交还浏览器原生锚点行为。
@@ -933,6 +947,26 @@
       }, { threshold: 0.08 });
     }
     $$(".reveal:not(.is-in)").forEach((el) => revealObserver.observe(el));
+  }
+
+  /* ---------- 进入视野时乱码定格（一次性，FUI 解码感） ---------- */
+  let scrambleObserver = null;
+  function observeScrambles() {
+    if (REDUCED || !("IntersectionObserver" in window)) return;
+    if (!scrambleObserver) {
+      scrambleObserver = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            scramble(en.target);
+            scrambleObserver.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.4 });
+    }
+    $$("[data-scramble-io]:not(.scr-seen)").forEach((el) => {
+      el.classList.add("scr-seen");
+      scrambleObserver.observe(el);
+    });
   }
 
   /* ---------- init ---------- */

@@ -174,22 +174,30 @@
         </aside>
 
         <div class="about-body">
-          <p class="bio-main" id="bioMain"></p>
-          <p class="bio-deco mono" id="bioDeco" lang="ja"></p>
+          <p class="bio-main reveal" id="bioMain"></p>
+          <p class="bio-deco mono reveal" id="bioDeco" lang="ja"></p>
 
-          <h2 class="ab-h mono">EXPERIENCE <span class="jp" lang="ja">経歴</span></h2>
+          <!-- 数据带：简历里的硬核事实，大字焦点块 -->
+          <div class="stat-band" id="statBand"></div>
+
+          <h2 class="ab-h mono"><span data-scramble-io>EXPERIENCE</span> <span class="jp" lang="ja">経歴</span></h2>
           <div id="xpList"></div>
 
-          <h2 class="ab-h mono">EDUCATION <span class="jp" lang="ja">学歴</span></h2>
-          <div id="eduBlock"></div>
+          <div class="ab-duo">
+            <div>
+              <h2 class="ab-h mono"><span data-scramble-io>EDUCATION</span> <span class="jp" lang="ja">学歴</span></h2>
+              <div id="eduBlock"></div>
+            </div>
+            <div>
+              <h2 class="ab-h mono"><span data-scramble-io>AWARDS</span> <span class="jp" lang="ja">受賞歴</span></h2>
+              <div id="awardList"></div>
+            </div>
+          </div>
 
-          <h2 class="ab-h mono">AWARDS <span class="jp" lang="ja">受賞歴</span></h2>
-          <div id="awardList"></div>
-
-          <h2 class="ab-h mono">CAPABILITIES <span class="jp" lang="ja">能力値</span></h2>
+          <h2 class="ab-h mono"><span data-scramble-io>CAPABILITIES</span> <span class="jp" lang="ja">能力値</span></h2>
           <div class="skill-chips" id="skillList"></div>
 
-          <h2 class="ab-h mono">CHANNELS <span class="jp" lang="ja">連絡先</span></h2>
+          <h2 class="ab-h mono"><span data-scramble-io>CHANNELS</span> <span class="jp" lang="ja">連絡先</span></h2>
           <div class="links mono" id="linkList"></div>
         </div>
       </div>

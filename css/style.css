@@ -622,20 +622,51 @@ a, button, .card.is-link, #lbImg {
 .hand.h2 { animation: spin 8s linear infinite reverse; }
 .hand.h3 { animation: spin 20s linear infinite; }
 
-.about-body { max-width: 720px; }
+/* about 主体用满宽度：层级靠字阶与明暗，而不是缩窄列宽 */
+.about-body { max-width: none; }
+
+/* bio = 这一页的视觉主角：display 字阶 + 灰底亮词混排 */
 .bio-main {
-  font-family: var(--disp); font-weight: 500;
-  font-size: clamp(16px, 2.1vw, 21px);
-  line-height: 1.75; letter-spacing: 0.01em;
+  font-family: var(--disp); font-weight: 600;
+  font-size: clamp(20px, 2.4vw, 34px);
+  line-height: 1.45; letter-spacing: 0;
+  color: var(--ink-dim);
+  max-width: 1100px;
+  text-wrap: pretty;
 }
+.bio-main .hi { font-style: normal; color: var(--ink); }
 .bio-deco {
-  margin-top: 14px;
+  margin-top: 16px;
   font-family: var(--jp); font-weight: 300;
   font-size: 11px; line-height: 1.9; letter-spacing: 0.28em;
   color: var(--ink-dim);
 }
+
+/* 数据带：硬核事实的大字焦点块 */
+.stat-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-top: 1px solid var(--line-dim);
+  border-bottom: 1px solid var(--line-dim);
+  margin: clamp(28px, 4.5vh, 44px) 0 4px;
+}
+.stat { padding: 20px 22px 18px; border-left: 1px solid var(--line-dim); }
+.stat:first-child { border-left: none; }
+.stat-n {
+  display: block;
+  font-family: var(--disp); font-weight: 900; font-stretch: 118%;
+  font-size: clamp(26px, 2.7vw, 46px);
+  line-height: 1; text-transform: uppercase;
+  white-space: nowrap;
+}
+.stat-l {
+  display: block; margin-top: 9px;
+  font-size: 10px; letter-spacing: 0.14em;
+  color: var(--ink-dim);
+}
+
 .ab-h {
-  margin: clamp(30px, 5vh, 48px) 0 16px;
+  margin: clamp(34px, 5.5vh, 56px) 0 4px;
   font-size: 13px; letter-spacing: 0.2em; color: var(--ink);
   border-bottom: 1px solid var(--line-dim);
   padding-bottom: 8px;
@@ -643,34 +674,88 @@ a, button, .card.is-link, #lbImg {
 }
 .ab-h .jp { color: var(--ink-soft); font-size: 11px; letter-spacing: 0.3em; }
 
-/* 经历 / 学历 / 奖项 — 日志行 */
+/* 经历 / 学历 / 奖项 — 任务块：period 左轨 | 大字主体 | 幽灵编号 */
 .xp {
-  border-bottom: 1px dashed var(--line-dim);
-  padding: 13px 2px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) auto;
+  gap: 6px 26px;
+  align-items: start;
+  padding: clamp(20px, 3vh, 30px) 2px clamp(22px, 3.2vh, 32px);
 }
-.xp-row {
-  display: flex; align-items: baseline;
-  gap: 8px 16px; flex-wrap: wrap;
+/* 虚线分隔改为伪元素：reveal 时从左划入 */
+.xp::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: repeating-linear-gradient(90deg, var(--line-dim) 0 6px, transparent 6px 12px);
+}
+/* 悬停信号线：左缘亮线自上而下点亮 */
+.xp::before {
+  content: ""; position: absolute; left: -14px; top: 22px; bottom: 24px; width: 2px;
+  background: var(--ink);
+  transform: scaleY(0); transform-origin: top;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.xp:hover::before { transform: scaleY(1); }
+.xp-when {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  padding-top: 6px;
   font-size: 11px; letter-spacing: 0.1em;
 }
 .xp-period { color: var(--ink-dim); min-width: 150px; }
-.xp-co { color: var(--ink); font-weight: 700; font-size: 13px; }
-.xp-role { color: var(--ink-dim); }
-.xp-note {
-  margin-top: 7px;
-  font-size: 10.5px; line-height: 1.8; letter-spacing: 0.06em;
-  color: var(--ink-dim);
-  max-width: 640px;
+.xp-co {
+  font-family: var(--disp); font-weight: 900; font-stretch: 118%;
+  font-size: clamp(22px, 2.6vw, 40px);
+  line-height: 1.02; text-transform: uppercase;
+  letter-spacing: 0.005em;
+  color: var(--ink);
 }
+.xp-role {
+  margin-top: 7px;
+  font-size: 11px; letter-spacing: 0.16em;
+  color: var(--ink-dim);
+}
+.xp-note {
+  margin-top: 9px;
+  font-size: 11px; line-height: 1.8; letter-spacing: 0.05em;
+  color: var(--ink-dim);
+  max-width: 680px;
+}
+/* 幽灵编号：描边数字，悬停时填充 */
+.xp-num {
+  font-family: var(--disp); font-weight: 900; font-stretch: 125%;
+  font-size: clamp(30px, 3.2vw, 56px);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(237, 237, 237, 0.22);
+  transition: -webkit-text-stroke-color 0.3s, color 0.3s;
+  user-select: none;
+}
+.xp:hover .xp-num { -webkit-text-stroke-color: rgba(237, 237, 237, 0.7); }
 
-/* 能力芯片 */
+/* 学历 + 奖项并排双栏，填满宽度 */
+.ab-duo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  column-gap: clamp(28px, 4vw, 72px);
+  align-items: start;
+}
+.ab-duo .xp { grid-template-columns: minmax(0, 1fr) auto; }
+.ab-duo .xp-when { padding-top: 0; flex-direction: row; align-items: baseline; gap: 14px; }
+.ab-duo .xp-when { grid-column: 1; }
+.ab-duo .xp-main { grid-column: 1; }
+.ab-duo .xp-num { grid-column: 2; grid-row: 1 / span 2; }
+.ab-duo .xp-co { font-size: clamp(18px, 1.7vw, 26px); }
+
+/* 能力芯片：逐个弹入 + 悬停反色 */
 .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-chip {
   border: 1px solid var(--line-dim);
-  padding: 7px 14px;
+  padding: 8px 16px;
   font-size: 10.5px; letter-spacing: 0.12em;
   color: var(--ink);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
+.skill-chip:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 .links { display: flex; flex-wrap: wrap; gap: 10px; }
 .links .dead {
