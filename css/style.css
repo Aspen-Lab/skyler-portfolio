@@ -19,6 +19,8 @@
   --disp: "Archivo", "Helvetica Neue", sans-serif;
   --jp: "Noto Sans JP", sans-serif;
   --zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --radius: 8px;      /* 统一圆角：卡片/画框 */
+  --radius-sm: 7px;   /* 按钮/芯片 */
   --bar-h: 46px;
   --pad: clamp(16px, 4vw, 56px);
   /* 内容列上限：超宽屏内容居中，不再左贴边右留白。
@@ -425,6 +427,7 @@ body.hero-ready .pill .pill-outline {
   margin-bottom: 18px;
 }
 .p-index {
+  border-radius: 5px;
   font-size: 11px; color: var(--line); letter-spacing: 0.14em;
   border: 1px solid var(--line-dim);
   padding: 3px 8px;
@@ -525,6 +528,7 @@ body.hero-ready .pill .pill-outline {
   flex: none;
 }
 .card .frame {
+  border-radius: var(--radius);
   position: relative;
   height: clamp(170px, 26vh, 250px);
   border: 1px solid var(--line-dim);
@@ -559,10 +563,10 @@ body.hero-ready .pill .pill-outline {
   opacity: 0; transition: opacity 0.2s, transform 0.25s;
   pointer-events: none;
 }
-.c-tl { top: -1px; left: -1px; border-top-width: 1.5px; border-left-width: 1.5px; }
-.c-tr { top: -1px; right: -1px; border-top-width: 1.5px; border-right-width: 1.5px; }
-.c-bl { bottom: -1px; left: -1px; border-bottom-width: 1.5px; border-left-width: 1.5px; }
-.c-br { bottom: -1px; right: -1px; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+.c-tl { top: -1px; left: -1px; border-top-width: 1.5px; border-left-width: 1.5px; border-top-left-radius: var(--radius); }
+.c-tr { top: -1px; right: -1px; border-top-width: 1.5px; border-right-width: 1.5px; border-top-right-radius: var(--radius); }
+.c-bl { bottom: -1px; left: -1px; border-bottom-width: 1.5px; border-left-width: 1.5px; border-bottom-left-radius: var(--radius); }
+.c-br { bottom: -1px; right: -1px; border-bottom-width: 1.5px; border-right-width: 1.5px; border-bottom-right-radius: var(--radius); }
 .card.is-link:hover .corner, .card.is-link:focus-visible .corner,
 .avatar-frame .corner, .lb-frame .corner { opacity: 1; }
 
@@ -705,6 +709,7 @@ body.hero-ready .pill .pill-outline {
 /* min-content 不许撑破容器（窄屏上 svg/img 会虚增最小宽度） */
 .about-grid > * { min-width: 0; }
 .about-card {
+  border-radius: var(--radius);
   border: 1px solid var(--line-dim);
   padding: 0;
   position: sticky; top: calc(var(--bar-h) + 20px);
@@ -713,6 +718,8 @@ body.hero-ready .pill .pill-outline {
 }
 /* 头像满边：吃掉卡片内距，只留底部发丝线与规格表分隔 */
 .avatar-frame {
+  border-radius: var(--radius);
+  overflow: hidden;
   position: relative;
   aspect-ratio: 1 / 1;
   border-bottom: 1px solid var(--line-dim);
@@ -899,6 +906,7 @@ body.hero-ready .pill .pill-outline {
 /* 能力芯片：逐个弹入 + 悬停反色 */
 .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-chip {
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
   padding: 8px 16px;
   font-size: 10.5px; letter-spacing: 0.12em;
@@ -916,6 +924,7 @@ body.hero-ready .pill .pill-outline {
   cursor: default;
 }
 .links a {
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
   color: var(--ink); text-decoration: none;
   font-size: 11px; letter-spacing: 0.12em;
@@ -970,6 +979,8 @@ footer .ast { color: var(--ink-dim); }
 .lb-stage { touch-action: pan-y; }
 .lb-frame {
   position: relative; display: inline-block;
+  border-radius: var(--radius);
+  overflow: hidden; /* 圆角裁切图片 */
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
   transform: scale(0.965) translateY(10px);
   opacity: 0;
@@ -1068,6 +1079,7 @@ footer .ast { color: var(--ink-dim); }
   flex: none;
   appearance: none; background: none;
   display: inline-flex; align-items: center; gap: 7px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
   color: var(--ink);
   padding: 7px 12px;
@@ -1093,9 +1105,10 @@ footer .ast { color: var(--ink-dim); }
 .lb-next { right: 0; }
 .lb-navbtn {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 42px; height: 42px;
-  border: 1px solid var(--line-dim);
-  background: rgba(7, 7, 7, 0.6);
+  width: 50px; height: 50px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(237, 237, 237, 0.38);
+  background: rgba(14, 14, 14, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--ink);
@@ -1124,6 +1137,13 @@ footer .ast { color: var(--ink-dim); }
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line-dim);
 }
+.lb-hint {
+  flex: none;
+  font-size: 9.5px; letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+@media (max-width: 860px) { .lb-hint { display: none; } }
 .lb-progress {
   flex: 1; height: 2px;
   background: var(--ink-faint);
@@ -1138,6 +1158,7 @@ footer .ast { color: var(--ink-dim); }
   flex: none;
   appearance: none; background: none;
   display: inline-flex; align-items: center; gap: 8px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
   color: var(--ink);
   padding: 8px 14px;

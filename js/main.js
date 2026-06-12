@@ -501,7 +501,8 @@
     if (!lbFrame || !lens || !loupeBtn) return;
 
     const glass = $("#lbLensGlass");
-    const Z = 3.5, R = 260; // 镜片半径 260px（直径 520），3.5× 放大
+    let Z = 3.5;                       // 当前倍率（滚轮可调）
+    const ZMIN = 2, ZMAX = 6, R = 260; // 倍率限位 2–6×；镜片半径 260px
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
@@ -543,10 +544,21 @@
       loupeBtn.classList.toggle("is-on", on);
     };
 
+    const zoomLabel = () => `${Z.toFixed(1).replace(/\.0$/, "")}×`;
+    const syncZoomUI = () => {
+      const tag = $("#lbLensTag"), fac = $("#lbZoomFactor"), hint = $("#lbHint");
+      if (tag) tag.textContent = zoomLabel();
+      if (fac) fac.textContent = zoomLabel();
+      if (hint) hint.textContent = on
+        ? `WHEEL: ${zoomLabel()} (${ZMIN}–${ZMAX}×) ✳︎ CLICK TO EXIT`
+        : "CLICK IMAGE TO MAGNIFY ✳︎ WHEEL TO ZOOM";
+    };
+
     function setLoupe(next, e) {
       on = next;
       lbZoomOn = next;
       syncBtn();
+      syncZoomUI();
       lbFrame.classList.toggle("lens-on", next);
       document.body.classList.toggle("lens-cursor", next); // 镜片激活时隐藏自定义光标
       if (next) {
@@ -561,6 +573,14 @@
 
     loupeBtn.addEventListener("click", () => setLoupe(!on));
 
+    lbFrame.addEventListener("wheel", (e) => {
+      if (!on) return;
+      e.preventDefault(); // 镜片激活时滚轮调倍率，不滚页面
+      Z = Math.min(ZMAX, Math.max(ZMIN, Z + (e.deltaY < 0 ? 0.5 : -0.5)));
+      measure();
+      place();
+      syncZoomUI();
+    }, { passive: false });
     lbFrame.addEventListener("pointermove", track);
     lbFrame.addEventListener("pointerdown", track);
     lbFrame.addEventListener("pointerleave", hideLens);
