@@ -164,6 +164,32 @@
     tick();
     setInterval(tick, 1000);
   }
+
+  /* about 卡时区时钟：SAV / SHA / TYO 真实当地时间，30s 刷新 */
+  const tzBoxes = $$("#tzClocks .clockbox[data-tz]");
+  if (tzBoxes.length) {
+    const tzTime = (tz) => {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz, hour: "numeric", minute: "numeric", hour12: false,
+      }).formatToParts(new Date());
+      const get = (t) => +parts.find((p) => p.type === t).value;
+      return { h: get("hour") % 12, m: get("minute"), hh24: get("hour") };
+    };
+    const setClocks = () => {
+      tzBoxes.forEach((box) => {
+        const { h, m, hh24 } = tzTime(box.dataset.tz);
+        const hh = $(".hand.hh", box);
+        const mh = $(".hand.mh", box);
+        if (hh) hh.style.transform = `rotate(${h * 30 + m * 0.5}deg)`;
+        if (mh) mh.style.transform = `rotate(${m * 6}deg)`;
+        const label = $(".clk-l", box);
+        if (label) box.setAttribute("aria-label", `${label.textContent} ${pad2(hh24)}:${pad2(m)}`);
+      });
+    };
+    setClocks();
+    setInterval(setClocks, 30000);
+  }
+
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
   const logEl = $("#footLog");
@@ -363,35 +389,12 @@
   let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
   let lbZoomToggle = null;   // 由 zoom 模块赋值：点击图片切换缩放
 
-  // 手机版映射网格：每格 = 一张作品缩略图（CSS 控制只在小屏显示）
-  function buildLbMap(group) {
-    const map = $("#lbMap");
-    if (!map) return;
-    const items = galleries[group] || [];
-    map.innerHTML = items.map((it, i) =>
-      `<button class="lb-cell" data-i="${i}" aria-label="Image ${i + 1}">
-        <img src="${esc(it.src)}" alt="" loading="lazy" decoding="async" />
-        <span class="lb-cell-n mono">${pad2(i + 1)}</span>
-      </button>`
-    ).join("");
-  }
-  function syncLbMap() {
-    const map = $("#lbMap");
-    if (!map) return;
-    $$(".lb-cell", map).forEach((c) => {
-      const on = Number(c.dataset.i) === lbState.index;
-      c.classList.toggle("is-on", on);
-      if (on && map.offsetParent !== null) c.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
-    });
-  }
-
   let lbHideT = 0;
   function lbOpen(group, index) {
     const items = galleries[group];
     if (!items || !items.length) return;
     clearTimeout(lbHideT);
     lbState = { group, index, lastFocus: document.activeElement, scrollY: window.scrollY };
-    buildLbMap(group);
     lbRender(true); // first open: instant (no fade-out on blank)
     lb.hidden = false;
     // 双 rAF 确保 hidden 移除后过渡能播：背景淡入 + 画框浮入
@@ -414,7 +417,6 @@
     if (cnt) cnt.textContent = `${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
     const pf = $("#lbProgressFill");
     if (pf) pf.style.width = `${((lbState.index + 1) / items.length) * 100}%`;
-    syncLbMap();
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
@@ -473,19 +475,6 @@
   }
   if (lb) {
     $(".lb-close", lb).addEventListener("click", lbClose);
-    // map 格子：按下显示对应作品
-    const lbMapEl = $("#lbMap");
-    if (lbMapEl) {
-      lbMapEl.addEventListener("click", (e) => {
-        const cell = e.target.closest(".lb-cell");
-        if (!cell) return;
-        const i = Number(cell.dataset.i);
-        if (Number.isNaN(i) || i === lbState.index) return;
-        const dir = i > lbState.index ? 1 : -1;
-        lbState.index = i;
-        lbRender(false, dir);
-      });
-    }
     $(".lb-prev", lb).addEventListener("click", () => lbNav(-1));
     $(".lb-next", lb).addEventListener("click", () => lbNav(1));
     // 触屏滑动翻页；滑动后吞掉随之而来的合成 click，避免翻两页
@@ -506,6 +495,8 @@
     // 点击图片 = 以点击位置为中心切换放大（ArtStation 式）
     lbImg.addEventListener("click", (e) => {
       if (swiped) { swiped = false; return; }
+      // 手机布局用按住放大（见 lb-zoomview 模块），点击不开桌面镜片
+      if (window.matchMedia("(max-width: 860px)").matches) return;
       if (lbZoomToggle) lbZoomToggle(e);
     });
     lb.addEventListener("click", (e) => { if (e.target === lb) lbClose(); });
@@ -1118,6 +1109,86 @@
       scrambleObserver.observe(el);
     });
   }
+
+  /* ---------- 手机按住放大：下图按点 → 上方方块显示细节（mapping） ----------
+     按住 ≥160ms 进入取景：上方 lb-zoomview 显示手指处的放大画面，
+     图上同步画出取景框；快速横滑仍然是翻页 */
+  (() => {
+    if (!lb) return;
+    const view = $("#lbZoomView");
+    const zrect = $("#lbZoomRect");
+    const frame = $("#lbFrame");
+    if (!view || !frame) return;
+
+    const MZ = 3; // 手机放大倍率
+    const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
+    let holdT = 0, tracking = false, sx = 0, sy = 0, rect = null;
+
+    const update = (e) => {
+      if (!rect) return;
+      const fx = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      const fy = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+      const vw = view.clientWidth, vh = view.clientHeight;
+      view.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
+      view.style.backgroundSize = `${rect.width * MZ}px ${rect.height * MZ}px`;
+      view.style.backgroundPosition =
+        `${vw / 2 - fx * rect.width * MZ}px ${vh / 2 - fy * rect.height * MZ}px`;
+      view.classList.add("live");
+      if (zrect) {
+        // 取景框：上方方块对应的图上区域
+        const rw = vw / MZ, rh = vh / MZ;
+        const rx = Math.min(rect.width - rw, Math.max(0, fx * rect.width - rw / 2));
+        const ry = Math.min(rect.height - rh, Math.max(0, fy * rect.height - rh / 2));
+        zrect.style.width = `${rw}px`;
+        zrect.style.height = `${rh}px`;
+        zrect.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+        zrect.classList.add("live");
+      }
+    };
+    const stopTracking = () => {
+      clearTimeout(holdT);
+      if (tracking) {
+        tracking = false;
+        lbZoomOn = false; // 恢复滑动翻页
+        if (zrect) zrect.classList.remove("live");
+      }
+    };
+    const resetView = () => {
+      stopTracking();
+      view.classList.remove("live");
+      view.style.backgroundImage = "";
+      if (zrect) { zrect.classList.remove("live"); }
+    };
+
+    frame.addEventListener("pointerdown", (e) => {
+      if (!isMobile()) return;
+      sx = e.clientX; sy = e.clientY;
+      clearTimeout(holdT);
+      holdT = setTimeout(() => {
+        tracking = true;
+        lbZoomOn = true; // 取景时禁用滑动翻页
+        rect = lbImg.getBoundingClientRect();
+        update(e);
+      }, 160);
+    }, { passive: true });
+    frame.addEventListener("pointermove", (e) => {
+      if (!isMobile()) return;
+      if (!tracking) {
+        // 还没进入取景：明显位移视为滑动手势，取消按住计时
+        if (Math.hypot(e.clientX - sx, e.clientY - sy) > 12) clearTimeout(holdT);
+        return;
+      }
+      update(e);
+    }, { passive: true });
+    frame.addEventListener("pointerup", stopTracking, { passive: true });
+    frame.addEventListener("pointercancel", stopTracking, { passive: true });
+
+    // 换图 / 关闭时复位
+    const _r = lbRender;
+    lbRender = function (...a) { resetView(); _r(...a); };
+    const _c = lbClose;
+    lbClose = function () { resetView(); _c(); };
+  })();
 
   /* ---------- 自定义光标：FUI 三角准星 ----------
      实心三角箭头 1:1 跟手（尖端=点击点）+ 描边三角拖尾跟随；

@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;600&family=Noto+Sans+JP:wght@300;500;700&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=13" />
+  <link rel="stylesheet" href="css/style.css?v=14" />
 </head>
 <body>
 
@@ -249,8 +249,10 @@
       </button>
     </div>
 
-    <!-- 手机版：正方形映射网格，按格子直接跳到对应作品 -->
-    <div class="lb-map" id="lbMap" aria-label="Image map"></div>
+    <!-- 手机版：按住下方图片，这个正方形实时显示手指处的放大细节（mapping） -->
+    <div class="lb-zoomview" id="lbZoomView" aria-hidden="true">
+      <span class="zv-hint mono">PRESS &amp; HOLD IMAGE TO INSPECT</span>
+    </div>
 
     <button class="lb-prev" aria-label="Previous image">
       <span class="lb-navbtn">
@@ -262,6 +264,7 @@
         <img id="lbImg" alt="" />
         <span class="corner c-tl"></span><span class="corner c-tr"></span>
         <span class="corner c-bl"></span><span class="corner c-br"></span>
+        <span class="lb-zoomrect" id="lbZoomRect" aria-hidden="true"></span>
         <div class="lens" id="lbLens" aria-hidden="true">
           <div class="lens-glass" id="lbLensGlass"></div>
           <span class="lens-tag mono" id="lbLensTag">3.5&times;</span>
@@ -286,7 +289,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=13"></script>
-  <script src="js/main.js?v=13"></script>
+  <script src="js/data.js?v=14"></script>
+  <script src="js/main.js?v=14"></script>
 </body>
 </html>

@@ -737,6 +737,13 @@ body.hero-ready .pill .pill-outline {
   display: flex; align-items: center; justify-content: center;
 }
 .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+/* 点阵滤镜：印刷网点叠在头像上，呼应全站 dotgrid 语言 */
+.avatar-frame::after {
+  content: ""; position: absolute; inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(7, 7, 7, 0.45) 0.7px, transparent 1.2px);
+  background-size: 4px 4px;
+}
 .avatar-frame .ph-ava {
   font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
   color: var(--ink-dim); text-align: center; line-height: 2;
@@ -773,19 +780,24 @@ body.hero-ready .pill .pill-outline {
   border-top: 1px solid var(--line-dim);
 }
 .clockbox {
-  flex: 1; aspect-ratio: 1/1;
+  flex: 1;
   border: 1px solid var(--line-dim);
-  display: flex; align-items: center; justify-content: center;
-  padding: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px;
+  padding: 8px 6px 6px;
+}
+.clk-l {
+  font-family: var(--mono); font-size: 8.5px;
+  letter-spacing: 0.22em; color: var(--ink-dim);
 }
 .clockbox.dark { background: var(--ink); }
 .clockbox.dark .ln { stroke: var(--bg); }
-.clockbox svg { width: 100%; height: 100%; }
+.clockbox.dark .clk-l { color: rgba(7, 7, 7, 0.7); }
+.clockbox svg { width: 100%; height: auto; }
 .clockbox .ln { stroke: var(--line); stroke-width: 1.5; fill: none; }
+/* 真实时钟指针：JS 按时区时间旋转；分针更细更长 */
 .clockbox .hand { transform-origin: 24px 24px; }
-.hand.h1 { animation: spin 12s linear infinite; }
-.hand.h2 { animation: spin 8s linear infinite reverse; }
-.hand.h3 { animation: spin 20s linear infinite; }
+.clockbox .hand.mh { stroke-width: 1; }
 
 /* about 主体用满宽度：层级靠字阶与明暗，而不是缩窄列宽 */
 .about-body { max-width: none; }
@@ -1187,64 +1199,61 @@ footer .ast { color: var(--ink-dim); }
   .lb-navbtn { width: 46px; height: 46px; }
 }
 
-/* ---------- 手机版映射网格：上方正方形格子，按下显示；图片置底 ---------- */
-.lb-map { display: none; }
+/* ---------- 手机：上方正方形 = 按住图片处的放大视图（mapping） ---------- */
+.lb-zoomview { display: none; }
+.lb-zoomrect { display: none; }
 @media (max-width: 860px) {
   #lightbox {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     justify-content: flex-start;
-    padding: 50px 0 64px;
+    padding: 58px 0 64px;
   }
-  /* 顶部：格子映射图（面板格，当前格高亮反白） */
-  .lb-map {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-    gap: 7px;
-    padding: 12px clamp(12px, 3vw, 20px);
-    max-height: 31vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .lb-cell {
-    position: relative;
-    appearance: none; border: none; padding: 0;
+  /* 放大视图方块：面板质感，按住下图即点亮 */
+  .lb-zoomview {
+    display: flex; align-items: center; justify-content: center;
+    width: min(82vw, 34vh);
     aspect-ratio: 1 / 1;
-    border-radius: 6px;
+    flex: none;
+    border-radius: var(--radius);
+    background-color: var(--srf-1);
+    background-repeat: no-repeat;
+    border: 1px solid var(--srf-line);
     overflow: hidden;
-    background: var(--srf-1);
-    outline: 1px solid var(--srf-line);
-    outline-offset: -1px;
-    transition: outline-color 0.2s, opacity 0.2s;
+    position: relative;
   }
-  .lb-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-    opacity: 0.55;
-    transition: opacity 0.25s;
+  .zv-hint {
+    font-size: 9.5px; letter-spacing: 0.16em;
+    color: var(--ink-dim);
+    text-align: center; padding: 0 18px;
+    transition: opacity 0.2s;
   }
-  .lb-cell-n {
-    position: absolute; right: 3px; bottom: 3px;
-    font-size: 8px; letter-spacing: 0.08em;
-    color: var(--ink);
-    background: rgba(7, 7, 7, 0.72);
+  .lb-zoomview.live .zv-hint { opacity: 0; }
+  .lb-zoomview.live { border-color: rgba(237, 237, 237, 0.35); }
+  /* 图上取景框：标记放大区域（mapping 关系） */
+  .lb-zoomrect {
+    display: block;
+    position: absolute; top: 0; left: 0; z-index: 2;
+    border: 1.5px solid var(--ink);
     border-radius: 4px;
-    padding: 1px 4px;
+    box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.25);
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    will-change: transform;
   }
-  .lb-cell.is-on { outline: 1.5px solid var(--ink); }
-  .lb-cell.is-on img { opacity: 1; }
-  .lb-cell.is-on .lb-cell-n { background: var(--ink); color: var(--bg); }
+  .lb-zoomrect.live { opacity: 1; }
   /* 图片：占据剩余空间并贴底显示 */
   .lb-stage {
-    flex: 1; min-height: 0;
+    flex: 1; min-height: 0; width: 100%;
     display: flex; align-items: flex-end; justify-content: center;
     padding: 10px 12px 12px;
   }
   .lb-frame { max-height: 100%; }
-  #lbImg { max-width: 100%; max-height: calc(100vh - 50px - 31vh - 110px); }
-  /* 箭头让位给 map（滑动手势仍可翻页） */
-  .lb-prev, .lb-next { display: none; }
+  #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 58px - 34vh - 120px); }
+  /* 翻页按钮：缩小贴底，避开放大视图 */
+  .lb-prev, .lb-next { top: auto; bottom: 64px; height: 30vh; width: 54px; }
+  .lb-navbtn { width: 40px; height: 40px; }
 }
 
 /* ---------- responsive ---------- */
@@ -1270,30 +1279,29 @@ footer .ast { color: var(--ink-dim); }
   .tab { font-size: 11px; padding: 0 8px; letter-spacing: 0.06em; flex: 1 0 auto; white-space: nowrap; }
   .tab .t-num { display: none; }
 
-  /* —— 手机端去装饰：假遥测/仪表盘全部隐藏，作品尽快出现 ——
-     保留的层级：SECAL72 → 学历行 → 署名 → 作品 */
-  .hero-readout,            /* RESTORE / TARGET / STATE 假遥测 */
-  .pill-box,                /* pill 仪表盘 + TAP 提示（桌面玩具，手机占 ~200px 还要横滑） */
-  .hero-stats,              /* FILES / PROJECTS / SIGNAL 装饰统计 */
-  .ticker {                 /* 跑马灯词条 */
-    display: none;
-  }
-  /* 标签行只留署名（真名+EST 有信息量；ID 与顶栏重复、日文行纯装饰） */
-  .hero-tags .tag-line:nth-child(-n+2) { display: none; }
+  /* —— 手机端字体层级（不删任何元素）：装饰退后 = 更小更暗，
+     内容前移 = 紧凑间距。层级：标题 > 学历行 > 装饰遥测 —— */
   .hero { padding-top: 14px; }
-  .hero-cred { margin-top: 12px; }
-  .hero-tags { margin-top: 8px; }
-  /* 项目头收敛为：[编号] 标题 / 年份 + 状态徽章（隐藏 ✳、媒介串、NN FILES、日文小字） */
-  .p-title .p-zh { display: none; }
-  .p-meta > span:nth-child(n+2):nth-child(-n+5) { display: none; } /* 对应 main.js p-meta 模板的 2-5 位 */
-  .p-meta { border-top: none; padding-top: 0; margin-top: 6px; }
-  .project { margin-bottom: 40px; }
+  .hero-readout { font-size: 9px; letter-spacing: 0.1em; gap: 10px; margin-bottom: 8px; color: var(--ink-soft); }
+  .hero-readout em { color: var(--ink-dim); }
+  .hero-cred { margin-top: 12px; font-size: 12px; letter-spacing: 0.1em; white-space: normal; }
+  .hero-tags { margin-top: 8px; font-size: 9.5px; gap: 8px 16px; color: var(--ink-soft); }
+  .tag-line { padding-left: 14px; }
+  .pill-box { margin-top: 12px; }
+  .pill-hint { font-size: 9px; }
+  .hero-stats { margin-top: 10px; font-size: 9px; gap: 8px 12px; color: var(--ink-soft); }
+  .hero-stats em { color: var(--ink-dim); }
+  .ticker { margin-top: 8px; padding: 6px 0; }
+  .ticker-track { font-size: 9px; }
+  /* 项目头：标题主导，meta/日文小字退为细注 */
+  .p-meta { font-size: 9px; letter-spacing: 0.08em; gap: 6px 10px; padding-top: 5px; margin-top: 8px; color: var(--ink-soft); }
+  .p-title .p-zh { display: block; margin: 5px 0 0; font-size: 0.32em; color: var(--ink-soft); }
+  .project { margin-bottom: 44px; }
   #projects { padding-top: 14px; }
-  /* 页头副标语也是装饰（DIAGNOSE → TARGET…），手机隐藏 */
-  .vh-readout, .vh-sub { display: none; }
+  /* 页头副标语保留，字阶退后 */
+  .vh-readout { font-size: 9px; color: var(--ink-soft); }
+  .vh-sub { font-size: 9.5px; color: var(--ink-soft); }
   .view-head { padding-top: 32px; padding-bottom: 12px; }
-
-  .hero-cred { font-size: 11px; letter-spacing: 0.1em; white-space: normal; }
   .card .frame { height: 150px; }
   .fan-grid { columns: 2 140px; }
   /* 触控目标 + 简历小字提级 */
@@ -1315,8 +1323,8 @@ footer .ast { color: var(--ink-dim); }
   .stat { padding: 14px 14px 12px; }
   .stat:nth-child(odd) { border-left: none; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line-dim); }
-  /* 日文装饰小字手机端隐藏（见上方去装饰块）；ARCHIVE 页同理 */
-  .arc-title .arc-ja { display: none; }
+  /* ARCHIVE 页日文小字同样保留为细注 */
+  .arc-title .arc-ja { display: block; margin: 5px 0 0; color: var(--ink-soft); }
   /* 满边设计下头像同样吃满卡宽；时钟隐藏后由规格表收底 */
   .spec { padding-bottom: 10px; }
   .clocks { display: none; }
