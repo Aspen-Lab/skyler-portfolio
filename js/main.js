@@ -363,12 +363,35 @@
   let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
   let lbZoomToggle = null;   // 由 zoom 模块赋值：点击图片切换缩放
 
+  // 手机版映射网格：每格 = 一张作品缩略图（CSS 控制只在小屏显示）
+  function buildLbMap(group) {
+    const map = $("#lbMap");
+    if (!map) return;
+    const items = galleries[group] || [];
+    map.innerHTML = items.map((it, i) =>
+      `<button class="lb-cell" data-i="${i}" aria-label="Image ${i + 1}">
+        <img src="${esc(it.src)}" alt="" loading="lazy" decoding="async" />
+        <span class="lb-cell-n mono">${pad2(i + 1)}</span>
+      </button>`
+    ).join("");
+  }
+  function syncLbMap() {
+    const map = $("#lbMap");
+    if (!map) return;
+    $$(".lb-cell", map).forEach((c) => {
+      const on = Number(c.dataset.i) === lbState.index;
+      c.classList.toggle("is-on", on);
+      if (on && map.offsetParent !== null) c.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+    });
+  }
+
   let lbHideT = 0;
   function lbOpen(group, index) {
     const items = galleries[group];
     if (!items || !items.length) return;
     clearTimeout(lbHideT);
     lbState = { group, index, lastFocus: document.activeElement, scrollY: window.scrollY };
+    buildLbMap(group);
     lbRender(true); // first open: instant (no fade-out on blank)
     lb.hidden = false;
     // 双 rAF 确保 hidden 移除后过渡能播：背景淡入 + 画框浮入
@@ -391,6 +414,7 @@
     if (cnt) cnt.textContent = `${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
     const pf = $("#lbProgressFill");
     if (pf) pf.style.width = `${((lbState.index + 1) / items.length) * 100}%`;
+    syncLbMap();
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
@@ -449,6 +473,19 @@
   }
   if (lb) {
     $(".lb-close", lb).addEventListener("click", lbClose);
+    // map 格子：按下显示对应作品
+    const lbMapEl = $("#lbMap");
+    if (lbMapEl) {
+      lbMapEl.addEventListener("click", (e) => {
+        const cell = e.target.closest(".lb-cell");
+        if (!cell) return;
+        const i = Number(cell.dataset.i);
+        if (Number.isNaN(i) || i === lbState.index) return;
+        const dir = i > lbState.index ? 1 : -1;
+        lbState.index = i;
+        lbRender(false, dir);
+      });
+    }
     $(".lb-prev", lb).addEventListener("click", () => lbNav(-1));
     $(".lb-next", lb).addEventListener("click", () => lbNav(1));
     // 触屏滑动翻页；滑动后吞掉随之而来的合成 click，避免翻两页

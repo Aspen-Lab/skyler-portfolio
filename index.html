@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;600&family=Noto+Sans+JP:wght@300;500;700&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=12" />
+  <link rel="stylesheet" href="css/style.css?v=13" />
 </head>
 <body>
 
@@ -191,10 +191,11 @@
             <div><dt>STATE</dt><dd class="ok">CREATING</dd></div>
             <div><dt>CHANNEL</dt><dd>07</dd></div>
           </dl>
-          <div class="clocks" aria-hidden="true">
-            <div class="clockbox"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="24" y2="8" class="ln hand h1"/></svg></div>
-            <div class="clockbox dark"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="36" y2="14" class="ln hand h2"/></svg></div>
-            <div class="clockbox"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="12" y2="24" class="ln hand h3"/></svg></div>
+          <!-- 真实时区时钟：SAV = SCAD 所在地 / SHA / TYO，指针由 JS 按当地时间驱动 -->
+          <div class="clocks" id="tzClocks" role="group" aria-label="Local time in Savannah, Shanghai and Tokyo">
+            <div class="clockbox" data-tz="America/New_York"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="24" y2="14" class="ln hand hh"/><line x1="24" y1="24" x2="24" y2="8" class="ln hand mh"/></svg><span class="clk-l">SAV</span></div>
+            <div class="clockbox dark" data-tz="Asia/Shanghai"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="24" y2="14" class="ln hand hh"/><line x1="24" y1="24" x2="24" y2="8" class="ln hand mh"/></svg><span class="clk-l">SHA</span></div>
+            <div class="clockbox" data-tz="Asia/Tokyo"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" class="ln"/><line x1="24" y1="24" x2="24" y2="14" class="ln hand hh"/><line x1="24" y1="24" x2="24" y2="8" class="ln hand mh"/></svg><span class="clk-l">TYO</span></div>
           </div>
         </aside>
 
@@ -248,6 +249,9 @@
       </button>
     </div>
 
+    <!-- 手机版：正方形映射网格，按格子直接跳到对应作品 -->
+    <div class="lb-map" id="lbMap" aria-label="Image map"></div>
+
     <button class="lb-prev" aria-label="Previous image">
       <span class="lb-navbtn">
         <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3"><polyline points="11.5 3 5.5 9 11.5 15"/></svg>
@@ -282,7 +286,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=12"></script>
-  <script src="js/main.js?v=12"></script>
+  <script src="js/data.js?v=13"></script>
+  <script src="js/main.js?v=13"></script>
 </body>
 </html>

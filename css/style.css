@@ -1187,6 +1187,66 @@ footer .ast { color: var(--ink-dim); }
   .lb-navbtn { width: 46px; height: 46px; }
 }
 
+/* ---------- 手机版映射网格：上方正方形格子，按下显示；图片置底 ---------- */
+.lb-map { display: none; }
+@media (max-width: 860px) {
+  #lightbox {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 50px 0 64px;
+  }
+  /* 顶部：格子映射图（面板格，当前格高亮反白） */
+  .lb-map {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 7px;
+    padding: 12px clamp(12px, 3vw, 20px);
+    max-height: 31vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lb-cell {
+    position: relative;
+    appearance: none; border: none; padding: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--srf-1);
+    outline: 1px solid var(--srf-line);
+    outline-offset: -1px;
+    transition: outline-color 0.2s, opacity 0.2s;
+  }
+  .lb-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    opacity: 0.55;
+    transition: opacity 0.25s;
+  }
+  .lb-cell-n {
+    position: absolute; right: 3px; bottom: 3px;
+    font-size: 8px; letter-spacing: 0.08em;
+    color: var(--ink);
+    background: rgba(7, 7, 7, 0.72);
+    border-radius: 4px;
+    padding: 1px 4px;
+    pointer-events: none;
+  }
+  .lb-cell.is-on { outline: 1.5px solid var(--ink); }
+  .lb-cell.is-on img { opacity: 1; }
+  .lb-cell.is-on .lb-cell-n { background: var(--ink); color: var(--bg); }
+  /* 图片：占据剩余空间并贴底显示 */
+  .lb-stage {
+    flex: 1; min-height: 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 10px 12px 12px;
+  }
+  .lb-frame { max-height: 100%; }
+  #lbImg { max-width: 100%; max-height: calc(100vh - 50px - 31vh - 110px); }
+  /* 箭头让位给 map（滑动手势仍可翻页） */
+  .lb-prev, .lb-next { display: none; }
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 860px) {
   .bar-meta .ver { display: none; }
