@@ -278,9 +278,52 @@ a, button, .card.is-link, #lbImg {
 }
 .hero-title .solid { color: var(--ink); }
 
-/* —— SECAL72 常驻动画：周期性信号干扰 + 空心数字呼吸 —— */
+/* —— SECAL72 常驻动画：掠光扫过 + 周期性信号干扰 + 空心数字呼吸 ——
+   掠光 = 暗翼+白热芯的光带横扫（background-clip:text）：
+   实心字母上是光泽反差带，空心 72 内部被光带瞬间填亮 */
 body.hero-ready .hero-title { animation: title-tick 7s linear 2.6s infinite; }
-body.hero-ready .hero-title .hollow { animation: hollow-breathe 4.8s ease-in-out 2s infinite; }
+body.hero-ready .hero-title .solid {
+  color: transparent;
+  background-image:
+    linear-gradient(100deg,
+      rgba(7, 7, 7, 0) 43%,
+      rgba(7, 7, 7, 0.55) 47%,
+      #ffffff 49.5%, #ffffff 50.5%,
+      rgba(7, 7, 7, 0.55) 53%,
+      rgba(7, 7, 7, 0) 57%),
+    linear-gradient(var(--ink), var(--ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 280% 100%, 100% 100%;
+  background-position: 100% 0, 0 0;
+  background-repeat: no-repeat;
+  animation: title-glint 4.6s cubic-bezier(0.45, 0, 0.2, 1) 1.4s infinite;
+}
+body.hero-ready .hero-title .hollow {
+  background-image: linear-gradient(100deg,
+    rgba(255, 255, 255, 0) 43%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0) 57%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 280% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  animation:
+    hollow-breathe 4.8s ease-in-out 2s infinite,
+    title-glint-h 4.6s cubic-bezier(0.45, 0, 0.2, 1) 1.75s infinite;
+}
+/* 光带从左到右扫 ~1.2s，停 ~3.4s 再来（百分比定位：100%=带在左外，0%=右外） */
+@keyframes title-glint {
+  0% { background-position: 100% 0, 0 0; }
+  26% { background-position: 0% 0, 0 0; }
+  100% { background-position: 0% 0, 0 0; }
+}
+@keyframes title-glint-h {
+  0% { background-position: 100% 0; }
+  26% { background-position: 0% 0; }
+  100% { background-position: 0% 0; }
+}
 @keyframes title-tick {
   0%, 93.9% { transform: none; }
   94.3% { transform: translate(-4px, 1px) skewX(-3deg); }
@@ -802,7 +845,7 @@ body.hero-ready .pill .pill-outline {
 .stat:first-child { border-left: none; }
 .stat-n {
   display: block;
-  font-family: var(--disp); font-weight: 900; font-stretch: 118%;
+  font-family: var(--disp); font-weight: 600; font-stretch: 118%;
   font-size: clamp(26px, 2.7vw, 46px);
   line-height: 1; text-transform: uppercase;
   white-space: nowrap;
@@ -851,7 +894,7 @@ body.hero-ready .pill .pill-outline {
 }
 .xp-period { color: var(--ink-dim); min-width: 150px; }
 .xp-co {
-  font-family: var(--disp); font-weight: 900; font-stretch: 118%;
+  font-family: var(--disp); font-weight: 600; font-stretch: 118%;
   font-size: clamp(22px, 2.6vw, 40px);
   line-height: 1.02; text-transform: uppercase;
   letter-spacing: 0.005em;
@@ -870,7 +913,7 @@ body.hero-ready .pill .pill-outline {
 }
 /* 幽灵编号：描边数字，悬停时填充 */
 .xp-num {
-  font-family: var(--disp); font-weight: 900; font-stretch: 125%;
+  font-family: var(--disp); font-weight: 600; font-stretch: 125%;
   font-size: clamp(30px, 3.2vw, 56px);
   line-height: 1;
   color: transparent;
@@ -970,17 +1013,21 @@ footer .ast { color: var(--ink-dim); }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
   transform: scale(0.965) translateY(10px);
   opacity: 0;
+  perspective: 1200px; /* 翻页时图片的轻微 3D 偏转 */
   transition:
     transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.3s ease;
 }
 #lightbox.is-open .lb-frame { transform: none; opacity: 1; }
+/* 翻页动画期间裁掉滑出帧外的部分 */
+.lb-frame.navving { overflow: hidden; }
 #lbImg {
   max-width: 88vw; max-height: 80vh;
   display: block;
   -webkit-user-drag: none; user-select: none;
   transition: opacity 0.18s ease;
   cursor: zoom-in;
+  will-change: transform, opacity;
 }
 /* 镜片模式：光标隐藏，镜片即光标 */
 .lb-frame.lens-on, .lb-frame.lens-on #lbImg { cursor: none; }
@@ -990,7 +1037,7 @@ footer .ast { color: var(--ink-dim); }
    内层 .lens-glass 承担玻璃质感与出现/消失动画 */
 .lens {
   position: absolute; top: 0; left: 0; z-index: 3;
-  width: 780px; height: 780px;
+  width: 520px; height: 520px;
   pointer-events: none;
   will-change: transform;
 }
@@ -1178,6 +1225,45 @@ footer .ast { color: var(--ink-dim); }
 }
 
 /* ---------- reduced motion ---------- */
+/* ---------- 自定义光标：FUI 菱形准星 ---------- */
+body.has-cursor,
+body.has-cursor a, body.has-cursor button,
+body.has-cursor .card.is-link, body.has-cursor #lbImg,
+body.has-cursor input, body.has-cursor textarea { cursor: none; }
+.cursor {
+  position: fixed; top: 0; left: 0; z-index: 500;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.cursor.on { opacity: 1; }
+/* 镜片激活时让位（镜片即光标） */
+body.lens-cursor .cursor { opacity: 0; }
+.c-dot, .c-ring { position: fixed; top: 0; left: 0; will-change: transform; }
+.c-dot { width: 4px; height: 4px; }
+.c-dot::before {
+  content: ""; position: absolute; inset: 0;
+  background: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.c-ring { width: 26px; height: 26px; }
+.c-ring::before {
+  content: ""; position: absolute; inset: 0;
+  border: 1px solid rgba(237, 237, 237, 0.45);
+  transform: rotate(45deg);   /* 默认：菱形 */
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease;
+}
+/* 悬停可点元素：菱形转正放大成方框（呼应卡片四角准星），白点收小 */
+.cursor.hot .c-ring::before {
+  transform: rotate(0deg) scale(1.5);
+  border-color: rgba(237, 237, 237, 0.9);
+}
+.cursor.hot .c-dot::before { transform: scale(0.5); }
+/* 按下：收缩反馈 */
+.cursor.down .c-ring::before { transform: rotate(0deg) scale(0.8); }
+
 /* 减弱动态效果：只停掉「循环不止」的动效（跑马灯/噪点/闪烁/旋转）。
    用户主动触发的一次性过渡（开灯箱、切页、悬停反馈）保留 ——
    全局 0.01ms 的一刀切会把站点变成无动画的死页面 */
@@ -1188,6 +1274,6 @@ footer .ast { color: var(--ink-dim); }
   .grain, .dotgrid::after, .dotgrid::before,
   .spin-ast, .dot, .scanline, .rotor,
   .hero-readout em, .hand,
-  .hero-title, .hero-title .hollow,
+  .hero-title, .hero-title .hollow, .hero-title .solid,
   .cred-mark, .cred-cursor { animation: none; }
 }

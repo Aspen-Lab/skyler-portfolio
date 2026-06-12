@@ -383,7 +383,7 @@
     $(".lb-close", lb).focus();
   }
   let lbTransitioning = false;
-  function lbRender(instant) {
+  function lbRender(instant, dir = 1) {
     const items = galleries[lbState.group];
     const it = items[lbState.index];
     lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em> ${AST} ${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
@@ -391,25 +391,42 @@
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       lbImg.style.opacity = "1";
+      lbImg.style.transform = "";
       lbTransitioning = false;
       return;
     }
-    // 淡出 → 换图 → 淡入
-    lbImg.style.transition = "opacity 0.18s ease";
-    lbImg.style.opacity = "0";
+    // 方向性翻页：出场向行进方向滑出 + 轻微透视偏转，入场从另一侧落定
+    const frame = $("#lbFrame");
     lbTransitioning = true;
+    if (frame) frame.classList.add("navving");
+    lbImg.style.transition = "transform 0.2s cubic-bezier(0.55, 0, 0.85, 0.4), opacity 0.18s ease";
+    lbImg.style.transform = `translate3d(${-46 * dir}px, 0, 0) scale(0.985) rotateY(${-5 * dir}deg)`;
+    lbImg.style.opacity = "0";
     const swap = () => {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
-      const onLoad = () => {
+      let entered = false;
+      const enter = () => {
+        if (entered) return;
+        entered = true;
+        lbImg.style.transition = "none";
+        lbImg.style.transform = `translate3d(${52 * dir}px, 0, 0) scale(0.985) rotateY(${5 * dir}deg)`;
+        void lbImg.offsetWidth; // 强制 reflow，让起始姿态生效
+        lbImg.style.transition = "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease";
+        lbImg.style.transform = "";
         lbImg.style.opacity = "1";
-        lbTransitioning = false;
+        setTimeout(() => {
+          if (frame) frame.classList.remove("navving");
+          lbTransitioning = false;
+        }, 480);
       };
-      if (lbImg.complete) onLoad();
-      else lbImg.addEventListener("load", onLoad, { once: true });
+      if (lbImg.complete) enter();
+      else {
+        lbImg.addEventListener("load", enter, { once: true });
+        lbImg.addEventListener("error", enter, { once: true });
+      }
     };
-    // wait for fade-out (180ms), then swap
-    setTimeout(swap, 160);
+    setTimeout(swap, 180);
   }
   function lbNav(dir) {
     if (lbTransitioning) return;
@@ -422,7 +439,7 @@
     }
     if (!items[i] || items[i].dead) return;
     lbState.index = i;
-    lbRender();
+    lbRender(false, dir);
   }
   function lbClose() {
     // 滚动与焦点立即还原；视觉上淡出 240ms 后才真正隐藏
@@ -490,7 +507,7 @@
     if (!lbFrame || !lens || !loupeBtn) return;
 
     const glass = $("#lbLensGlass");
-    const Z = 3.5, R = 390; // 镜片半径 390px（直径 780），3.5× 放大
+    const Z = 3.5, R = 260; // 镜片半径 260px（直径 520），3.5× 放大
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
@@ -537,6 +554,7 @@
       lbZoomOn = next;
       syncBtn();
       lbFrame.classList.toggle("lens-on", next);
+      document.body.classList.toggle("lens-cursor", next); // 镜片激活时隐藏自定义光标
       if (next) {
         measure();
         if (e && e.clientX !== undefined) track(e);
@@ -558,7 +576,7 @@
 
     const hardReset = () => setLoupe(false);
     const _origRender = lbRender;
-    lbRender = function (instant) { hardReset(); _origRender(instant); };
+    lbRender = function (...args) { hardReset(); _origRender(...args); };
     const _origClose = lbClose;
     lbClose = function () { hardReset(); _origClose(); };
 
@@ -1049,6 +1067,40 @@
       scrambleObserver.observe(el);
     });
   }
+
+  /* ---------- 自定义光标：FUI 菱形准星 ----------
+     白点 1:1 跟手 + 菱形细框拖尾跟随；
+     悬停可点元素时菱形转正放大成方框（呼应卡片四角准星），按下收缩 */
+  (() => {
+    if (TOUCH || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const cur = document.createElement("div");
+    cur.className = "cursor";
+    cur.setAttribute("aria-hidden", "true");
+    cur.innerHTML = `<span class="c-dot"></span><span class="c-ring"></span>`;
+    document.body.appendChild(cur);
+    document.body.classList.add("has-cursor");
+    const dot = cur.firstElementChild, ring = cur.lastElementChild;
+    let tx = -100, ty = -100, rx = -100, ry = -100, raf = 0, seen = false;
+    const step = () => {
+      rx += (tx - rx) * 0.28;
+      ry += (ty - ry) * 0.28;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      if (Math.abs(tx - rx) > 0.2 || Math.abs(ty - ry) > 0.2) raf = requestAnimationFrame(step);
+      else raf = 0;
+    };
+    document.addEventListener("pointermove", (e) => {
+      tx = e.clientX; ty = e.clientY;
+      dot.style.transform = `translate3d(${tx}px, ${ty}px, 0) translate(-50%, -50%)`;
+      if (!seen) { seen = true; rx = tx; ry = ty; cur.classList.add("on"); }
+      const hot = e.target.closest("a, button, [role='button'], .card.is-link, input, textarea, summary, label");
+      cur.classList.toggle("hot", !!hot);
+      if (!raf) raf = requestAnimationFrame(step);
+    }, { passive: true });
+    document.addEventListener("pointerdown", () => cur.classList.add("down"), { passive: true });
+    document.addEventListener("pointerup", () => cur.classList.remove("down"), { passive: true });
+    document.documentElement.addEventListener("pointerleave", () => cur.classList.remove("on"));
+    document.documentElement.addEventListener("pointerenter", () => { if (seen) cur.classList.add("on"); });
+  })();
 
   /* ---------- init ---------- */
   applySite();
