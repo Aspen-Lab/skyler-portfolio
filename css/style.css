@@ -690,9 +690,11 @@ body.hero-ready .pill .pill-outline {
   padding: 2px 10px; font-size: 9.5px; color: var(--ink-dim);
 }
 .view-title {
-  font-weight: 900; font-stretch: 122%;
-  font-size: clamp(46px, 10vw, 130px);
-  line-height: 0.92; text-transform: uppercase;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: clamp(26px, 2.6vw, 44px);
+  letter-spacing: 0.14em;
+  line-height: 1.1; text-transform: uppercase;
 }
 .vh-sub {
   margin-top: 14px;
@@ -868,8 +870,9 @@ body.hero-ready .pill .pill-outline {
 .stat:first-child { border-left: none; }
 .stat-n {
   display: block;
-  font-family: var(--disp); font-weight: 600; font-stretch: 118%;
-  font-size: clamp(26px, 2.7vw, 46px);
+  font-family: var(--mono); font-weight: 500;
+  font-size: clamp(18px, 1.8vw, 30px);
+  letter-spacing: 0.08em;
   line-height: 1; text-transform: uppercase;
   white-space: nowrap;
 }
@@ -917,10 +920,10 @@ body.hero-ready .pill .pill-outline {
 }
 .xp-period { color: var(--ink-dim); min-width: 150px; }
 .xp-co {
-  font-family: var(--disp); font-weight: 600; font-stretch: 118%;
-  font-size: clamp(22px, 2.6vw, 40px);
-  line-height: 1.02; text-transform: uppercase;
-  letter-spacing: 0.005em;
+  font-family: var(--mono); font-weight: 500;
+  font-size: clamp(16px, 1.4vw, 22px);
+  line-height: 1.2; text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: var(--ink);
 }
 .xp-role {
@@ -936,11 +939,11 @@ body.hero-ready .pill .pill-outline {
 }
 /* 幽灵编号：描边数字，悬停时填充 */
 .xp-num {
-  font-family: var(--disp); font-weight: 600; font-stretch: 125%;
-  font-size: clamp(30px, 3.2vw, 56px);
+  font-family: var(--mono); font-weight: 500;
+  font-size: clamp(20px, 2vw, 34px);
   line-height: 1;
   color: transparent;
-  -webkit-text-stroke: 1.5px rgba(237, 237, 237, 0.22);
+  -webkit-text-stroke: 1px rgba(237, 237, 237, 0.22);
   transition: -webkit-text-stroke-color 0.3s, color 0.3s;
   user-select: none;
 }
@@ -958,7 +961,7 @@ body.hero-ready .pill .pill-outline {
 .ab-duo .xp-when { grid-column: 1; }
 .ab-duo .xp-main { grid-column: 1; }
 .ab-duo .xp-num { grid-column: 2; grid-row: 1 / span 2; }
-.ab-duo .xp-co { font-size: clamp(18px, 1.7vw, 26px); }
+.ab-duo .xp-co { font-size: clamp(13px, 1.1vw, 16px); }
 
 /* 能力芯片：逐个弹入 + 悬停反色 */
 .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; }
