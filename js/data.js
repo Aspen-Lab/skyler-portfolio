@@ -53,9 +53,31 @@ const PROJECTS = [
     works: [
       { title: "BAIZE — BOOK SPREAD", src: "assets/works/p02/02-baize-spread.jpg", featured: true, w: 1920, h: 1242 },
       { title: "BAIZE — CHARACTER SHEET",  src: "assets/works/p02/01-baize.jpg", w: 1920, h: 1242 },
+      { title: "BAIZE & CHONGMING — SPREAD",   src: "assets/works/p02/06-baize-chongming-spread.jpg", w: 1920, h: 740 },
+      { title: "TAOTIE & NINE-TAILED FOX — SPREAD", src: "assets/works/p02/07-taotie-fox-spread.jpg", w: 1920, h: 740 },
+      { title: "KUNPENG & BIFANG — SPREAD",    src: "assets/works/p02/08-kunpeng-bifang-spread.jpg", w: 1920, h: 740 },
       { title: "LEPTAILURUS PAVONINUS",    src: "assets/works/p02/03-leptailurus.jpg", w: 1920, h: 1242 },
       { title: "OVIS CAMELOPARDALIS",      src: "assets/works/p02/04-ovis.jpg", w: 1920, h: 1242 },
       { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg", w: 1920, h: 1242 },
+    ],
+  },
+  {
+    id: "P-03",
+    // ✳ 项目名是占位（按画面内容起的），Skyler 可改成项目真名
+    title: "OVERGROWTH",
+    ja: "ワールドビルディング",
+    year: "SPRING 2026",
+    medium: "ENVIRONMENT / PROP / KEYFRAME",
+    state: "ONGOING",
+    works: [
+      { title: "KEYFRAME — SUNSET BLOOM",      src: "assets/works/p03/01-keyframe-sunset.jpg",   w: 1920, h: 1080 },
+      { title: "KEYFRAME — OVERGROWN STREET",  src: "assets/works/p03/02-keyframe-ruins.jpg",    w: 1920, h: 1080 },
+      { title: "BLOOM COLONY — DESIGN",        src: "assets/works/p03/03-bloom-colony.jpg",      w: 1920, h: 1483 },
+      { title: "BLOOM PLANT — VARIATIONS",     src: "assets/works/p03/04-plant-variations.jpg",  w: 1920, h: 1483 },
+      { title: "BLOOM PLANT — PROCESS",        src: "assets/works/p03/05-plant-process.jpg",     w: 1483, h: 1920 },
+      { title: "EXPEDITION VAN — DESIGN",      src: "assets/works/p03/06-van-design.jpg",        w: 1920, h: 1080 },
+      { title: "SURVIVAL PACK — DESIGN",       src: "assets/works/p03/07-backpack-design.jpg",   w: 1920, h: 1080 },
+      { title: "STATION — ISOMETRIC CUTAWAY",  src: "assets/works/p03/08-station-isometric.jpg", w: 1920, h: 1080 },
     ],
   },
 ];
@@ -69,13 +91,11 @@ const SKETCHES = {
   year: "2023 — 2026",
   medium: "SKETCH / STUDY / WIP",
   works: [
-    { title: "SKETCH_01", src: "" },
-    { title: "SKETCH_02", src: "" },
-    { title: "SKETCH_03", src: "" },
+    { title: "MATERIAL STUDIES — SPHERES",       src: "assets/works/sketches/01-material-studies.jpg", w: 1920, h: 1919 },
+    { title: "ENVIRONMENT STUDY — MARKET",       src: "assets/works/sketches/02-env-study-market.jpg", w: 1920, h: 1080 },
+    { title: "THE LITTLE PRINCE — CHARACTER SHEET", src: "assets/works/sketches/03-little-prince.jpg", w: 1200, h: 900 },
     { title: "SKETCH_04", src: "" },
     { title: "SKETCH_05", src: "" },
-    { title: "SKETCH_06", src: "" },
-    { title: "SKETCH_07", src: "" },
   ],
 };
 

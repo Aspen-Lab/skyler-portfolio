@@ -268,6 +268,8 @@ a, button, .card.is-link, #lbImg {
   letter-spacing: -0.01em;
   text-transform: uppercase;
   user-select: none;
+  position: relative;
+  overflow: hidden; /* 光刃只在标题框内可见 */
 }
 .hero-title .hollow { color: var(--ink); }
 @supports (-webkit-text-stroke: 1px black) {
@@ -278,19 +280,40 @@ a, button, .card.is-link, #lbImg {
 }
 .hero-title .solid { color: var(--ink); }
 
-/* —— SECAL72 常驻动画：掠光扫过 + 周期性信号干扰 + 空心数字呼吸 ——
-   掠光 = 暗翼+白热芯的光带横扫（background-clip:text）：
-   实心字母上是光泽反差带，空心 72 内部被光带瞬间填亮 */
+/* —— SECAL72 常驻动画：光刃掠过(glint) + 字面光泽带 + 周期性信号干扰 + 空心数字呼吸 ——
+   光刃 = 斜切亮条 + mix-blend-mode:overlay：黑底上几乎隐形，
+   扫到字母上时整个字面被点燃 —— 主视觉的高光扫过 */
 body.hero-ready .hero-title { animation: title-tick 7s linear 2.6s infinite; }
+body.hero-ready .hero-title::after {
+  content: ""; position: absolute;
+  top: -25%; bottom: -25%; left: 0; width: 17%;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 35%,
+    #ffffff 50%,
+    rgba(255, 255, 255, 0.55) 65%,
+    rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-180%) skewX(-18deg);
+  mix-blend-mode: overlay;
+  animation: title-blade 4.6s cubic-bezier(0.45, 0, 0.2, 1) 1.4s infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+@keyframes title-blade {
+  0%   { transform: translateX(-180%) skewX(-18deg); }
+  26%  { transform: translateX(720%) skewX(-18deg); }
+  100% { transform: translateX(720%) skewX(-18deg); }
+}
+/* 字面光泽带：与光刃同步的暗翼+白芯（background-clip:text），加深立体感 */
 body.hero-ready .hero-title .solid {
   color: transparent;
   background-image:
     linear-gradient(100deg,
-      rgba(7, 7, 7, 0) 43%,
-      rgba(7, 7, 7, 0.55) 47%,
+      rgba(7, 7, 7, 0) 41%,
+      rgba(7, 7, 7, 0.72) 46.5%,
       #ffffff 49.5%, #ffffff 50.5%,
-      rgba(7, 7, 7, 0.55) 53%,
-      rgba(7, 7, 7, 0) 57%),
+      rgba(7, 7, 7, 0.72) 53.5%,
+      rgba(7, 7, 7, 0) 59%),
     linear-gradient(var(--ink), var(--ink));
   -webkit-background-clip: text;
   background-clip: text;
@@ -301,9 +324,9 @@ body.hero-ready .hero-title .solid {
 }
 body.hero-ready .hero-title .hollow {
   background-image: linear-gradient(100deg,
-    rgba(255, 255, 255, 0) 43%,
-    rgba(255, 255, 255, 0.65) 50%,
-    rgba(255, 255, 255, 0) 57%);
+    rgba(255, 255, 255, 0) 42%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0) 58%);
   -webkit-background-clip: text;
   background-clip: text;
   background-size: 280% 100%;
@@ -1032,6 +1055,17 @@ footer .ast { color: var(--ink-dim); }
 /* 镜片模式：光标隐藏，镜片即光标 */
 .lb-frame.lens-on, .lb-frame.lens-on #lbImg { cursor: none; }
 
+/* 像素解码画布：覆盖在图片上，由 JS 逐级细化绘制 */
+.lb-pixel {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+  image-rendering: pixelated;
+  transition: opacity 0.16s ease;
+}
+
 /* 放大镜镜片 = 光标本体：
    外层 .lens 只负责 transform 定位（合成器，零布局开销），
    内层 .lens-glass 承担玻璃质感与出现/消失动画 */
@@ -1231,25 +1265,30 @@ body.has-cursor a, body.has-cursor button,
 body.has-cursor .card.is-link, body.has-cursor #lbImg,
 body.has-cursor input, body.has-cursor textarea { cursor: none; }
 .cursor {
-  position: fixed; top: 0; left: 0; z-index: 500;
+  position: fixed; top: 0; left: 0; z-index: 999;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 .cursor.on { opacity: 1; }
 /* 镜片激活时让位（镜片即光标） */
 body.lens-cursor .cursor { opacity: 0; }
-.c-dot, .c-ring { position: fixed; top: 0; left: 0; will-change: transform; }
-.c-dot { width: 4px; height: 4px; }
+.c-dot, .c-ring {
+  position: fixed; top: 0; left: 0;
+  will-change: transform;
+  /* difference 混合：白色在亮图上自动反成黑色，任何背景都清晰可见 */
+  mix-blend-mode: difference;
+}
+.c-dot { width: 6px; height: 6px; }
 .c-dot::before {
   content: ""; position: absolute; inset: 0;
-  background: var(--ink);
+  background: #fff;
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.c-ring { width: 26px; height: 26px; }
+.c-ring { width: 34px; height: 34px; }
 .c-ring::before {
   content: ""; position: absolute; inset: 0;
-  border: 1px solid rgba(237, 237, 237, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
   transform: rotate(45deg);   /* 默认：菱形 */
   transition:
     transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1258,7 +1297,7 @@ body.lens-cursor .cursor { opacity: 0; }
 /* 悬停可点元素：菱形转正放大成方框（呼应卡片四角准星），白点收小 */
 .cursor.hot .c-ring::before {
   transform: rotate(0deg) scale(1.5);
-  border-color: rgba(237, 237, 237, 0.9);
+  border-color: #fff;
 }
 .cursor.hot .c-dot::before { transform: scale(0.5); }
 /* 按下：收缩反馈 */
@@ -1274,6 +1313,6 @@ body.lens-cursor .cursor { opacity: 0; }
   .grain, .dotgrid::after, .dotgrid::before,
   .spin-ast, .dot, .scanline, .rotor,
   .hero-readout em, .hand,
-  .hero-title, .hero-title .hollow, .hero-title .solid,
+  .hero-title, .hero-title::after, .hero-title .hollow, .hero-title .solid,
   .cred-mark, .cred-cursor { animation: none; }
 }

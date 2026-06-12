@@ -383,19 +383,70 @@
     $(".lb-close", lb).focus();
   }
   let lbTransitioning = false;
+  /* ---------- 像素解码入场：图片从大块马赛克逐级细化 ---------- */
+  let pixCanvas = null, pixOff = null, pixT = 0;
+  function pixelHide() {
+    clearTimeout(pixT);
+    if (pixCanvas) { pixCanvas.style.display = "none"; pixCanvas.style.opacity = "1"; }
+  }
+  function pixelReveal(tries = 0) {
+    const frame = $("#lbFrame");
+    if (!frame || !lbImg.naturalWidth) return;
+    if (!pixCanvas) {
+      pixCanvas = document.createElement("canvas");
+      pixCanvas.className = "lb-pixel";
+      pixCanvas.setAttribute("aria-hidden", "true");
+      frame.appendChild(pixCanvas);
+      pixOff = document.createElement("canvas");
+    }
+    const w = lbImg.clientWidth, h = lbImg.clientHeight;
+    if (!w || !h) { // 还没布局好（如刚移除 hidden），下一帧重试
+      if (tries < 10) requestAnimationFrame(() => pixelReveal(tries + 1));
+      return;
+    }
+    pixCanvas.width = w; pixCanvas.height = h;
+    pixCanvas.style.display = "block";
+    pixCanvas.style.opacity = "1";
+    const ctx = pixCanvas.getContext("2d");
+    const offCtx = pixOff.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    const steps = [64, 40, 24, 14, 8]; // 马赛克块尺寸逐级变细
+    let i = 0;
+    clearTimeout(pixT);
+    const draw = () => {
+      const p = steps[i];
+      const tw = Math.max(1, Math.round(w / p)), th = Math.max(1, Math.round(h / p));
+      pixOff.width = tw; pixOff.height = th;
+      offCtx.drawImage(lbImg, 0, 0, tw, th);
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(pixOff, 0, 0, tw, th, 0, 0, w, h);
+      i++;
+      if (i < steps.length) pixT = setTimeout(draw, 72);
+      else {
+        pixCanvas.style.opacity = "0";
+        pixT = setTimeout(() => { pixCanvas.style.display = "none"; pixCanvas.style.opacity = "1"; }, 170);
+      }
+    };
+    try { draw(); } catch { pixelHide(); } // canvas 异常（跨域等）时直接放弃特效
+  }
+
   function lbRender(instant, dir = 1) {
     const items = galleries[lbState.group];
     const it = items[lbState.index];
     lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em> ${AST} ${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
+    pixelHide();
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       lbImg.style.opacity = "1";
       lbImg.style.transform = "";
       lbTransitioning = false;
+      // 首次打开也用像素解码入场
+      if (lbImg.complete && lbImg.naturalWidth) pixelReveal();
+      else lbImg.addEventListener("load", () => pixelReveal(), { once: true });
       return;
     }
-    // 方向性翻页：出场向行进方向滑出 + 轻微透视偏转，入场从另一侧落定
+    // 方向性翻页：出场向行进方向滑出 + 透视偏转 → 新图像素解码显形
     const frame = $("#lbFrame");
     lbTransitioning = true;
     if (frame) frame.classList.add("navving");
@@ -410,15 +461,13 @@
         if (entered) return;
         entered = true;
         lbImg.style.transition = "none";
-        lbImg.style.transform = `translate3d(${52 * dir}px, 0, 0) scale(0.985) rotateY(${5 * dir}deg)`;
-        void lbImg.offsetWidth; // 强制 reflow，让起始姿态生效
-        lbImg.style.transition = "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease";
         lbImg.style.transform = "";
         lbImg.style.opacity = "1";
+        pixelReveal(); // 像素块逐级细化显形
         setTimeout(() => {
           if (frame) frame.classList.remove("navving");
           lbTransitioning = false;
-        }, 480);
+        }, 440);
       };
       if (lbImg.complete) enter();
       else {
@@ -1088,18 +1137,22 @@
       if (Math.abs(tx - rx) > 0.2 || Math.abs(ty - ry) > 0.2) raf = requestAnimationFrame(step);
       else raf = 0;
     };
-    document.addEventListener("pointermove", (e) => {
+    const onMove = (e) => {
       tx = e.clientX; ty = e.clientY;
       dot.style.transform = `translate3d(${tx}px, ${ty}px, 0) translate(-50%, -50%)`;
-      if (!seen) { seen = true; rx = tx; ry = ty; cur.classList.add("on"); }
-      const hot = e.target.closest("a, button, [role='button'], .card.is-link, input, textarea, summary, label");
+      if (!seen) { seen = true; rx = tx; ry = ty; }
+      cur.classList.add("on"); // 每次移动都强制可见（黏性，杜绝偶发消失）
+      const t = e.target;
+      const hot = t && t.closest && t.closest("a, button, [role='button'], .card.is-link, input, textarea, summary, label");
       cur.classList.toggle("hot", !!hot);
       if (!raf) raf = requestAnimationFrame(step);
-    }, { passive: true });
-    document.addEventListener("pointerdown", () => cur.classList.add("down"), { passive: true });
+    };
+    document.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerdown", (e) => { cur.classList.add("down"); onMove(e); }, { passive: true });
     document.addEventListener("pointerup", () => cur.classList.remove("down"), { passive: true });
-    document.documentElement.addEventListener("pointerleave", () => cur.classList.remove("on"));
-    document.documentElement.addEventListener("pointerenter", () => { if (seen) cur.classList.add("on"); });
+    // 只在真正离开窗口 / 失焦时隐藏
+    document.addEventListener("mouseleave", () => cur.classList.remove("on"));
+    window.addEventListener("blur", () => cur.classList.remove("on"));
   })();
 
   /* ---------- init ---------- */
