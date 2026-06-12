@@ -277,7 +277,7 @@
     const items = galleries[group];
     if (!items || !items.length) return;
     lbState = { group, index, lastFocus: document.activeElement, scrollY: window.scrollY };
-    lbRender();
+    lbRender(true); // first open: instant (no fade-out on blank)
     lb.hidden = false;
     // iOS 也锁得住的滚动锁：body 定格 + 记录位置，关闭时还原
     document.body.style.position = "fixed";
@@ -288,17 +288,39 @@
     document.body.style.overflow = "hidden";
     $(".lb-close", lb).focus();
   }
-  function lbRender() {
+  let lbTransitioning = false;
+  function lbRender(instant) {
     const items = galleries[lbState.group];
     const it = items[lbState.index];
-    lbImg.src = it.src;
-    lbImg.alt = it.cap;
     lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em> ${AST} ${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
+    if (instant || REDUCED) {
+      lbImg.src = it.src;
+      lbImg.alt = it.cap;
+      lbImg.style.opacity = "1";
+      lbTransitioning = false;
+      return;
+    }
+    // 淡出 → 换图 → 淡入
+    lbImg.style.transition = "opacity 0.18s ease";
+    lbImg.style.opacity = "0";
+    lbTransitioning = true;
+    const swap = () => {
+      lbImg.src = it.src;
+      lbImg.alt = it.cap;
+      const onLoad = () => {
+        lbImg.style.opacity = "1";
+        lbTransitioning = false;
+      };
+      if (lbImg.complete) onLoad();
+      else lbImg.addEventListener("load", onLoad, { once: true });
+    };
+    // wait for fade-out (180ms), then swap
+    setTimeout(swap, 160);
   }
   function lbNav(dir) {
+    if (lbTransitioning) return;
     const items = galleries[lbState.group];
     if (!items) return;
-    // 跳过加载失败的死项
     let i = lbState.index;
     for (let n = 0; n < items.length; n++) {
       i = (i + dir + items.length) % items.length;
@@ -381,9 +403,9 @@
       clearTimeout(scanTimer);
     };
 
-    // hook into lbRender to reset tools on nav
+    // hook into lbRender to reset tools on nav (preserve instant param)
     const _origRender = lbRender;
-    lbRender = function() { _origRender(); resetTools(); };
+    lbRender = function(instant) { resetTools(); _origRender(instant); };
 
     // ZOOM — pointer-tracked 2.5× magnifier
     if (zoomBtn) {
