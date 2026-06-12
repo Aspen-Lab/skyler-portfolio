@@ -61,7 +61,7 @@
   const killBoot = () => boot && boot.classList.add("killed");
   let bootShown = false;
   if (boot) {
-    if (REDUCED || storeGet("skyler-booted")) {
+    if (storeGet("skyler-booted")) {
       killBoot();
     } else {
       bootShown = true;
@@ -87,7 +87,6 @@
     if (heroIntroDone) return;
     heroIntroDone = true;
     document.body.classList.add("hero-ready");
-    if (REDUCED) return; // CSS 已全局降级；JS 动画直接跳过
     decodeHeroTitle();
     setTimeout(typeCredential, 380);
     setTimeout(countUpStats, 1200);
@@ -270,7 +269,7 @@
         // aria-label 变更 VoiceOver 不播报，用 live region 主动播
         if (pillLive && !instant) pillLive.textContent = `${st.aria} (${pillIdx + 1}/4)`;
       };
-      if (instant || REDUCED) { apply(); return; }
+      if (instant) { apply(); return; }
       const svg = $(".pill", pillBtn);
       svg.classList.add("glitch");
       setTimeout(apply, 110);
@@ -283,7 +282,7 @@
   /* ---------- text scramble ---------- */
   const GLYPHS = "ABCDEFGHIKLMNOPRSTUVXYZ0123456789*#/<>+=";
   function scramble(el) {
-    if (REDUCED || !el) return;
+    if (!el) return;
     if (!el.dataset.original) el.dataset.original = el.textContent;
     const original = el.dataset.original;
     // SR 始终读完整标题，不读动画中的乱码帧
@@ -388,7 +387,7 @@
     const items = galleries[lbState.group];
     const it = items[lbState.index];
     lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em> ${AST} ${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
-    if (instant || REDUCED) {
+    if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       lbImg.style.opacity = "1";
@@ -490,25 +489,29 @@
     const loupeBtn = $("#lbZoomBtn");
     if (!lbFrame || !lens || !loupeBtn) return;
 
-    const Z = 2.5, R = 120; // 镜片半径 120px（直径 240）
+    const glass = $("#lbLensGlass");
+    const Z = 2.5, R = 85; // 镜片半径 85px（直径 170）
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
     const measure = () => {
       rect = lbImg.getBoundingClientRect();
-      lens.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
-      lens.style.backgroundSize = `${rect.width * Z}px ${rect.height * Z}px`;
+      if (glass) {
+        glass.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
+        glass.style.backgroundSize = `${rect.width * Z}px ${rect.height * Z}px`;
+      }
     };
+    // transform 定位（合成器，不触发布局）；镜内画面与镜片同源同步
     const place = () => {
-      lens.style.left = `${cx - R}px`;
-      lens.style.top = `${cy - R}px`;
-      lens.style.backgroundPosition = `${R - cx * Z}px ${R - cy * Z}px`;
+      lens.style.transform = `translate3d(${cx - R}px, ${cy - R}px, 0)`;
+      if (glass) glass.style.backgroundPosition = `${R - cx * Z}px ${R - cy * Z}px`;
     };
     const step = () => {
-      cx += (tx - cx) * 0.22;
-      cy += (ty - cy) * 0.22;
+      // 0.55：紧贴光标的"光标感"，只留一丝重量
+      cx += (tx - cx) * 0.55;
+      cy += (ty - cy) * 0.55;
       place();
-      if (Math.abs(tx - cx) > 0.25 || Math.abs(ty - cy) > 0.25) raf = requestAnimationFrame(step);
+      if (Math.abs(tx - cx) > 0.2 || Math.abs(ty - cy) > 0.2) raf = requestAnimationFrame(step);
       else raf = 0;
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
@@ -1019,7 +1022,6 @@
   /* ---------- scroll reveals ---------- */
   let revealObserver = null;
   function observeReveals() {
-    if (REDUCED) return;
     if (!revealObserver) {
       revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
@@ -1036,7 +1038,7 @@
   /* ---------- 进入视野时乱码定格（一次性，FUI 解码感） ---------- */
   let scrambleObserver = null;
   function observeScrambles() {
-    if (REDUCED || !("IntersectionObserver" in window)) return;
+    if (!("IntersectionObserver" in window)) return;
     if (!scrambleObserver) {
       scrambleObserver = new IntersectionObserver((entries) => {
         entries.forEach((en) => {

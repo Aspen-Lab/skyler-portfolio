@@ -69,29 +69,35 @@ a, button, .card.is-link, #lbImg {
 }
 
 /* ---------- atmosphere ---------- */
-/* 背景微点阵：1px 小点 + 一团缓慢漫游的光斑点亮经过的点。
+/* 背景微点阵：1.2px 小点常亮 + 两团反向漫游的光斑点亮经过的点。
    z-index:-1 → 只出现在页面留白处，被卡片/图片自然遮住 */
 .dotgrid {
   position: fixed; inset: 0;
   z-index: -1; pointer-events: none;
-  -webkit-mask-image: radial-gradient(circle, #000 1px, transparent 1.4px);
+  /* 基础点阵直接画在本层（被下面的 mask 切成点） */
+  background: rgba(237, 237, 237, 0.16);
+  -webkit-mask-image: radial-gradient(circle, #000 1.2px, transparent 1.7px);
   -webkit-mask-size: 26px 26px;
-  mask-image: radial-gradient(circle, #000 1px, transparent 1.4px);
+  mask-image: radial-gradient(circle, #000 1.2px, transparent 1.7px);
   mask-size: 26px 26px;
 }
-.dotgrid::before {
-  /* 常亮的基础点阵（很暗） */
-  content: ""; position: absolute; inset: 0;
-  background: rgba(237, 237, 237, 0.07);
-}
+/* 漫游光斑 ×2：transform-only，合成器动画 */
 .dotgrid::after {
-  /* 漫游光斑：transform-only，合成器动画 */
   content: ""; position: absolute;
   width: 64vmax; height: 64vmax;
   left: -32vmax; top: -32vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(237, 237, 237, 0.20), transparent 62%);
-  animation: dot-roam 30s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(237, 237, 237, 0.34), transparent 62%);
+  animation: dot-roam 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.dotgrid::before {
+  content: ""; position: absolute;
+  width: 38vmax; height: 38vmax;
+  left: -19vmax; top: -19vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(237, 237, 237, 0.26), transparent 60%);
+  animation: dot-roam 21s ease-in-out infinite alternate-reverse;
   will-change: transform;
 }
 @keyframes dot-roam {
@@ -933,33 +939,52 @@ footer .ast { color: var(--ink-dim); }
 /* 镜片模式：光标隐藏，镜片即光标 */
 .lb-frame.lens-on, .lb-frame.lens-on #lbImg { cursor: none; }
 
-/* 放大镜镜片：跟随光标的圆形局部细节 */
+/* 放大镜镜片 = 光标本体：
+   外层 .lens 只负责 transform 定位（合成器，零布局开销），
+   内层 .lens-glass 承担玻璃质感与出现/消失动画 */
 .lens {
-  position: absolute; z-index: 3;
-  width: 240px; height: 240px;
+  position: absolute; top: 0; left: 0; z-index: 3;
+  width: 170px; height: 170px;
+  pointer-events: none;
+  will-change: transform;
+}
+.lens-glass {
+  position: relative;
+  width: 100%; height: 100%;
   border-radius: 50%;
-  border: 1px solid rgba(237, 237, 237, 0.28);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 18px 50px rgba(0, 0, 0, 0.65),
-    inset 0 0 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(237, 237, 237, 0.35);
   background-repeat: no-repeat;
   background-color: #0a0a0a;
-  pointer-events: none;
-  opacity: 0; transform: scale(0.7);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 14px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 18px rgba(0, 0, 0, 0.3);
+  opacity: 0; transform: scale(0.55);
   transition:
-    opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: left, top, background-position;
+    opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  will-change: background-position;
 }
-.lens.show { opacity: 1; transform: scale(1); }
-/* 镜片中心极淡十字 */
-.lens::after {
-  content: ""; position: absolute; inset: 0;
-  background:
-    linear-gradient(rgba(237,237,237,0.18), rgba(237,237,237,0.18)) center/9px 1px no-repeat,
-    linear-gradient(rgba(237,237,237,0.18), rgba(237,237,237,0.18)) center/1px 9px no-repeat;
+/* 玻璃球面高光 */
+.lens-glass::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(60% 45% at 32% 22%, rgba(255, 255, 255, 0.13), transparent 70%);
 }
+/* 倍率小注：镜片下缘 */
+.lens-tag {
+  position: absolute; left: 50%; bottom: -22px;
+  transform: translateX(-50%) translateY(-4px);
+  font-size: 9px; letter-spacing: 0.18em;
+  color: var(--ink-dim);
+  opacity: 0;
+  transition:
+    opacity 0.25s ease 0.05s,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
+}
+.lens.show .lens-glass { opacity: 1; transform: scale(1); }
+.lens.show .lens-tag { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* caption：底部居中，细 */
 #lbCap {
@@ -1153,16 +1178,14 @@ footer .ast { color: var(--ink-dim); }
 }
 
 /* ---------- reduced motion ---------- */
+/* 减弱动态效果：只停掉「循环不止」的动效（跑马灯/噪点/闪烁/旋转）。
+   用户主动触发的一次性过渡（开灯箱、切页、悬停反馈）保留 ——
+   全局 0.01ms 的一刀切会把站点变成无动画的死页面 */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
   html { scroll-behavior: auto; }
-  .track { animation: none; }
+  .track, .ticker-track { animation: none; }
   .strip { overflow-x: auto; }
-  .ticker-track { animation: none; }
-  #boot { display: none; }
-  .reveal { opacity: 1; transform: none; }
+  .grain, .dotgrid::after,
+  .spin-ast, .dot, .scanline, .rotor,
+  .hero-readout em, .hand { animation: none; }
 }
