@@ -10,6 +10,7 @@ const SITE = {
   heroName: "SECAL72", // 主页大标题（留空则用 name）
   alias: "SKYLER",
   displayName: "ZHIYI PAN", // 署名行（显示在 hero 标签里）
+  credential: "SCAD B.F.A. — ILLUSTRATION · CONCEPT DESIGN", // hero 标题下的学历强调行（打字机效果）
   tagline: "VISUAL ARCHIVE ✳ ILLUSTRATION ✳ FANART",
   est: "EST. 2026",
 };

@@ -43,20 +43,34 @@
     set("footCopy", SITE.name);
     set("tagId", `ID: ${SITE.alias}`);
     set("tagZh", `${SITE.displayName} ${AST} ${SITE.est}`);
+    // 学历强调行（data.js 驱动；留空则整行移除）
+    const cred = $("#heroCred");
+    if (cred) {
+      const txt = String(SITE.credential || "").trim();
+      if (!txt) cred.remove();
+      else {
+        cred.setAttribute("aria-label", txt);
+        const s = $(".cred-text", cred);
+        if (s) s.textContent = txt;
+      }
+    }
   }
 
   /* ---------- boot overlay ---------- */
   const boot = $("#boot");
   const killBoot = () => boot && boot.classList.add("killed");
+  let bootShown = false;
   if (boot) {
     if (REDUCED || storeGet("skyler-booted")) {
       killBoot();
     } else {
+      bootShown = true;
       const dismiss = () => {
         document.removeEventListener("keydown", onKey);
         boot.classList.add("done");
         storeSet("skyler-booted", "1");
         setTimeout(killBoot, 650);
+        heroIntro(); // boot 掀开的同时开始 hero 入场编排
       };
       // 键盘也能跳过开机动画
       const onKey = (e) => { if (e.key === "Enter" || e.key === " " || e.key === "Escape") dismiss(); };
@@ -64,6 +78,81 @@
       boot.addEventListener("click", dismiss, { once: true });
       document.addEventListener("keydown", onKey);
     }
+  }
+
+  /* ---------- hero 入场编排 ----------
+     标题逐字解码 → 学历行打字机 → 标签浮入(CSS) → pill 描边画入(CSS) → 计数器跳动 */
+  let heroIntroDone = false;
+  function heroIntro() {
+    if (heroIntroDone) return;
+    heroIntroDone = true;
+    document.body.classList.add("hero-ready");
+    if (REDUCED) return; // CSS 已全局降级；JS 动画直接跳过
+    decodeHeroTitle();
+    setTimeout(typeCredential, 380);
+    setTimeout(countUpStats, 1200);
+  }
+
+  // SECAL72 逐字乱码定格：实心/空心两段分别拆字符，错峰落定
+  function decodeHeroTitle() {
+    const hero = $("#heroTitle");
+    if (!hero) return;
+    const full = hero.textContent.trim();
+    hero.setAttribute("aria-label", full); // SR 始终读完整名字
+    const parts = $$("span", hero).filter((s) => s.classList.contains("solid") || s.classList.contains("hollow"));
+    const chars = []; // { el, final, settleAt }
+    let idx = 0;
+    parts.forEach((part) => {
+      const text = part.textContent;
+      part.innerHTML = [...text].map(() => `<span class="tch" aria-hidden="true"></span>`).join("");
+      $$(".tch", part).forEach((ch, i2) => {
+        chars.push({ el: ch, final: [...text][i2] || "", settleAt: idx * 60 + 340 });
+        idx++;
+      });
+    });
+    const t0 = performance.now();
+    const timer = setInterval(() => {
+      const t = performance.now() - t0;
+      let live = 0;
+      chars.forEach((c) => {
+        if (t >= c.settleAt) { c.el.textContent = c.final; }
+        else { c.el.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; live++; }
+      });
+      if (!live) clearInterval(timer);
+    }, 34);
+  }
+
+  // 学历行打字机（aria-label 已含全文，打字过程对 SR 隐藏）
+  function typeCredential() {
+    const wrap = $("#heroCred");
+    if (!wrap) return;
+    const txt = String(SITE.credential || "").trim();
+    if (!txt) { wrap.remove(); return; }
+    wrap.setAttribute("aria-label", txt);
+    const span = $(".cred-text", wrap);
+    if (!span) return;
+    let i = 0;
+    span.textContent = "";
+    const timer = setInterval(() => {
+      i++;
+      span.textContent = txt.slice(0, i);
+      if (i >= txt.length) clearInterval(timer);
+    }, 20);
+  }
+
+  // FILES / PROJECTS 计数器从 00 跳到实际值
+  function countUpStats() {
+    $$("#statFiles, #statProjects").forEach((el) => {
+      const target = parseInt(el.textContent, 10);
+      if (!target || Number.isNaN(target)) return;
+      const t0 = performance.now(), dur = 700;
+      const tick = () => {
+        const p = Math.min(1, (performance.now() - t0) / dur);
+        el.textContent = pad2(Math.round(target * (1 - Math.pow(1 - p, 2.2))));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
   }
 
   /* ---------- clock + live telemetry ---------- */
@@ -275,12 +364,16 @@
   let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
   let lbZoomToggle = null;   // 由 zoom 模块赋值：点击图片切换缩放
 
+  let lbHideT = 0;
   function lbOpen(group, index) {
     const items = galleries[group];
     if (!items || !items.length) return;
+    clearTimeout(lbHideT);
     lbState = { group, index, lastFocus: document.activeElement, scrollY: window.scrollY };
     lbRender(true); // first open: instant (no fade-out on blank)
     lb.hidden = false;
+    // 双 rAF 确保 hidden 移除后过渡能播：背景淡入 + 画框浮入
+    requestAnimationFrame(() => requestAnimationFrame(() => lb.classList.add("is-open")));
     // iOS 也锁得住的滚动锁：body 定格 + 记录位置，关闭时还原
     document.body.style.position = "fixed";
     document.body.style.top = `-${lbState.scrollY}px`;
@@ -333,14 +426,16 @@
     lbRender();
   }
   function lbClose() {
-    lb.hidden = true;
-    lbImg.src = "";
+    // 滚动与焦点立即还原；视觉上淡出 240ms 后才真正隐藏
+    lb.classList.remove("is-open");
     ["position", "top", "left", "right", "width", "overflow"].forEach((p) => { document.body.style[p] = ""; });
     // html 有 scroll-behavior:smooth，必须 instant 否则还原会变成滚动动画
     window.scrollTo({ top: lbState.scrollY || 0, left: 0, behavior: "instant" });
     const f = lbState.lastFocus;
     if (f && f.isConnected && f.offsetParent !== null) f.focus({ preventScroll: true });
     else { const t = $(".tab.is-active"); if (t) t.focus({ preventScroll: true }); }
+    clearTimeout(lbHideT);
+    lbHideT = setTimeout(() => { lb.hidden = true; lbImg.src = ""; }, 240);
   }
   if (lb) {
     $(".lb-close", lb).addEventListener("click", lbClose);
@@ -371,7 +466,7 @@
       if (lb.hidden) return;
       if (e.key === "Tab") {
         // 简易焦点圈：在可见的灯箱按钮之间循环
-        const f = $$(".lb-close, .lb-prev, .lb-zoom-btn, .lb-next", lb).filter((b) => b.offsetParent !== null);
+        const f = $$(".lb-close, .lb-prev, .lb-next, .lb-loupe", lb).filter((b) => b.offsetParent !== null);
         if (!f.length) return;
         const first = f[0], last = f[f.length - 1];
         if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -384,86 +479,81 @@
       else if (e.key === "ArrowRight") lbNav(1);
     });
   }
-  /* ---------- 放大镜：rAF 插值驱动，全程丝滑 ----------
-     - 点图片 / 点按钮 进入 2.4× 缩放，缩放中心 = 点击位置
-     - 缩放时鼠标移动 / 手指拖动平移视野（指数缓动跟随，无跳变）
-     - scale 与位移都走同一个 lerp 循环，没有 CSS transition 打架 */
+  /* ---------- loupe 放大镜：圆形镜片跟随光标局部放大 ----------
+     不缩放整图 —— 一块 2.5× 的圆形镜片贴着光标走，
+     构图全貌始终可见，看细节像拿着放大镜看原画。
+     镜片位置 rAF lerp 跟随，背景图位置同源计算，全程同步丝滑。 */
   (() => {
     if (!lb) return;
     const lbFrame = $("#lbFrame");
-    const zoomBtn = $("#lbZoomBtn");
-    if (!lbFrame || !zoomBtn) return;
+    const lens = $("#lbLens");
+    const loupeBtn = $("#lbZoomBtn");
+    if (!lbFrame || !lens || !loupeBtn) return;
 
-    const Z = 2.4, EASE = 0.16;
-    let on = false, raf = 0, rect = null;
-    let s = 1, ts = 1;          // 当前/目标缩放
-    let px = 0, py = 0, tpx = 0, tpy = 0; // 当前/目标位移
+    const Z = 2.5, R = 120; // 镜片半径 120px（直径 240）
+    let on = false, raf = 0, rect = null, visible = false;
+    let cx = 0, cy = 0, tx = 0, ty = 0;
 
+    const measure = () => {
+      rect = lbImg.getBoundingClientRect();
+      lens.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
+      lens.style.backgroundSize = `${rect.width * Z}px ${rect.height * Z}px`;
+    };
+    const place = () => {
+      lens.style.left = `${cx - R}px`;
+      lens.style.top = `${cy - R}px`;
+      lens.style.backgroundPosition = `${R - cx * Z}px ${R - cy * Z}px`;
+    };
     const step = () => {
-      s += (ts - s) * EASE;
-      px += (tpx - px) * EASE;
-      py += (tpy - py) * EASE;
-      const settled = Math.abs(ts - s) < 0.002 && Math.abs(tpx - px) < 0.25 && Math.abs(tpy - py) < 0.25;
-      if (settled) { s = ts; px = tpx; py = tpy; }
-      lbImg.style.transform = `translate3d(${px}px, ${py}px, 0) scale(${s})`;
-      if (!settled || on) {
-        raf = requestAnimationFrame(step);
-      } else {
-        raf = 0;
-        if (ts === 1) { lbImg.style.transform = ""; lbFrame.classList.remove("zoom-mode"); }
-      }
+      cx += (tx - cx) * 0.22;
+      cy += (ty - cy) * 0.22;
+      place();
+      if (Math.abs(tx - cx) > 0.25 || Math.abs(ty - cy) > 0.25) raf = requestAnimationFrame(step);
+      else raf = 0;
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
 
-    const targetFromPoint = (clientX, clientY) => {
-      if (!rect) rect = lbFrame.getBoundingClientRect();
-      const fx = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-      const fy = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
-      tpx = (0.5 - fx) * (Z - 1) * rect.width;
-      tpy = (0.5 - fy) * (Z - 1) * rect.height;
+    const showLens = () => { if (!visible) { visible = true; lens.classList.add("show"); } };
+    const hideLens = () => { if (visible) { visible = false; lens.classList.remove("show"); } };
+
+    const track = (e) => {
+      if (!on || !rect) return;
+      tx = Math.min(rect.width, Math.max(0, e.clientX - rect.left));
+      ty = Math.min(rect.height, Math.max(0, e.clientY - rect.top));
+      if (!visible) { cx = tx; cy = ty; place(); showLens(); } // 首次出现不飞入
+      kick();
     };
 
     const syncBtn = () => {
-      zoomBtn.setAttribute("aria-pressed", String(on));
-      zoomBtn.classList.toggle("is-on", on);
+      loupeBtn.setAttribute("aria-pressed", String(on));
+      loupeBtn.classList.toggle("is-on", on);
     };
 
-    function setZoom(next, e) {
+    function setLoupe(next, e) {
       on = next;
       lbZoomOn = next;
       syncBtn();
+      lbFrame.classList.toggle("lens-on", next);
       if (next) {
-        rect = lbFrame.getBoundingClientRect();
-        lbFrame.classList.add("zoom-mode");
-        ts = Z;
-        if (e && e.clientX !== undefined) targetFromPoint(e.clientX, e.clientY);
-        else { tpx = 0; tpy = 0; }
+        measure();
+        if (e && e.clientX !== undefined) track(e);
       } else {
-        ts = 1; tpx = 0; tpy = 0;
+        hideLens();
+        cancelAnimationFrame(raf); raf = 0;
       }
-      kick();
     }
-    lbZoomToggle = (e) => setZoom(!on, e);
+    lbZoomToggle = (e) => setLoupe(!on, e);
 
-    zoomBtn.addEventListener("click", (e) => { e.stopPropagation(); setZoom(!on); });
+    loupeBtn.addEventListener("click", () => setLoupe(!on));
 
-    // 缩放中：指针移动 = 平移视野（鼠标悬停跟随 / 触屏拖动跟随）
-    lbFrame.addEventListener("pointermove", (e) => {
-      if (!on) return;
-      targetFromPoint(e.clientX, e.clientY);
-      kick();
-    });
-    window.addEventListener("resize", () => { rect = on ? lbFrame.getBoundingClientRect() : null; });
+    lbFrame.addEventListener("pointermove", track);
+    lbFrame.addEventListener("pointerdown", track);
+    lbFrame.addEventListener("pointerleave", hideLens);
+    lbFrame.addEventListener("pointerenter", (e) => { if (on) { measure(); track(e); } });
+    window.addEventListener("resize", () => { if (on) measure(); });
+    lbImg.addEventListener("load", () => { if (on) measure(); });
 
-    // 立即复位（换图 / 关闭时用，不播动画）
-    const hardReset = () => {
-      cancelAnimationFrame(raf); raf = 0;
-      on = false; lbZoomOn = false;
-      s = ts = 1; px = py = tpx = tpy = 0;
-      lbImg.style.transform = "";
-      lbFrame.classList.remove("zoom-mode");
-      syncBtn();
-    };
+    const hardReset = () => setLoupe(false);
     const _origRender = lbRender;
     lbRender = function (instant) { hardReset(); _origRender(instant); };
     const _origClose = lbClose;
@@ -472,7 +562,7 @@
     // Z 键快捷切换
     document.addEventListener("keydown", (e) => {
       if (lb.hidden) return;
-      if (e.key === "z" || e.key === "Z") setZoom(!on);
+      if (e.key === "z" || e.key === "Z") setLoupe(!on);
     });
   })();
 
@@ -971,4 +1061,5 @@
   renderFanart();
   renderAbout();
   if (!applyHash()) switchView("portfolio", false);
+  if (!bootShown) heroIntro(); // 无 boot 动画（回访/REDUCED）时立即跑 hero 入场
 })();
