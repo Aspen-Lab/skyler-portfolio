@@ -844,14 +844,14 @@ body.hero-ready .pill .pill-outline {
 
 /* bio = 这一页的视觉主角：display 字阶 + 灰底亮词混排 */
 .bio-main {
-  font-family: var(--disp); font-weight: 600;
+  font-family: var(--disp); font-weight: 300;
   font-size: clamp(20px, 2.4vw, 34px);
-  line-height: 1.45; letter-spacing: 0;
+  line-height: 1.45; letter-spacing: 0.005em;
   color: var(--ink-dim);
   max-width: 1100px;
   text-wrap: pretty;
 }
-.bio-main .hi { font-style: normal; color: var(--ink); }
+.bio-main .hi { font-style: normal; font-weight: 600; color: var(--ink); }
 .bio-deco {
   margin-top: 16px;
   font-family: var(--jp); font-weight: 300;
