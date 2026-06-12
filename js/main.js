@@ -666,24 +666,6 @@
   });
 
   /* ---------- portfolio render ---------- */
-  /* ---------- featured card (主图) ---------- */
-  function featuredHTML(work, fileId, lbGroup, lbIndex) {
-    const hasImg = work.src && String(work.src).trim() !== "";
-    if (!hasImg) return "";
-    return `<figure class="card featured-card is-link" tabindex="0" role="button"
-        aria-label="View ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}">
-      <div class="frame">
-        <img src="${esc(work.src)}" alt="${esc(work.title)}" loading="eager" fetchpriority="high" decoding="async" />
-        <span class="corner c-tl"></span><span class="corner c-tr"></span>
-        <span class="corner c-bl"></span><span class="corner c-br"></span>
-        <div class="featured-label mono">
-          <span>${esc(work.title)}</span>
-          <span class="fid">${esc(fileId)}</span>
-        </div>
-      </div>
-    </figure>`;
-  }
-
   function renderProjects() {
     const wrap = $("#projects");
     if (!wrap) return;
@@ -691,28 +673,15 @@
       const stateCls = p.state === "ACTIVE" ? " is-active" : p.state === "ARCHIVED" ? " is-archived" : "";
       const gallery = [];
 
-      // 分离主图 (featured:true 或第一张有图) 与其余作品
-      const allWorks = p.works;
-      let featWork = null, featFileId = null, featLbIdx = -1;
-      const stripWorks = [];
-
-      allWorks.forEach((w, wi) => {
+      // 所有作品都进滚动条（不再拆 featured 大图）
+      const cards = p.works.map((w, wi) => {
         const fileId = `F-${pad2(pi + 1)}${pad2(wi + 1)}`;
         const hasImg = w.src && String(w.src).trim() !== "";
         const lbIndex = hasImg ? gallery.length : wi;
         if (hasImg) gallery.push({ src: w.src, cap: `${w.title} / ${p.title}` });
-        if (!featWork && (w.featured || wi === 0) && hasImg) {
-          featWork = w; featFileId = fileId; featLbIdx = lbIndex;
-        } else {
-          stripWorks.push({ w, fileId, lbIndex });
-        }
-      });
+        return cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0 && wi < 4);
+      }).join("");
       galleries[`p-${pi}`] = gallery;
-
-      const featHTML = featWork ? featuredHTML(featWork, featFileId, `p-${pi}`, featLbIdx) : "";
-      const cards = stripWorks.map(({ w, fileId, lbIndex }) =>
-        cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0)
-      ).join("");
 
       const pauseBtn = (REDUCED || TOUCH) ? "" :
         `<button class="strip-toggle mono" type="button" aria-label="Pause scrolling">PAUSE</button>`;
@@ -731,7 +700,6 @@
             ${pauseBtn}
           </div>
         </header>
-        ${featHTML ? `<div class="featured-wrap">${featHTML}</div>` : ""}
         ${cards ? `<div class="strip">
           <div class="track${pi % 2 ? " rev" : ""}">
             <div class="half">${cards}</div>

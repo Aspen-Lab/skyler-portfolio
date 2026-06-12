@@ -137,13 +137,6 @@ const ABOUT = {
       note: "Concept designs for Free Fire & Arena of Valor. IP collaborations (Detective Conan, Jujutsu Kaisen). AI-assisted ideation pipeline.",
     },
     {
-      period: "JUN 2025",
-      company: "SKY: CHILDREN OF THE LIGHT",
-      role: "OFFICIAL ILLUSTRATOR",
-      tag: "TGC 6TH ANNIV.",
-      note: "Official 6th-anniversary event illustration for thatgamecompany, published across anniversary channels.",
-    },
-    {
       period: "AUG 2021 — FEB 2022",
       company: "XING ART",
       role: "TEST ILLUSTRATOR",
