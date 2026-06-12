@@ -52,11 +52,11 @@ const PROJECTS = [
     medium: "CHARACTER DESIGN · WORLDBUILDING",
     state: "ACTIVE",
     works: [
-      { title: "BAIZE — CHARACTER SHEET",       src: "assets/works/p02/01-baize.jpg" },
-      { title: "BAIZE — BOOK SPREAD",           src: "assets/works/p02/02-baize-spread.jpg" },
-      { title: "LEPTAILURUS PAVONINUS",         src: "assets/works/p02/03-leptailurus.jpg" },
-      { title: "OVIS CAMELOPARDALIS",           src: "assets/works/p02/04-ovis.jpg" },
-      { title: "RHINOLAGUS CAMPANULA",          src: "assets/works/p02/05-rhinolagus.jpg" },
+      { title: "BAIZE — BOOK SPREAD", src: "assets/works/p02/02-baize-spread.jpg", featured: true },
+      { title: "BAIZE — CHARACTER SHEET",  src: "assets/works/p02/01-baize.jpg" },
+      { title: "LEPTAILURUS PAVONINUS",    src: "assets/works/p02/03-leptailurus.jpg" },
+      { title: "OVIS CAMELOPARDALIS",      src: "assets/works/p02/04-ovis.jpg" },
+      { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg" },
     ],
   },
   {

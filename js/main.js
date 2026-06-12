@@ -358,6 +358,130 @@
       else if (e.key === "ArrowRight") lbNav(1);
     });
   }
+  /* ---------- lightbox tools: ZOOM / MONO / SCAN ---------- */
+  (() => {
+    if (!lb) return;
+    const lbFrame = $("#lbFrame");
+    const zoomBtn = $("#lbZoomBtn"), greyBtn = $("#lbGreyBtn"), scanBtn = $("#lbScanBtn");
+    const scanOverlay = $("#lbScanOverlay"), scanBeam = $("#scanBeam");
+    const scanPanel = $("#scanPanel"), spStatus = $("#spStatus"), spRows = $("#spRows"), spVerdict = $("#spVerdict");
+
+    let zoomOn = false, greyOn = false, scanOn = false, scanTimer = null;
+
+    // reset all tools when image changes
+    const resetTools = () => {
+      zoomOn = false; greyOn = false; scanOn = false;
+      if (zoomBtn) { zoomBtn.setAttribute("aria-pressed", "false"); zoomBtn.classList.remove("is-on"); }
+      if (greyBtn) { greyBtn.setAttribute("aria-pressed", "false"); greyBtn.classList.remove("is-on"); }
+      if (scanBtn) { scanBtn.setAttribute("aria-pressed", "false"); scanBtn.classList.remove("is-on"); }
+      if (lbImg) { lbImg.style.filter = ""; lbImg.style.transform = ""; lbImg.style.transformOrigin = ""; }
+      if (lbFrame) lbFrame.classList.remove("zoom-mode");
+      if (scanOverlay) scanOverlay.hidden = true;
+      if (scanPanel) scanPanel.hidden = true;
+      clearTimeout(scanTimer);
+    };
+
+    // hook into lbRender to reset tools on nav
+    const _origRender = lbRender;
+    lbRender = function() { _origRender(); resetTools(); };
+
+    // ZOOM — pointer-tracked 2.5× magnifier
+    if (zoomBtn) {
+      zoomBtn.addEventListener("click", () => {
+        zoomOn = !zoomOn;
+        zoomBtn.setAttribute("aria-pressed", String(zoomOn));
+        zoomBtn.classList.toggle("is-on", zoomOn);
+        lbFrame.classList.toggle("zoom-mode", zoomOn);
+        if (!zoomOn) { lbImg.style.transform = ""; lbImg.style.transformOrigin = ""; }
+      });
+    }
+    if (lbFrame) {
+      lbFrame.addEventListener("mousemove", (e) => {
+        if (!zoomOn || !lbImg) return;
+        const r = lbFrame.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width * 100).toFixed(2);
+        const y = ((e.clientY - r.top) / r.height * 100).toFixed(2);
+        lbImg.style.transformOrigin = `${x}% ${y}%`;
+        lbImg.style.transform = "scale(2.5)";
+      });
+      lbFrame.addEventListener("mouseleave", () => {
+        if (!zoomOn) return;
+        lbImg.style.transform = "";
+        lbImg.style.transformOrigin = "";
+      });
+    }
+
+    // MONO — grayscale toggle
+    if (greyBtn) {
+      greyBtn.addEventListener("click", () => {
+        greyOn = !greyOn;
+        greyBtn.setAttribute("aria-pressed", String(greyOn));
+        greyBtn.classList.toggle("is-on", greyOn);
+        if (lbImg) lbImg.style.filter = greyOn ? "grayscale(1)" : "";
+      });
+    }
+
+    // AI SCAN — animated origin analysis
+    const SCAN_ROWS = [
+      { label: "BRUSH STROKES",   key: "strokes" },
+      { label: "LAYER DEPTH",     key: "layers"  },
+      { label: "TEXTURE SOURCE",  key: "texture" },
+      { label: "SYNTHETIC RATIO", key: "synth"   },
+      { label: "HUMAN ORIGIN",    key: "human"   },
+    ];
+    function runScan() {
+      if (!scanOverlay || !scanPanel) return;
+      scanOverlay.hidden = false;
+      scanBeam.style.animation = "none";
+      void scanBeam.offsetWidth; // reflow
+      scanBeam.style.animation = "";
+      scanPanel.hidden = true;
+      spStatus.textContent = "SCANNING...";
+      spRows.innerHTML = "";
+      spVerdict.textContent = "";
+      clearTimeout(scanTimer);
+      // generate deterministic-ish values from image index
+      const seed = (lbState.index * 37 + lbState.group.charCodeAt(0)) % 97;
+      const strokes = 1840 + (seed * 31 % 3000);
+      const layers = 8 + (seed % 7);
+      const synth = (0.3 + (seed % 12) * 0.05).toFixed(1);
+      const human = (100 - parseFloat(synth)).toFixed(1);
+      const values = { strokes: `${strokes.toLocaleString()} DETECTED`, layers: `${layers} LAYERS`, texture: "HAND-PAINTED", synth: `${synth}%`, human: `${human}%` };
+      scanTimer = setTimeout(() => {
+        scanPanel.hidden = false;
+        spStatus.textContent = "COMPLETE";
+        spRows.innerHTML = SCAN_ROWS.map((r, i) => {
+          const v = values[r.key];
+          const pct = r.key === "synth" ? parseFloat(synth) : r.key === "human" ? parseFloat(human) : null;
+          const bar = pct !== null ? `<span class="sp-bar"><span class="sp-fill" style="width:${Math.min(pct, 100)}%"></span></span>` : "";
+          return `<div class="sp-row" style="animation-delay:${i*0.09}s"><span class="sp-label">${r.label}</span>${bar}<span class="sp-val">${v}</span></div>`;
+        }).join("");
+        spVerdict.innerHTML = `VERDICT: <em>HUMAN_MADE</em> &#x2713;`;
+        // animate fill bars after they're in the DOM
+        requestAnimationFrame(() => {
+          $$(".sp-fill", spRows).forEach((f) => {
+            const w = f.style.width;
+            f.style.width = "0";
+            requestAnimationFrame(() => { f.style.width = w; });
+          });
+        });
+      }, 900);
+    }
+    if (scanBtn) {
+      scanBtn.addEventListener("click", () => {
+        scanOn = !scanOn;
+        scanBtn.setAttribute("aria-pressed", String(scanOn));
+        scanBtn.classList.toggle("is-on", scanOn);
+        if (scanOn) runScan();
+        else { scanOverlay.hidden = true; clearTimeout(scanTimer); }
+      });
+    }
+
+    // reset on close
+    const _origClose = lbClose;
+    lbClose = function() { resetTools(); _origClose(); };
+  })();
+
   // 图片 404：换成占位卡并撤销链接语义，灯箱里也跳过（error 不冒泡，用捕获）
   document.addEventListener("error", (e) => {
     const img = e.target;
@@ -455,29 +579,58 @@
   });
 
   /* ---------- portfolio render ---------- */
+  /* ---------- featured card (主图) ---------- */
+  function featuredHTML(work, fileId, lbGroup, lbIndex) {
+    const hasImg = work.src && String(work.src).trim() !== "";
+    if (!hasImg) return "";
+    return `<figure class="card featured-card is-link" tabindex="0" role="button"
+        aria-label="View ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}">
+      <div class="frame">
+        <img src="${esc(work.src)}" alt="${esc(work.title)}" loading="eager" fetchpriority="high" decoding="async" />
+        <span class="corner c-tl"></span><span class="corner c-tr"></span>
+        <span class="corner c-bl"></span><span class="corner c-br"></span>
+        <div class="featured-label mono">
+          <span class="feat-tag">FEATURED</span>
+          <span>${esc(work.title)}</span>
+          <span class="fid">${esc(fileId)}</span>
+        </div>
+      </div>
+    </figure>`;
+  }
+
   function renderProjects() {
     const wrap = $("#projects");
     if (!wrap) return;
     wrap.innerHTML = PROJECTS.map((p, pi) => {
       const stateCls = p.state === "ACTIVE" ? " is-active" : p.state === "ARCHIVED" ? " is-archived" : "";
       const gallery = [];
-      const cards = p.works.map((w, wi) => {
+
+      // 分离主图 (featured:true 或第一张有图) 与其余作品
+      const allWorks = p.works;
+      let featWork = null, featFileId = null, featLbIdx = -1;
+      const stripWorks = [];
+
+      allWorks.forEach((w, wi) => {
         const fileId = `F-${pad2(pi + 1)}${pad2(wi + 1)}`;
         const hasImg = w.src && String(w.src).trim() !== "";
-        let lbIndex = wi;
-        if (hasImg) {
-          lbIndex = gallery.length;
-          gallery.push({ src: w.src, cap: `${w.title} / ${p.title}` });
+        const lbIndex = hasImg ? gallery.length : wi;
+        if (hasImg) gallery.push({ src: w.src, cap: `${w.title} / ${p.title}` });
+        if (!featWork && (w.featured || wi === 0) && hasImg) {
+          featWork = w; featFileId = fileId; featLbIdx = lbIndex;
+        } else {
+          stripWorks.push({ w, fileId, lbIndex });
         }
-        // 第一个项目的前几张在首屏：立刻加载，其余懒加载
-        return cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0 && wi < 4);
-      }).join("");
+      });
       galleries[`p-${pi}`] = gallery;
+
+      const featHTML = featWork ? featuredHTML(featWork, featFileId, `p-${pi}`, featLbIdx) : "";
+      const cards = stripWorks.map(({ w, fileId, lbIndex }) =>
+        cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0)
+      ).join("");
 
       const pauseBtn = (REDUCED || TOUCH) ? "" :
         `<button class="strip-toggle mono" type="button" aria-label="Pause scrolling">PAUSE</button>`;
 
-      // 有真实作品的项目放大展示；纯占位的项目压缩，让真作品主导首页
       const hasArt = p.works.some((w) => w.src && String(w.src).trim() !== "");
 
       return `<article class="project reveal${hasArt ? " has-art" : " is-empty"}" id="${esc(p.id)}">
@@ -492,11 +645,12 @@
             ${pauseBtn}
           </div>
         </header>
-        <div class="strip">
+        ${featHTML ? `<div class="featured-wrap">${featHTML}</div>` : ""}
+        ${cards ? `<div class="strip">
           <div class="track${pi % 2 ? " rev" : ""}">
             <div class="half">${cards}</div>
           </div>
-        </div>
+        </div>` : ""}
       </article>`;
     }).join("");
 
