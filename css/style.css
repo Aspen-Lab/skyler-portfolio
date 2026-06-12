@@ -706,14 +706,16 @@ body.hero-ready .pill .pill-outline {
 .about-grid > * { min-width: 0; }
 .about-card {
   border: 1px solid var(--line-dim);
-  padding: 18px;
+  padding: 0;
   position: sticky; top: calc(var(--bar-h) + 20px);
   background: rgba(12, 12, 12, 0.5);
+  overflow: hidden;
 }
+/* 头像满边：吃掉卡片内距，只留底部发丝线与规格表分隔 */
 .avatar-frame {
   position: relative;
   aspect-ratio: 1 / 1;
-  border: 1px solid var(--line-dim);
+  border-bottom: 1px solid var(--line-dim);
   background: var(--bg-2);
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
@@ -739,16 +741,21 @@ body.hero-ready .pill .pill-outline {
   0%, 100% { transform: translateY(8%); }
   50% { transform: translateY(92%); }
 }
-.spec { margin-top: 16px; font-size: 11px; letter-spacing: 0.1em; }
+.spec { margin: 0; padding: 8px 16px 0; font-size: 11px; letter-spacing: 0.1em; }
 .spec > div {
   display: flex; justify-content: space-between;
-  padding: 7px 2px;
+  padding: 8px 0;
   border-bottom: 1px dashed var(--line-dim);
 }
+.spec > div:last-child { border-bottom: none; }
 .spec dt { color: var(--ink-dim); }
 .spec dd { color: var(--ink); }
 
-.clocks { display: flex; gap: 8px; margin-top: 16px; }
+.clocks {
+  display: flex; gap: 8px;
+  margin: 0; padding: 14px 16px 16px;
+  border-top: 1px solid var(--line-dim);
+}
 .clockbox {
   flex: 1; aspect-ratio: 1/1;
   border: 1px solid var(--line-dim);
@@ -951,7 +958,8 @@ footer .ast { color: var(--ink-dim); }
   position: fixed; inset: 0; z-index: 150;
   background: rgba(4, 4, 4, 0.985);
   display: flex; align-items: center; justify-content: center;
-  padding: 4vh 4vw 7vh;
+  /* 给顶/底 HUD 条留位 */
+  padding: 62px 4vw 70px;
   touch-action: none;
   opacity: 0;
   transition: opacity 0.22s ease;
@@ -974,7 +982,7 @@ footer .ast { color: var(--ink-dim); }
 /* 翻页动画期间裁掉滑出帧外的部分 */
 .lb-frame.navving { overflow: hidden; }
 #lbImg {
-  max-width: 88vw; max-height: 80vh;
+  max-width: 88vw; max-height: calc(100vh - 150px);
   display: block;
   -webkit-user-drag: none; user-select: none;
   transition: opacity 0.18s ease;
@@ -1031,79 +1039,119 @@ footer .ast { color: var(--ink-dim); }
 .lens.show .lens-glass { opacity: 1; transform: scale(1); }
 .lens.show .lens-tag { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* caption：底部居中，细 */
+/* ---------- 灯箱 HUD chrome：与作品集同语言，全部常显 ---------- */
+/* 顶部条：文件名 ✳ 计数 ✳ 关闭 */
+.lb-top {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 4;
+  height: 50px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 clamp(16px, 3vw, 28px);
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-dim);
+  font-size: 10.5px; letter-spacing: 0.16em;
+}
 #lbCap {
-  position: fixed; left: 50%; bottom: 22px;
-  transform: translateX(-50%);
-  font-family: var(--mono);
-  font-size: 10px; letter-spacing: 0.18em; color: var(--ink-dim);
-  white-space: nowrap;
+  margin-right: auto;
+  color: var(--ink-dim);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 #lbCap em { font-style: normal; color: var(--ink); }
-
-/* 关闭：右上角裸图标，悬停旋转 */
-.lb-close {
-  position: fixed; top: 18px; right: 20px; z-index: 4;
-  appearance: none; background: none; border: none;
-  width: 44px; height: 44px;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: rgba(237, 237, 237, 0.55);
-  transition: color 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+.lb-count {
+  flex: none;
+  border: 1px solid var(--line-dim); border-radius: 99px;
+  padding: 3px 12px;
+  font-size: 10px; color: var(--ink);
 }
-.lb-close:hover { color: var(--ink); transform: rotate(90deg); }
-.lb-close:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; border-radius: 50%; }
+.lb-close {
+  flex: none;
+  appearance: none; background: none;
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--line-dim);
+  color: var(--ink);
+  padding: 7px 12px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.lb-close:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.lb-close:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
+.lb-key {
+  font-size: 8.5px; letter-spacing: 0.1em;
+  border: 1px solid currentColor; border-radius: 3px;
+  padding: 1px 5px; opacity: 0.65;
+}
 
-/* 翻页：两侧全高热区，悬停才浮现箭头 + 边缘微光 */
+/* 翻页：两侧常显方按钮（热区仍是全高） */
 .lb-prev, .lb-next {
-  position: fixed; top: 0; bottom: 0; z-index: 2;
-  width: clamp(56px, 9vw, 130px);
+  position: fixed; top: 50px; bottom: 64px; z-index: 3;
+  width: clamp(64px, 9vw, 130px);
   appearance: none; border: none; background: none;
   display: flex; align-items: center; justify-content: center;
-  color: rgba(237, 237, 237, 0);
-  transition: color 0.3s ease;
 }
 .lb-prev { left: 0; }
 .lb-next { right: 0; }
-.lb-prev::before, .lb-next::before {
-  content: ""; position: absolute; inset: 0;
-  opacity: 0; transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-.lb-prev::before { background: linear-gradient(90deg, rgba(255,255,255,0.04), transparent); }
-.lb-next::before { background: linear-gradient(270deg, rgba(255,255,255,0.04), transparent); }
-.lb-prev:hover, .lb-next:hover,
-.lb-prev:focus-visible, .lb-next:focus-visible { color: rgba(237, 237, 237, 0.9); outline: none; }
-.lb-prev:hover::before, .lb-next:hover::before { opacity: 1; }
-.lb-prev svg, .lb-next svg { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
-.lb-prev:hover svg { transform: translateX(-3px); }
-.lb-next:hover svg { transform: translateX(3px); }
-.lb-prev:active svg { transform: translateX(-6px) scale(0.94); }
-.lb-next:active svg { transform: translateX(6px) scale(0.94); }
-
-/* 放大镜开关：右下角，唯一的工具 */
-.lb-loupe {
-  position: fixed; right: 20px; bottom: 16px; z-index: 4;
-  appearance: none;
-  width: 40px; height: 40px;
+.lb-navbtn {
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(237, 237, 237, 0.14);
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(237, 237, 237, 0.6);
+  width: 42px; height: 42px;
+  border: 1px solid var(--line-dim);
+  background: rgba(7, 7, 7, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--ink);
   transition:
-    background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.3s ease,
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s, color 0.25s,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.lb-loupe:hover { color: var(--ink); border-color: rgba(237, 237, 237, 0.4); transform: scale(1.07); }
-.lb-loupe:active { transform: scale(0.92); }
-.lb-loupe.is-on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-.lb-loupe:focus-visible { outline: 1px solid var(--acid); outline-offset: 3px; }
+.lb-prev:hover .lb-navbtn, .lb-next:hover .lb-navbtn {
+  background: var(--ink); color: var(--bg); border-color: var(--ink);
+  transform: scale(1.08);
+}
+.lb-prev:active .lb-navbtn, .lb-next:active .lb-navbtn { transform: scale(0.92); }
+.lb-prev:focus-visible .lb-navbtn, .lb-next:focus-visible .lb-navbtn {
+  outline: 1px solid var(--acid); outline-offset: 3px;
+}
 
-/* 触屏：箭头淡显常驻，热区收窄 */
+/* 底部条：进度线 ✳ 放大镜芯片 */
+.lb-bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
+  height: 56px;
+  display: flex; align-items: center; gap: 18px;
+  padding: 0 clamp(16px, 3vw, 28px);
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line-dim);
+}
+.lb-progress {
+  flex: 1; height: 2px;
+  background: var(--ink-faint);
+  position: relative; overflow: hidden;
+}
+#lbProgressFill {
+  position: absolute; inset: 0 auto 0 0;
+  width: 0; background: var(--ink);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lb-loupe {
+  flex: none;
+  appearance: none; background: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line-dim);
+  color: var(--ink);
+  padding: 8px 14px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.lb-loupe:hover { border-color: var(--line); }
+.lb-loupe.is-on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.lb-loupe.is-on .lb-key { opacity: 0.8; }
+.lb-loupe:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
+
+/* 触屏：按钮再大一点，方便手指 */
 @media (hover: none) and (pointer: coarse) {
-  .lb-prev, .lb-next { color: rgba(237, 237, 237, 0.3); width: 52px; }
+  .lb-navbtn { width: 46px; height: 46px; }
 }
 
 /* ---------- responsive ---------- */
@@ -1153,7 +1201,8 @@ footer .ast { color: var(--ink-dim); }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line-dim); }
   .p-title .p-zh { display: block; margin: 6px 0 0; }
   .arc-title .arc-ja { display: block; margin: 6px 0 0; }
-  .avatar-frame { max-width: 240px; margin-inline: auto; }
+  /* 满边设计下头像同样吃满卡宽；时钟隐藏后由规格表收底 */
+  .spec { padding-bottom: 10px; }
   .clocks { display: none; }
   /* pill 图横向滚动而不是缩成糊：保持文字可读。滚动容器在按钮外层 +
      右缘渐隐提示还有内容可滑 */
@@ -1177,7 +1226,7 @@ footer .ast { color: var(--ink-dim); }
 }
 
 /* ---------- reduced motion ---------- */
-/* ---------- 自定义光标：FUI 菱形准星 ---------- */
+/* ---------- 自定义光标：FUI 三角准星 ---------- */
 body.has-cursor,
 body.has-cursor a, body.has-cursor button,
 body.has-cursor .card.is-link, body.has-cursor #lbImg,
@@ -1194,32 +1243,32 @@ body.lens-cursor .cursor { opacity: 0; }
 .c-dot, .c-ring {
   position: fixed; top: 0; left: 0;
   will-change: transform;
-  /* difference 混合：白色在亮图上自动反成黑色，任何背景都清晰可见 */
-  mix-blend-mode: difference;
+  /* 不用 mix-blend difference：白色在中灰背景上 difference 后≈中灰会隐形。
+     改用 白面 + 暗描边阴影 —— 亮图暗图上都清晰 */
 }
-.c-dot { width: 6px; height: 6px; }
+/* 1:1 指针：实心三角箭头（白面+暗衬边），尖端 = 精确点击点（JS 不再居中偏移） */
+.c-dot { width: 17px; height: 17px; margin: -1px 0 0 -1px; }
 .c-dot::before {
   content: ""; position: absolute; inset: 0;
-  background: #fff;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2018%2018'%3E%3Cpath%20d='M1%201L17%207.4L7.4%2017Z'%20fill='none'%20stroke='rgba(0,0,0,0.7)'%20stroke-width='3'%20stroke-linejoin='round'/%3E%3Cpath%20d='M1%201L17%207.4L7.4%2017Z'%20fill='%23ffffff'/%3E%3C/svg%3E") center / contain no-repeat;
+  transform-origin: 6% 6%; /* 缩放时尖端不动 */
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.c-ring { width: 34px; height: 34px; }
+/* 拖尾：细线描边三角（暗衬边+白线），慢半拍跟随 */
+.c-ring { width: 38px; height: 38px; }
 .c-ring::before {
   content: ""; position: absolute; inset: 0;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-  transform: rotate(45deg);   /* 默认：菱形 */
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M20%203L37%2034H3Z'%20fill='none'%20stroke='rgba(0,0,0,0.55)'%20stroke-width='3.4'/%3E%3Cpath%20d='M20%203L37%2034H3Z'%20fill='none'%20stroke='rgba(255,255,255,0.85)'%20stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* 悬停可点元素：菱形转正放大成方框（呼应卡片四角准星），白点收小 */
+/* 悬停可点元素：拖尾三角翻转 180° 放大、描边变实白；箭头向尖端收小 */
 .cursor.hot .c-ring::before {
-  transform: rotate(0deg) scale(1.5);
-  border-color: #fff;
+  transform: rotate(180deg) scale(1.45);
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cpath%20d='M20%203L37%2034H3Z'%20fill='none'%20stroke='rgba(0,0,0,0.6)'%20stroke-width='4'/%3E%3Cpath%20d='M20%203L37%2034H3Z'%20fill='none'%20stroke='%23ffffff'%20stroke-width='2.2'/%3E%3C/svg%3E");
 }
-.cursor.hot .c-dot::before { transform: scale(0.5); }
+.cursor.hot .c-dot::before { transform: scale(0.55); }
 /* 按下：收缩反馈 */
-.cursor.down .c-ring::before { transform: rotate(0deg) scale(0.8); }
+.cursor.down .c-ring::before { transform: rotate(180deg) scale(0.78); }
 
 /* 减弱动态效果：只停掉「循环不止」的动效（跑马灯/噪点/闪烁/旋转）。
    用户主动触发的一次性过渡（开灯箱、切页、悬停反馈）保留 ——

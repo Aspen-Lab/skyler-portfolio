@@ -386,7 +386,11 @@
   function lbRender(instant, dir = 1) {
     const items = galleries[lbState.group];
     const it = items[lbState.index];
-    lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em> ${AST} ${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
+    lbCap.innerHTML = `FILE: <em>${esc(it.cap)}</em>`;
+    const cnt = $("#lbCount");
+    if (cnt) cnt.textContent = `${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
+    const pf = $("#lbProgressFill");
+    if (pf) pf.style.width = `${((lbState.index + 1) / items.length) * 100}%`;
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
@@ -1058,9 +1062,9 @@
     });
   }
 
-  /* ---------- 自定义光标：FUI 菱形准星 ----------
-     白点 1:1 跟手 + 菱形细框拖尾跟随；
-     悬停可点元素时菱形转正放大成方框（呼应卡片四角准星），按下收缩 */
+  /* ---------- 自定义光标：FUI 三角准星 ----------
+     实心三角箭头 1:1 跟手（尖端=点击点）+ 描边三角拖尾跟随；
+     悬停可点元素时拖尾翻转放大，按下收缩 */
   (() => {
     if (TOUCH || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const cur = document.createElement("div");
@@ -1080,7 +1084,8 @@
     };
     const onMove = (e) => {
       tx = e.clientX; ty = e.clientY;
-      dot.style.transform = `translate3d(${tx}px, ${ty}px, 0) translate(-50%, -50%)`;
+      // 箭头不居中偏移：元素左上角 = 三角尖端 = 真实点击点
+      dot.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
       if (!seen) { seen = true; rx = tx; ry = ty; }
       cur.classList.add("on"); // 每次移动都强制可见（黏性，杜绝偶发消失）
       const t = e.target;

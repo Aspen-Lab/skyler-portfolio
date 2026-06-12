@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;600&family=Noto+Sans+JP:wght@300;500;700&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=10" />
+  <link rel="stylesheet" href="css/style.css?v=11" />
 </head>
 <body>
 
@@ -235,17 +235,29 @@
     <span>© <span id="year">2026</span> <span id="footCopy">SKYLER</span> — V.1.0</span>
   </footer>
 
-  <!-- ======== LIGHTBOX：沉浸式画廊 + loupe 镜片 ======== -->
+  <!-- ======== LIGHTBOX：沉浸式画廊 + loupe 镜片（FUI HUD chrome，全部常显） ======== -->
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer" hidden>
-    <button class="lb-close" aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="3" y1="3" x2="15" y2="15"/><line x1="15" y1="3" x2="3" y2="15"/></svg>
-    </button>
+
+    <!-- 顶部 HUD：文件名 ✳ 计数 ✳ 关闭 -->
+    <div class="lb-top mono">
+      <p id="lbCap" aria-live="polite" aria-atomic="true"></p>
+      <span class="lb-count" id="lbCount" aria-hidden="true">01 / 01</span>
+      <button class="lb-close" aria-label="Close (Esc)">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/></svg>
+        <span class="lb-key">ESC</span>
+      </button>
+    </div>
+
     <button class="lb-prev" aria-label="Previous image">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="13.5 4 6.5 11 13.5 18"/></svg>
+      <span class="lb-navbtn">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3"><polyline points="11.5 3 5.5 9 11.5 15"/></svg>
+      </span>
     </button>
     <figure class="lb-stage">
       <div class="lb-frame" id="lbFrame">
         <img id="lbImg" alt="" />
+        <span class="corner c-tl"></span><span class="corner c-tr"></span>
+        <span class="corner c-bl"></span><span class="corner c-br"></span>
         <div class="lens" id="lbLens" aria-hidden="true">
           <div class="lens-glass" id="lbLensGlass"></div>
           <span class="lens-tag mono">3.5&times;</span>
@@ -253,15 +265,23 @@
       </div>
     </figure>
     <button class="lb-next" aria-label="Next image">
-      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="8.5 4 15.5 11 8.5 18"/></svg>
+      <span class="lb-navbtn">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3"><polyline points="6.5 3 12.5 9 6.5 15"/></svg>
+      </span>
     </button>
-    <p id="lbCap" aria-live="polite" aria-atomic="true"></p>
-    <button class="lb-loupe" id="lbZoomBtn" aria-pressed="false" aria-label="Magnifier (Z)">
-      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7" cy="7" r="4.8"/><line x1="10.8" y1="10.8" x2="15.2" y2="15.2"/><line x1="4.8" y1="7" x2="9.2" y2="7"/><line x1="7" y1="4.8" x2="7" y2="9.2"/></svg>
-    </button>
+
+    <!-- 底部 HUD：进度线 ✳ 放大镜 -->
+    <div class="lb-bottom mono">
+      <span class="lb-progress" aria-hidden="true"><span id="lbProgressFill"></span></span>
+      <button class="lb-loupe" id="lbZoomBtn" aria-pressed="false" aria-label="Magnifier (Z)">
+        <svg width="14" height="14" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="7" r="4.8"/><line x1="10.8" y1="10.8" x2="15.2" y2="15.2"/><line x1="4.8" y1="7" x2="9.2" y2="7"/><line x1="7" y1="4.8" x2="7" y2="9.2"/></svg>
+        <span>3.5&times;</span>
+        <span class="lb-key">Z</span>
+      </button>
+    </div>
   </div>
 
-  <script src="js/data.js?v=10"></script>
-  <script src="js/main.js?v=10"></script>
+  <script src="js/data.js?v=11"></script>
+  <script src="js/main.js?v=11"></script>
 </body>
 </html>
