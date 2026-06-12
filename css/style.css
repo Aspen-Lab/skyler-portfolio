@@ -269,8 +269,12 @@ a, button, .card.is-link, #lbImg {
   text-transform: uppercase;
   user-select: none;
   position: relative;
+  /* 盒宽收缩到文字实际宽度：光刃 (::after) 以此为基准计算行程，
+     否则 grid 单元格撑满整列，光刃会冲出标题扫到右侧 pill 上 */
+  width: max-content;
+  max-width: 100%;
   /* 不能用 overflow:hidden —— Chrome 下会连同 background-clip:text 的
-     空心描边一起裁掉（72 消失）。光刃出框无妨：overlay 在黑底上不可见 */
+     空心描边一起裁掉（72 消失）。出框残余由 keyframes 末端淡出兜底 */
 }
 .hero-title .hollow { color: var(--ink); }
 @supports (-webkit-text-stroke: 1px black) {
@@ -301,9 +305,10 @@ body.hero-ready .hero-title::after {
   will-change: transform;
 }
 @keyframes title-blade {
-  0%   { transform: translateX(-180%) skewX(-18deg); }
-  26%  { transform: translateX(720%) skewX(-18deg); }
-  100% { transform: translateX(720%) skewX(-18deg); }
+  0%   { transform: translateX(-180%) skewX(-18deg); opacity: 1; }
+  21%  { opacity: 1; }
+  26%  { transform: translateX(720%) skewX(-18deg); opacity: 0; }
+  100% { transform: translateX(720%) skewX(-18deg); opacity: 0; }
 }
 /* 字面光泽带：与光刃同步的暗翼+白芯（background-clip:text），加深立体感 */
 body.hero-ready .hero-title .solid {
@@ -413,8 +418,11 @@ body.hero-ready .tag-line:nth-child(3) { animation-delay: 1.24s; }
   grid-area: pill;
   width: 100%; max-width: 520px;
   justify-self: end; align-self: end;
+  /* 关键：grid item 的自动最小宽不许被内部 560px 的 pill 撑开
+     （手机上曾把整个 hero 列撑到 536px，全页横向溢出） */
+  min-width: 0;
 }
-.pill-scroll { width: 100%; }
+.pill-scroll { width: 100%; min-width: 0; }
 .pill-wrap {
   width: 100%;
   margin: 0;
