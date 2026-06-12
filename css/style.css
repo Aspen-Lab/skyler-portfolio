@@ -844,7 +844,7 @@ body.hero-ready .pill .pill-outline {
 
 /* bio = 这一页的视觉主角：display 字阶 + 灰底亮词混排 */
 .bio-main {
-  font-family: var(--disp); font-weight: 300;
+  font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif; font-weight: 300;
   font-size: clamp(20px, 2.4vw, 34px);
   line-height: 1.45; letter-spacing: 0.005em;
   color: var(--ink-dim);
