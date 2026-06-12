@@ -212,47 +212,29 @@
 
   <!-- ======== LIGHTBOX ======== -->
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer" hidden>
-    <button class="lb-close mono" aria-label="Close">[ ✕ ]</button>
-    <button class="lb-prev mono" aria-label="Previous image">&larr;</button>
+    <button class="lb-close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+    </button>
+    <button class="lb-prev" aria-label="Previous image">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="11 3 5 9 11 15"/></svg>
+    </button>
     <figure class="lb-stage">
       <div class="lb-frame" id="lbFrame">
         <img id="lbImg" alt="" />
-        <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
-        <!-- AI scan overlay -->
-        <div class="lb-scan-overlay" id="lbScanOverlay" hidden aria-hidden="true">
-          <div class="scan-beam" id="scanBeam"></div>
-          <div class="scan-panel mono" id="scanPanel" hidden>
-            <div class="sp-head">⊛ ORIGIN ANALYSIS <span class="sp-status" id="spStatus">SCANNING...</span></div>
-            <div class="sp-rows" id="spRows"></div>
-            <div class="sp-verdict" id="spVerdict"></div>
-          </div>
-        </div>
-      </div>
-      <figcaption class="mono" id="lbCap" aria-live="polite" aria-atomic="true"></figcaption>
-      <!-- tool bar -->
-      <div class="lb-toolbar mono" role="toolbar" aria-label="Image tools">
-        <button class="lb-tool" id="lbZoomBtn" aria-pressed="false" title="Zoom">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="5.5" cy="5.5" r="4"/><line x1="9" y1="9" x2="13" y2="13"/><line x1="3.5" y1="5.5" x2="7.5" y2="5.5"/><line x1="5.5" y1="3.5" x2="5.5" y2="7.5"/></svg>
-          ZOOM
-        </button>
-        <button class="lb-tool" id="lbGreyBtn" aria-pressed="false" title="Grayscale">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="7" cy="7" r="5.5"/><path d="M7 1.5 A5.5 5.5 0 0 1 7 12.5 Z" fill="currentColor" stroke="none"/></svg>
-          MONO
-        </button>
-        <button class="lb-tool" id="lbScanBtn" aria-pressed="false" title="AI detection scan">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="1" width="12" height="12" rx="2"/><line x1="1" y1="5" x2="13" y2="5"/><line x1="1" y1="9" x2="13" y2="9"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
-          SCAN
+        <!-- zoom toggle — floats over image, appears on hover -->
+        <button class="lb-zoom-btn" id="lbZoomBtn" aria-pressed="false" aria-label="Toggle zoom">
+          <svg class="zoom-icon zoom-in" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7.5" cy="7.5" r="5"/><line x1="11.5" y1="11.5" x2="16" y2="16"/><line x1="5" y1="7.5" x2="10" y2="7.5"/><line x1="7.5" y1="5" x2="7.5" y2="10"/></svg>
+          <svg class="zoom-icon zoom-out" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7.5" cy="7.5" r="5"/><line x1="11.5" y1="11.5" x2="16" y2="16"/><line x1="5" y1="7.5" x2="10" y2="7.5"/></svg>
         </button>
       </div>
+      <figcaption id="lbCap" aria-live="polite" aria-atomic="true"></figcaption>
     </figure>
-    <button class="lb-next mono" aria-label="Next image">&rarr;</button>
+    <button class="lb-next" aria-label="Next image">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="7 3 13 9 7 15"/></svg>
+    </button>
   </div>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
-<script>window.addEventListener("load",()=>{setTimeout(()=>{
-const b=document.querySelector(".stat-band"),ab=document.querySelector(".about-body"),ag=document.querySelector(".about-grid"),xp=document.querySelector(".xp");
-document.title="PROBE SW="+document.documentElement.scrollWidth+" band="+(b?b.offsetWidth:-1)+" cols="+(b?getComputedStyle(b).gridTemplateColumns:"-")+" body="+(ab?ab.offsetWidth:-1)+" grid="+(ag?getComputedStyle(ag).gridTemplateColumns:"-")+" xp="+(xp?xp.offsetWidth+"/"+getComputedStyle(xp).gridTemplateColumns:"-")+" mq640="+matchMedia("(max-width:640px)").matches;
-},600);});</script>
 </body>
 </html>
