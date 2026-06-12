@@ -1185,7 +1185,9 @@ footer .ast { color: var(--ink-dim); }
   html { scroll-behavior: auto; }
   .track, .ticker-track { animation: none; }
   .strip { overflow-x: auto; }
-  .grain, .dotgrid::after,
+  .grain, .dotgrid::after, .dotgrid::before,
   .spin-ast, .dot, .scanline, .rotor,
-  .hero-readout em, .hand { animation: none; }
+  .hero-readout em, .hand,
+  .hero-title, .hero-title .hollow,
+  .cred-mark, .cred-cursor { animation: none; }
 }
