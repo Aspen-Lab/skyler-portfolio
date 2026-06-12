@@ -1058,17 +1058,6 @@ footer .ast { color: var(--ink-dim); }
 /* 镜片模式：光标隐藏，镜片即光标 */
 .lb-frame.lens-on, .lb-frame.lens-on #lbImg { cursor: none; }
 
-/* 像素解码画布：覆盖在图片上，由 JS 逐级细化绘制 */
-.lb-pixel {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  display: none;
-  image-rendering: pixelated;
-  transition: opacity 0.16s ease;
-}
-
 /* 放大镜镜片 = 光标本体：
    外层 .lens 只负责 transform 定位（合成器，零布局开销），
    内层 .lens-glass 承担玻璃质感与出现/消失动画 */
