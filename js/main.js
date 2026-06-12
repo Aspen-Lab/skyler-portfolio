@@ -490,7 +490,7 @@
     if (!lbFrame || !lens || !loupeBtn) return;
 
     const glass = $("#lbLensGlass");
-    const Z = 3.5, R = 130; // 镜片半径 130px（直径 260），3.5× 放大
+    const Z = 3.5, R = 390; // 镜片半径 390px（直径 780），3.5× 放大
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
@@ -677,7 +677,6 @@
         <span class="corner c-tl"></span><span class="corner c-tr"></span>
         <span class="corner c-bl"></span><span class="corner c-br"></span>
         <div class="featured-label mono">
-          <span class="feat-tag">FEATURED</span>
           <span>${esc(work.title)}</span>
           <span class="fid">${esc(fileId)}</span>
         </div>
@@ -1014,9 +1013,11 @@
       else t.removeAttribute("aria-current");
     });
     if (push && location.hash.slice(1) !== name) location.hash = name;
+    // 路由名 fanart 保留（深链接兼容），展示名是 ARCHIVE
+    const viewLabel = name === "fanart" ? "ARCHIVE" : name.toUpperCase();
     document.title = name === "portfolio"
       ? `${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`
-      : `${name.toUpperCase()} — ${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`;
+      : `${viewLabel} — ${SITE.name} (${SITE.heroName}) ${AST} VISUAL ARCHIVE`;
     // 切换后把焦点放到新视图标题：SR 收到上下文，Tab 从头开始
     if (!isInitial) {
       const target = $(`#view-${name} [data-scramble]`) || $(`#view-${name} h1`) || $(`#view-${name}`);
@@ -1085,6 +1086,7 @@
   applySite();
   renderProjects();
   renderTicker();
+  renderSketches();
   renderFanartFilters();
   renderFanart();
   renderAbout();

@@ -2,7 +2,7 @@
 
 Skyler 的个人作品集网站。黑底 · 文字与线 · FUI/HUD 风格。
 
-**结构**：顶部窄横向 bar 切换三个页面 —— `01 PORTFOLIO`（主页/作品集）/ `02 FANART` / `03 ABOUT ME`。
+**结构**：顶部窄横向 bar 切换三个页面 —— `01 PORTFOLIO`（主页/作品集）/ `02 ARCHIVE`（SKETCH ARCHIVE + FAN ART & COMMISSION）/ `03 ABOUT ME`。
 作品集按 project 分组，每个 project 标题下是一条自动滚动的作品条。
 
 ---
@@ -31,10 +31,14 @@ works: [
 
 在 `PROJECTS` 数组里复制一段改名字即可。`state` 可以填 `ACTIVE` / `ONGOING` / `ARCHIVED`，会显示成不同的状态徽章。
 
-### 3. Fanart
+### 3. Archive（速写 + Fanart/委托）
 
-改 `FANART` 数组，`fandom` 字段会自动生成顶部的筛选按钮。
-筛选状态会进网址（如 `#fanart/圈名`），可以直接把筛选后的链接分享给别人。
+`02 ARCHIVE` 页分两个板块：
+
+- **SKETCH ARCHIVE**：改 `SKETCHES.works` 数组（年份/媒介在 `SKETCHES.year` / `SKETCHES.medium`）。
+- **FAN ART & COMMISSION**：改 `FANART` 数组，`fandom` 字段会自动生成筛选按钮；
+  委托作品把 `fandom` 填成 `"COMMISSION"` 即可。
+  筛选状态会进网址（如 `#fanart/圈名`），可以直接把筛选后的链接分享给别人。
 
 ### 4. About Me
 
