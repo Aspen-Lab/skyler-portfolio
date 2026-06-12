@@ -69,6 +69,39 @@ a, button, .card.is-link, #lbImg {
 }
 
 /* ---------- atmosphere ---------- */
+/* 背景微点阵：1px 小点 + 一团缓慢漫游的光斑点亮经过的点。
+   z-index:-1 → 只出现在页面留白处，被卡片/图片自然遮住 */
+.dotgrid {
+  position: fixed; inset: 0;
+  z-index: -1; pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle, #000 1px, transparent 1.4px);
+  -webkit-mask-size: 26px 26px;
+  mask-image: radial-gradient(circle, #000 1px, transparent 1.4px);
+  mask-size: 26px 26px;
+}
+.dotgrid::before {
+  /* 常亮的基础点阵（很暗） */
+  content: ""; position: absolute; inset: 0;
+  background: rgba(237, 237, 237, 0.07);
+}
+.dotgrid::after {
+  /* 漫游光斑：transform-only，合成器动画 */
+  content: ""; position: absolute;
+  width: 64vmax; height: 64vmax;
+  left: -32vmax; top: -32vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(237, 237, 237, 0.20), transparent 62%);
+  animation: dot-roam 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes dot-roam {
+  0%   { transform: translate(16vw, 12vh); }
+  25%  { transform: translate(72vw, 28vh); }
+  50%  { transform: translate(38vw, 74vh); }
+  75%  { transform: translate(86vw, 58vh); }
+  100% { transform: translate(8vw, 82vh); }
+}
+
 .grain {
   position: fixed; inset: -140px;
   pointer-events: none; z-index: 80;
