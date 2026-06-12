@@ -1107,12 +1107,13 @@ footer .ast { color: var(--ink-dim); }
   }
   .pill-scroll::-webkit-scrollbar { display: none; }
   .pill { min-width: 560px; }
-  /* 灯箱：prev/next 换行到图片下方，保持可点 */
-  #lightbox { flex-wrap: wrap; align-content: center; row-gap: 12px; }
-  .lb-stage { order: 1; flex-basis: 100%; }
-  .lb-prev { order: 2; }
-  .lb-next { order: 3; }
-  #lbImg { max-height: 64vh; }
+  /* 灯箱：箭头为固定边缘热区，无需换行；caption 允许折行 */
+  #lbImg { max-height: 68vh; max-width: 92vw; }
+  #lbCap {
+    bottom: 14px; font-size: 9px;
+    max-width: 86vw; white-space: normal; text-align: center;
+  }
+  .lb-loupe { right: 14px; bottom: 12px; }
 }
 @media (max-width: 400px) {
   .bar-meta { display: none; }
