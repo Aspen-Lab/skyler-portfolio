@@ -272,6 +272,8 @@
   const lbCap = $("#lbCap");
   const galleries = {}; // group -> [{src, cap}]
   let lbState = { group: null, index: 0, lastFocus: null };
+  let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
+  let lbZoomToggle = null;   // 由 zoom 模块赋值：点击图片切换缩放
 
   function lbOpen(group, index) {
     const items = galleries[group];
@@ -355,19 +357,21 @@
       if (swipeX === null) return;
       const dx = e.clientX - swipeX;
       swipeX = null;
-      if (Math.abs(dx) > 40) { swiped = true; lbNav(dx < 0 ? 1 : -1); }
+      // 放大状态下水平拖动是平移，不是翻页
+      if (Math.abs(dx) > 40 && !lbZoomOn) { swiped = true; lbNav(dx < 0 ? 1 : -1); }
     }, { passive: true });
     stage.addEventListener("pointercancel", () => { swipeX = null; }, { passive: true });
-    lbImg.addEventListener("click", () => {
+    // 点击图片 = 以点击位置为中心切换放大（ArtStation 式）
+    lbImg.addEventListener("click", (e) => {
       if (swiped) { swiped = false; return; }
-      lbNav(1);
+      if (lbZoomToggle) lbZoomToggle(e);
     });
     lb.addEventListener("click", (e) => { if (e.target === lb) lbClose(); });
     document.addEventListener("keydown", (e) => {
       if (lb.hidden) return;
       if (e.key === "Tab") {
         // 简易焦点圈：在可见的灯箱按钮之间循环
-        const f = $$(".lb-close, .lb-prev, .lb-next", lb).filter((b) => b.offsetParent !== null);
+        const f = $$(".lb-close, .lb-prev, .lb-zoom-btn, .lb-next", lb).filter((b) => b.offsetParent !== null);
         if (!f.length) return;
         const first = f[0], last = f[f.length - 1];
         if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -380,128 +384,96 @@
       else if (e.key === "ArrowRight") lbNav(1);
     });
   }
-  /* ---------- lightbox tools: ZOOM / MONO / SCAN ---------- */
+  /* ---------- 放大镜：rAF 插值驱动，全程丝滑 ----------
+     - 点图片 / 点按钮 进入 2.4× 缩放，缩放中心 = 点击位置
+     - 缩放时鼠标移动 / 手指拖动平移视野（指数缓动跟随，无跳变）
+     - scale 与位移都走同一个 lerp 循环，没有 CSS transition 打架 */
   (() => {
     if (!lb) return;
     const lbFrame = $("#lbFrame");
-    const zoomBtn = $("#lbZoomBtn"), greyBtn = $("#lbGreyBtn"), scanBtn = $("#lbScanBtn");
-    const scanOverlay = $("#lbScanOverlay"), scanBeam = $("#scanBeam");
-    const scanPanel = $("#scanPanel"), spStatus = $("#spStatus"), spRows = $("#spRows"), spVerdict = $("#spVerdict");
+    const zoomBtn = $("#lbZoomBtn");
+    if (!lbFrame || !zoomBtn) return;
 
-    let zoomOn = false, greyOn = false, scanOn = false, scanTimer = null;
+    const Z = 2.4, EASE = 0.16;
+    let on = false, raf = 0, rect = null;
+    let s = 1, ts = 1;          // 当前/目标缩放
+    let px = 0, py = 0, tpx = 0, tpy = 0; // 当前/目标位移
 
-    // reset all tools when image changes
-    const resetTools = () => {
-      zoomOn = false; greyOn = false; scanOn = false;
-      if (zoomBtn) { zoomBtn.setAttribute("aria-pressed", "false"); zoomBtn.classList.remove("is-on"); }
-      if (greyBtn) { greyBtn.setAttribute("aria-pressed", "false"); greyBtn.classList.remove("is-on"); }
-      if (scanBtn) { scanBtn.setAttribute("aria-pressed", "false"); scanBtn.classList.remove("is-on"); }
-      if (lbImg) { lbImg.style.filter = ""; lbImg.style.transform = ""; lbImg.style.transformOrigin = ""; }
-      if (lbFrame) lbFrame.classList.remove("zoom-mode");
-      if (scanOverlay) scanOverlay.hidden = true;
-      if (scanPanel) scanPanel.hidden = true;
-      clearTimeout(scanTimer);
+    const step = () => {
+      s += (ts - s) * EASE;
+      px += (tpx - px) * EASE;
+      py += (tpy - py) * EASE;
+      const settled = Math.abs(ts - s) < 0.002 && Math.abs(tpx - px) < 0.25 && Math.abs(tpy - py) < 0.25;
+      if (settled) { s = ts; px = tpx; py = tpy; }
+      lbImg.style.transform = `translate3d(${px}px, ${py}px, 0) scale(${s})`;
+      if (!settled || on) {
+        raf = requestAnimationFrame(step);
+      } else {
+        raf = 0;
+        if (ts === 1) { lbImg.style.transform = ""; lbFrame.classList.remove("zoom-mode"); }
+      }
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
+
+    const targetFromPoint = (clientX, clientY) => {
+      if (!rect) rect = lbFrame.getBoundingClientRect();
+      const fx = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+      const fy = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+      tpx = (0.5 - fx) * (Z - 1) * rect.width;
+      tpy = (0.5 - fy) * (Z - 1) * rect.height;
     };
 
-    // hook into lbRender to reset tools on nav (preserve instant param)
+    const syncBtn = () => {
+      zoomBtn.setAttribute("aria-pressed", String(on));
+      zoomBtn.classList.toggle("is-on", on);
+    };
+
+    function setZoom(next, e) {
+      on = next;
+      lbZoomOn = next;
+      syncBtn();
+      if (next) {
+        rect = lbFrame.getBoundingClientRect();
+        lbFrame.classList.add("zoom-mode");
+        ts = Z;
+        if (e && e.clientX !== undefined) targetFromPoint(e.clientX, e.clientY);
+        else { tpx = 0; tpy = 0; }
+      } else {
+        ts = 1; tpx = 0; tpy = 0;
+      }
+      kick();
+    }
+    lbZoomToggle = (e) => setZoom(!on, e);
+
+    zoomBtn.addEventListener("click", (e) => { e.stopPropagation(); setZoom(!on); });
+
+    // 缩放中：指针移动 = 平移视野（鼠标悬停跟随 / 触屏拖动跟随）
+    lbFrame.addEventListener("pointermove", (e) => {
+      if (!on) return;
+      targetFromPoint(e.clientX, e.clientY);
+      kick();
+    });
+    window.addEventListener("resize", () => { rect = on ? lbFrame.getBoundingClientRect() : null; });
+
+    // 立即复位（换图 / 关闭时用，不播动画）
+    const hardReset = () => {
+      cancelAnimationFrame(raf); raf = 0;
+      on = false; lbZoomOn = false;
+      s = ts = 1; px = py = tpx = tpy = 0;
+      lbImg.style.transform = "";
+      lbFrame.classList.remove("zoom-mode");
+      syncBtn();
+    };
     const _origRender = lbRender;
-    lbRender = function(instant) { resetTools(); _origRender(instant); };
-
-    // ZOOM — pointer-tracked 2.5× magnifier
-    if (zoomBtn) {
-      zoomBtn.addEventListener("click", () => {
-        zoomOn = !zoomOn;
-        zoomBtn.setAttribute("aria-pressed", String(zoomOn));
-        zoomBtn.classList.toggle("is-on", zoomOn);
-        lbFrame.classList.toggle("zoom-mode", zoomOn);
-        if (!zoomOn) { lbImg.style.transform = ""; lbImg.style.transformOrigin = ""; }
-      });
-    }
-    if (lbFrame) {
-      lbFrame.addEventListener("mousemove", (e) => {
-        if (!zoomOn || !lbImg) return;
-        const r = lbFrame.getBoundingClientRect();
-        const x = ((e.clientX - r.left) / r.width * 100).toFixed(2);
-        const y = ((e.clientY - r.top) / r.height * 100).toFixed(2);
-        lbImg.style.transformOrigin = `${x}% ${y}%`;
-        lbImg.style.transform = "scale(2.5)";
-      });
-      lbFrame.addEventListener("mouseleave", () => {
-        if (!zoomOn) return;
-        lbImg.style.transform = "";
-        lbImg.style.transformOrigin = "";
-      });
-    }
-
-    // MONO — grayscale toggle
-    if (greyBtn) {
-      greyBtn.addEventListener("click", () => {
-        greyOn = !greyOn;
-        greyBtn.setAttribute("aria-pressed", String(greyOn));
-        greyBtn.classList.toggle("is-on", greyOn);
-        if (lbImg) lbImg.style.filter = greyOn ? "grayscale(1)" : "";
-      });
-    }
-
-    // AI SCAN — animated origin analysis
-    const SCAN_ROWS = [
-      { label: "BRUSH STROKES",   key: "strokes" },
-      { label: "LAYER DEPTH",     key: "layers"  },
-      { label: "TEXTURE SOURCE",  key: "texture" },
-      { label: "SYNTHETIC RATIO", key: "synth"   },
-      { label: "HUMAN ORIGIN",    key: "human"   },
-    ];
-    function runScan() {
-      if (!scanOverlay || !scanPanel) return;
-      scanOverlay.hidden = false;
-      scanBeam.style.animation = "none";
-      void scanBeam.offsetWidth; // reflow
-      scanBeam.style.animation = "";
-      scanPanel.hidden = true;
-      spStatus.textContent = "SCANNING...";
-      spRows.innerHTML = "";
-      spVerdict.textContent = "";
-      clearTimeout(scanTimer);
-      // generate deterministic-ish values from image index
-      const seed = (lbState.index * 37 + lbState.group.charCodeAt(0)) % 97;
-      const strokes = 1840 + (seed * 31 % 3000);
-      const layers = 8 + (seed % 7);
-      const synth = (0.3 + (seed % 12) * 0.05).toFixed(1);
-      const human = (100 - parseFloat(synth)).toFixed(1);
-      const values = { strokes: `${strokes.toLocaleString()} DETECTED`, layers: `${layers} LAYERS`, texture: "HAND-PAINTED", synth: `${synth}%`, human: `${human}%` };
-      scanTimer = setTimeout(() => {
-        scanPanel.hidden = false;
-        spStatus.textContent = "COMPLETE";
-        spRows.innerHTML = SCAN_ROWS.map((r, i) => {
-          const v = values[r.key];
-          const pct = r.key === "synth" ? parseFloat(synth) : r.key === "human" ? parseFloat(human) : null;
-          const bar = pct !== null ? `<span class="sp-bar"><span class="sp-fill" style="width:${Math.min(pct, 100)}%"></span></span>` : "";
-          return `<div class="sp-row" style="animation-delay:${i*0.09}s"><span class="sp-label">${r.label}</span>${bar}<span class="sp-val">${v}</span></div>`;
-        }).join("");
-        spVerdict.innerHTML = `VERDICT: <em>HUMAN_MADE</em> &#x2713;`;
-        // animate fill bars after they're in the DOM
-        requestAnimationFrame(() => {
-          $$(".sp-fill", spRows).forEach((f) => {
-            const w = f.style.width;
-            f.style.width = "0";
-            requestAnimationFrame(() => { f.style.width = w; });
-          });
-        });
-      }, 900);
-    }
-    if (scanBtn) {
-      scanBtn.addEventListener("click", () => {
-        scanOn = !scanOn;
-        scanBtn.setAttribute("aria-pressed", String(scanOn));
-        scanBtn.classList.toggle("is-on", scanOn);
-        if (scanOn) runScan();
-        else { scanOverlay.hidden = true; clearTimeout(scanTimer); }
-      });
-    }
-
-    // reset on close
+    lbRender = function (instant) { hardReset(); _origRender(instant); };
     const _origClose = lbClose;
-    lbClose = function() { resetTools(); _origClose(); };
+    lbClose = function () { hardReset(); _origClose(); };
+
+    // Z 键快捷切换
+    document.addEventListener("keydown", (e) => {
+      if (lb.hidden) return;
+      if (e.key === "z" || e.key === "Z") setZoom(!on);
+    });
   })();
 
   // 图片 404：换成占位卡并撤销链接语义，灯箱里也跳过（error 不冒泡，用捕获）
