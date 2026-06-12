@@ -19,6 +19,10 @@
   --disp: "Archivo", "Helvetica Neue", sans-serif;
   --jp: "Noto Sans JP", sans-serif;
   --zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  /* 面 > 线：填充面板代替线框 */
+  --srf-1: rgba(255, 255, 255, 0.05);
+  --srf-2: rgba(255, 255, 255, 0.09);
+  --srf-line: rgba(237, 237, 237, 0.09);
   --radius: 8px;      /* 统一圆角：卡片/画框 */
   --radius-sm: 7px;   /* 按钮/芯片 */
   --bar-h: 46px;
@@ -428,8 +432,9 @@ body.hero-ready .pill .pill-outline {
 }
 .p-index {
   border-radius: 5px;
-  font-size: 11px; color: var(--line); letter-spacing: 0.14em;
-  border: 1px solid var(--line-dim);
+  font-size: 11px; color: var(--ink); letter-spacing: 0.14em;
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line);
   padding: 3px 8px;
 }
 .p-title {
@@ -454,7 +459,8 @@ body.hero-ready .pill .pill-outline {
   font-size: 10.5px; letter-spacing: 0.12em; color: var(--ink-dim);
 }
 .chip {
-  border: 1px solid var(--line);
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line);
   border-radius: 99px;
   color: var(--ink);
   padding: 2px 10px;
@@ -505,8 +511,9 @@ body.hero-ready .pill .pill-outline {
 }
 
 .strip-toggle {
-  appearance: none; background: none;
-  border: 1px solid var(--line-dim); border-radius: 99px;
+  appearance: none;
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line); border-radius: 99px;
   color: var(--ink-dim);
   font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
   padding: 4px 12px; min-height: 24px;
@@ -529,6 +536,7 @@ body.hero-ready .pill .pill-outline {
 }
 .card .frame {
   border-radius: var(--radius);
+  background: #111111;
   position: relative;
   height: clamp(170px, 26vh, 250px);
   border: 1px solid var(--line-dim);
@@ -676,8 +684,9 @@ body.hero-ready .pill .pill-outline {
   padding: 22px 0 26px;
 }
 .fbtn {
-  appearance: none; background: none;
-  border: 1px solid var(--line-dim); border-radius: 99px;
+  appearance: none;
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line); border-radius: 99px;
   color: var(--ink-dim);
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
   padding: 6px 16px;
@@ -752,7 +761,7 @@ body.hero-ready .pill .pill-outline {
 .spec > div {
   display: flex; justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px dashed var(--line-dim);
+  border-bottom: 1px solid var(--srf-line);
 }
 .spec > div:last-child { border-bottom: none; }
 .spec dt { color: var(--ink-dim); }
@@ -907,7 +916,8 @@ body.hero-ready .pill .pill-outline {
 .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-chip {
   border-radius: var(--radius-sm);
-  border: 1px solid var(--line-dim);
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line);
   padding: 8px 16px;
   font-size: 10.5px; letter-spacing: 0.12em;
   color: var(--ink);
@@ -925,7 +935,8 @@ body.hero-ready .pill .pill-outline {
 }
 .links a {
   border-radius: var(--radius-sm);
-  border: 1px solid var(--line-dim);
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line);
   color: var(--ink); text-decoration: none;
   font-size: 11px; letter-spacing: 0.12em;
   padding: 9px 18px;
@@ -1071,13 +1082,14 @@ footer .ast { color: var(--ink-dim); }
 #lbCap em { font-style: normal; color: var(--ink); }
 .lb-count {
   flex: none;
-  border: 1px solid var(--line-dim); border-radius: 99px;
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line); border-radius: 99px;
   padding: 3px 12px;
   font-size: 10px; color: var(--ink);
 }
 .lb-close {
   flex: none;
-  appearance: none; background: none;
+  appearance: none; background: var(--srf-1);
   display: inline-flex; align-items: center; gap: 7px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
@@ -1156,7 +1168,7 @@ footer .ast { color: var(--ink-dim); }
 }
 .lb-loupe {
   flex: none;
-  appearance: none; background: none;
+  appearance: none; background: var(--srf-1);
   display: inline-flex; align-items: center; gap: 8px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-dim);
@@ -1197,7 +1209,30 @@ footer .ast { color: var(--ink-dim); }
   .tabs { flex: 1; }
   .tab { font-size: 11px; padding: 0 8px; letter-spacing: 0.06em; flex: 1 0 auto; white-space: nowrap; }
   .tab .t-num { display: none; }
-  .hero-readout { gap: 12px; }
+
+  /* —— 手机端去装饰：假遥测/仪表盘全部隐藏，作品尽快出现 ——
+     保留的层级：SECAL72 → 学历行 → 署名 → 作品 */
+  .hero-readout,            /* RESTORE / TARGET / STATE 假遥测 */
+  .pill-box,                /* pill 仪表盘 + TAP 提示（桌面玩具，手机占 ~200px 还要横滑） */
+  .hero-stats,              /* FILES / PROJECTS / SIGNAL 装饰统计 */
+  .ticker {                 /* 跑马灯词条 */
+    display: none;
+  }
+  /* 标签行只留署名（真名+EST 有信息量；ID 与顶栏重复、日文行纯装饰） */
+  .hero-tags .tag-line:nth-child(-n+2) { display: none; }
+  .hero { padding-top: 14px; }
+  .hero-cred { margin-top: 12px; }
+  .hero-tags { margin-top: 8px; }
+  /* 项目头收敛为：[编号] 标题 / 年份 + 状态徽章（隐藏 ✳、媒介串、NN FILES、日文小字） */
+  .p-title .p-zh { display: none; }
+  .p-meta > span:nth-child(n+2):nth-child(-n+5) { display: none; } /* 对应 main.js p-meta 模板的 2-5 位 */
+  .p-meta { border-top: none; padding-top: 0; margin-top: 6px; }
+  .project { margin-bottom: 40px; }
+  #projects { padding-top: 14px; }
+  /* 页头副标语也是装饰（DIAGNOSE → TARGET…），手机隐藏 */
+  .vh-readout, .vh-sub { display: none; }
+  .view-head { padding-top: 32px; padding-bottom: 12px; }
+
   .hero-cred { font-size: 11px; letter-spacing: 0.1em; white-space: normal; }
   .card .frame { height: 150px; }
   .fan-grid { columns: 2 140px; }
@@ -1220,8 +1255,8 @@ footer .ast { color: var(--ink-dim); }
   .stat { padding: 14px 14px 12px; }
   .stat:nth-child(odd) { border-left: none; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line-dim); }
-  .p-title .p-zh { display: block; margin: 6px 0 0; }
-  .arc-title .arc-ja { display: block; margin: 6px 0 0; }
+  /* 日文装饰小字手机端隐藏（见上方去装饰块）；ARCHIVE 页同理 */
+  .arc-title .arc-ja { display: none; }
   /* 满边设计下头像同样吃满卡宽；时钟隐藏后由规格表收底 */
   .spec { padding-bottom: 10px; }
   .clocks { display: none; }
