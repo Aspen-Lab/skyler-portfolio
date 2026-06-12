@@ -395,12 +395,10 @@
       lbTransitioning = false;
       return;
     }
-    // 方向性翻页：出场向行进方向滑出 + 透视偏转，新图从另一侧滑入落定
-    const frame = $("#lbFrame");
+    // 正常加载过渡：淡出 → 换图 → 淡入
     lbTransitioning = true;
-    if (frame) frame.classList.add("navving");
-    lbImg.style.transition = "transform 0.2s cubic-bezier(0.55, 0, 0.85, 0.4), opacity 0.18s ease";
-    lbImg.style.transform = `translate3d(${-46 * dir}px, 0, 0) scale(0.985) rotateY(${-5 * dir}deg)`;
+    lbImg.style.transition = "opacity 0.18s ease";
+    lbImg.style.transform = "";
     lbImg.style.opacity = "0";
     const swap = () => {
       lbImg.src = it.src;
@@ -409,16 +407,8 @@
       const enter = () => {
         if (entered) return;
         entered = true;
-        lbImg.style.transition = "none";
-        lbImg.style.transform = `translate3d(${52 * dir}px, 0, 0) scale(0.985) rotateY(${5 * dir}deg)`;
-        void lbImg.offsetWidth; // 强制 reflow，让起始姿态生效
-        lbImg.style.transition = "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease";
-        lbImg.style.transform = "";
         lbImg.style.opacity = "1";
-        setTimeout(() => {
-          if (frame) frame.classList.remove("navving");
-          lbTransitioning = false;
-        }, 480);
+        setTimeout(() => { lbTransitioning = false; }, 200);
       };
       if (lbImg.complete) enter();
       else {
@@ -426,7 +416,7 @@
         lbImg.addEventListener("error", enter, { once: true });
       }
     };
-    setTimeout(swap, 180);
+    setTimeout(swap, 170);
   }
   function lbNav(dir) {
     if (lbTransitioning) return;

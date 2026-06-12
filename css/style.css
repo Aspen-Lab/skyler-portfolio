@@ -269,7 +269,8 @@ a, button, .card.is-link, #lbImg {
   text-transform: uppercase;
   user-select: none;
   position: relative;
-  overflow: hidden; /* 光刃只在标题框内可见 */
+  /* 不能用 overflow:hidden —— Chrome 下会连同 background-clip:text 的
+     空心描边一起裁掉（72 消失）。光刃出框无妨：overlay 在黑底上不可见 */
 }
 .hero-title .hollow { color: var(--ink); }
 @supports (-webkit-text-stroke: 1px black) {
@@ -286,7 +287,7 @@ a, button, .card.is-link, #lbImg {
 body.hero-ready .hero-title { animation: title-tick 7s linear 2.6s infinite; }
 body.hero-ready .hero-title::after {
   content: ""; position: absolute;
-  top: -25%; bottom: -25%; left: 0; width: 17%;
+  top: -8%; bottom: -8%; left: 0; width: 17%;
   background: linear-gradient(90deg,
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 0.55) 35%,
