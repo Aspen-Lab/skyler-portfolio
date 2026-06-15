@@ -74,3 +74,6 @@ git push
 ---
 
 MADE WITH ✳ FOR SKYLER · EST. 2026
+
+<!-- contributing via fork + PR welcome -->
+
