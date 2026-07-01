@@ -409,6 +409,21 @@
     $(".lb-close", lb).focus();
   }
   let lbTransitioning = false;
+  let lbFullToken = 0;
+  // 渐进升级：当前显示的是缩略图(it.src)，后台预载原图(it.full)，
+  // 加载完且仍停在同一张时无缝换成高清。token 防止快速翻页时换错图。
+  function upgradeToFull(it) {
+    if (!it.full || it.full === it.src) return;
+    const token = ++lbFullToken;
+    const pre = new Image();
+    pre.onload = () => {
+      if (token !== lbFullToken) return;        // 已翻到别的图，放弃
+      const cur = galleries[lbState.group] && galleries[lbState.group][lbState.index];
+      if (cur !== it) return;
+      lbImg.src = it.full;                       // 同尺寸显示，换源即变清晰
+    };
+    pre.src = it.full;
+  }
   function lbRender(instant, dir = 1) {
     const items = galleries[lbState.group];
     const it = items[lbState.index];
@@ -417,12 +432,14 @@
     if (cnt) cnt.textContent = `${pad2(lbState.index + 1)} / ${pad2(items.length)}`;
     const pf = $("#lbProgressFill");
     if (pf) pf.style.width = `${((lbState.index + 1) / items.length) * 100}%`;
+    lbFullToken++;                               // 让上一张未完成的升级作废
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       lbImg.style.opacity = "1";
       lbImg.style.transform = "";
       lbTransitioning = false;
+      upgradeToFull(it);
       return;
     }
     // 正常加载过渡：淡出 → 换图 → 淡入
@@ -439,6 +456,7 @@
         entered = true;
         lbImg.style.opacity = "1";
         setTimeout(() => { lbTransitioning = false; }, 200);
+        upgradeToFull(it);                       // 缩略图淡入后再升级高清
       };
       if (lbImg.complete) enter();
       else {
@@ -710,6 +728,52 @@
     $$("#projects .strip").forEach((s) => { if (!fillStrip(s)) ok = false; });
     marqueesDone = ok;
   }
+
+  /* ---------- 触屏自动滚动 ----------
+     桌面用 CSS transform marquee；触屏改成原生 overflow-x 滑动 + 这里的慢速
+     scrollLeft 自增，保留手动滑动的同时也会自己走。手指一碰即停，松手 1.5s 后续。
+     复制一份内容做无缝循环；离屏 / 不在作品页时不滚，省电。 */
+  function setupTouchAutoScroll() {
+    $$("#projects .strip").forEach((strip) => {
+      const track = $(".track", strip);
+      const half = track && $(".half", track);
+      if (!track || !half) return;
+      if (!track.dataset.dup) {        // 复制一份用于无缝回卷（幂等）
+        const clone = half.cloneNode(true);
+        clone.setAttribute("aria-hidden", "true");
+        $$("[tabindex]", clone).forEach((el) => el.removeAttribute("tabindex"));
+        track.appendChild(clone);
+        track.dataset.dup = "1";
+      }
+
+      let down = false, paused = false, idleT = 0, onView = true;
+      const arm = () => { clearTimeout(idleT); idleT = setTimeout(() => { paused = false; }, 1500); };
+      strip.addEventListener("pointerdown", () => { down = true; paused = true; clearTimeout(idleT); }, { passive: true });
+      const release = () => { down = false; arm(); };
+      strip.addEventListener("pointerup", release, { passive: true });
+      strip.addEventListener("pointercancel", release, { passive: true });
+      strip.addEventListener("scroll", () => { if (!down) arm(); }, { passive: true });
+
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(
+          (es) => es.forEach((en) => { onView = en.isIntersecting; }),
+          { rootMargin: "60px" }
+        ).observe(strip);
+      }
+
+      let last = 0;
+      const tick = (t) => {
+        const dt = last ? t - last : 0; last = t;
+        if (!paused && onView && dt < 100 && portfolioVisible()) {
+          strip.scrollLeft += dt * 0.03;            // ~30px/s，与桌面一致
+          const wrap = half.offsetWidth;
+          if (wrap > 0 && strip.scrollLeft >= wrap) strip.scrollLeft -= wrap;
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }
   function portfolioVisible() {
     const v = $("#view-portfolio");
     return v && v.classList.contains("is-active");
@@ -738,7 +802,7 @@
         const fileId = `F-${pad2(pi + 1)}${pad2(wi + 1)}`;
         const hasImg = w.src && String(w.src).trim() !== "";
         const lbIndex = hasImg ? gallery.length : wi;
-        if (hasImg) gallery.push({ src: w.src, cap: `${w.title} / ${p.title}` });
+        if (hasImg) gallery.push({ src: w.src, full: w.full, cap: `${w.title} / ${p.title}` });
         return cardHTML(w, fileId, `p-${pi}`, lbIndex, pi === 0 && wi < 4);
       }).join("");
       galleries[`p-${pi}`] = gallery;
@@ -809,6 +873,9 @@
         strip.scrollLeft = 0;
       });
     });
+
+    // 触屏：原生滑动 + 慢速自动滚动
+    if (TOUCH && !REDUCED) setupTouchAutoScroll();
 
     // 离屏的条暂停动画，省合成开销
     if (!REDUCED && !TOUCH && "IntersectionObserver" in window) {

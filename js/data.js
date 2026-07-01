@@ -58,6 +58,28 @@ const PROJECTS = [
       { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg", w: 1920, h: 1242 },
     ],
   },
+  {
+    id: "P-03",
+    title: "SILENT BELL",
+    ja: "サイレントベル",
+    year: "SPRING 2026",
+    medium: "CHARACTER / ENVIRONMENT / PROP",
+    state: "ACTIVE",
+    // src = 列表缩略图(快)；full = 灯箱原图(高清)。灯箱会先显缩略图再无缝换成 full。
+    works: [
+      { title: "CHARACTER LINEUP",              src: "assets/works/p03/thumb/01-lineup.jpg",           full: "assets/works/p03/01-lineup.jpg",           featured: true, w: 4800, h: 2700 },
+      { title: "SULI — CHARACTER",              src: "assets/works/p03/thumb/02-suli.jpg",             full: "assets/works/p03/02-suli.jpg",             w: 4800, h: 2700 },
+      { title: "ZHIXIA — CHARACTER",            src: "assets/works/p03/thumb/03-zhixia.jpg",           full: "assets/works/p03/03-zhixia.jpg",           w: 4800, h: 2700 },
+      { title: "CANGHENG — CHARACTER",          src: "assets/works/p03/thumb/04-cangheng.jpg",         full: "assets/works/p03/04-cangheng.jpg",         w: 4800, h: 2700 },
+      { title: "YANHE — CHARACTER",             src: "assets/works/p03/thumb/05-yanhe.jpg",            full: "assets/works/p03/05-yanhe.jpg",            w: 4800, h: 2700 },
+      { title: "ENVIRONMENT — SPIRITUAL MARKET", src: "assets/works/p03/thumb/06-spiritual-market.jpg", full: "assets/works/p03/06-spiritual-market.jpg", w: 4800, h: 2700 },
+      { title: "ENVIRONMENT — DIM SUM HOUSE",   src: "assets/works/p03/thumb/07-dim-sum-house.jpg",     full: "assets/works/p03/07-dim-sum-house.jpg",     w: 4800, h: 2700 },
+      { title: "BOAT — CONCEPT",                src: "assets/works/p03/thumb/08-boat.jpg",             full: "assets/works/p03/08-boat.jpg",             w: 4800, h: 2700 },
+      { title: "FUNCTIONAL PROP",               src: "assets/works/p03/thumb/09-functional-prop.jpg",  full: "assets/works/p03/09-functional-prop.jpg",  w: 4800, h: 2700 },
+      { title: "CONCEPT ART",                   src: "assets/works/p03/thumb/10-concept-art.jpg",      full: "assets/works/p03/10-concept-art.jpg",      w: 6400, h: 3600 },
+      { title: "CONCEPT ART 2",                 src: "assets/works/p03/thumb/11-concept-art-2.jpg",    full: "assets/works/p03/11-concept-art-2.jpg",    w: 6400, h: 3600 },
+    ],
+  },
 ];
 
 /* ------------------------------------------------------------
