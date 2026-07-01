@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;600&family=Noto+Sans+JP:wght@300;500;700&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=14" />
+  <link rel="stylesheet" href="css/style.css?v=17" />
 </head>
 <body>
 
@@ -267,7 +267,28 @@
         <span class="lb-zoomrect" id="lbZoomRect" aria-hidden="true"></span>
         <div class="lens" id="lbLens" aria-hidden="true">
           <div class="lens-glass" id="lbLensGlass"></div>
-          <span class="lens-tag mono" id="lbLensTag">3.5&times;</span>
+          <!-- 环绕式机能 HUD：刻度环 + 顶部倍率弧 + 四角括号 + 倍率读数 -->
+          <svg class="lens-hud" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="hud-ring" cx="100" cy="100" r="98"/>
+            <circle class="hud-tickring" cx="100" cy="100" r="90"/>
+            <path class="hud-arc-track" pathLength="100" d="M30 100 A70 70 0 0 1 170 100"/>
+            <path class="hud-arc" id="lbHudArc" pathLength="100" d="M30 100 A70 70 0 0 1 170 100"/>
+            <g class="hud-cross">
+              <line x1="100" y1="2" x2="100" y2="11"/>
+              <line x1="100" y1="189" x2="100" y2="198"/>
+              <line x1="2" y1="100" x2="11" y2="100"/>
+              <line x1="189" y1="100" x2="198" y2="100"/>
+            </g>
+            <g class="hud-brackets">
+              <path d="M9 22 V9 H22"/><path d="M178 9 H191 V22"/>
+              <path d="M191 178 V191 H178"/><path d="M22 191 H9 V178"/>
+            </g>
+            <text class="hud-end" x="30" y="118">2&times;</text>
+            <text class="hud-end" x="170" y="118" text-anchor="end">6&times;</text>
+            <rect class="hud-readout" x="73" y="138" width="54" height="20" rx="10"/>
+            <text class="hud-zoom" id="lbLensZoomNum" x="100" y="152" text-anchor="middle">3.5&times;</text>
+            <text class="hud-label" x="100" y="171" text-anchor="middle">ZOOM</text>
+          </svg>
         </div>
       </div>
     </figure>
@@ -287,9 +308,15 @@
         <span class="lb-key">Z</span>
       </button>
     </div>
+
+    <!-- 首次进入的放大镜引导：光标处浮现，点击/超时后消失 -->
+    <div class="lb-maghint mono" id="lbMagHint" aria-hidden="true">
+      <svg width="12" height="12" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="4.8"/><line x1="10.8" y1="10.8" x2="15.2" y2="15.2"/></svg>
+      CLICK TO MAGNIFY
+    </div>
   </div>
 
-  <script src="js/data.js?v=14"></script>
-  <script src="js/main.js?v=14"></script>
+  <script src="js/data.js?v=17"></script>
+  <script src="js/main.js?v=17"></script>
 </body>
 </html>

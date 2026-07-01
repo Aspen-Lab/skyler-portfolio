@@ -548,7 +548,12 @@
 
     const glass = $("#lbLensGlass");
     let Z = 3.5;                       // 当前倍率（滚轮可调）
-    const ZMIN = 2, ZMAX = 6, R = 260; // 倍率限位 2–6×；镜片半径 260px
+    const ZMIN = 2, ZMAX = 6, R = 180; // 倍率限位 2–6×；镜片半径 180px（镜片 360px）
+
+    // 首次进入灯箱的放大镜引导提示（每次页面加载只提示一次）
+    const magHint = $("#lbMagHint");
+    let magHintDone = false, magHintT = 0;
+    const hideMagHint = () => { if (magHint) { clearTimeout(magHintT); magHint.classList.remove("show"); } };
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
@@ -592,8 +597,10 @@
 
     const zoomLabel = () => `${Z.toFixed(1).replace(/\.0$/, "")}×`;
     const syncZoomUI = () => {
-      const tag = $("#lbLensTag"), fac = $("#lbZoomFactor"), hint = $("#lbHint");
-      if (tag) tag.textContent = zoomLabel();
+      const num = $("#lbLensZoomNum"), arc = $("#lbHudArc"),
+            fac = $("#lbZoomFactor"), hint = $("#lbHint");
+      if (num) num.textContent = zoomLabel();
+      if (arc) arc.style.strokeDashoffset = `${100 * (1 - (Z - ZMIN) / (ZMAX - ZMIN))}`;
       if (fac) fac.textContent = zoomLabel();
       if (hint) hint.textContent = on
         ? `WHEEL: ${zoomLabel()} (${ZMIN}–${ZMAX}×) ✳︎ CLICK TO EXIT`
@@ -608,6 +615,7 @@
       lbFrame.classList.toggle("lens-on", next);
       document.body.classList.toggle("lens-cursor", next); // 镜片激活时隐藏自定义光标
       if (next) {
+        hideMagHint();
         measure();
         if (e && e.clientX !== undefined) track(e);
       } else {
@@ -630,7 +638,18 @@
     lbFrame.addEventListener("pointermove", track);
     lbFrame.addEventListener("pointerdown", track);
     lbFrame.addEventListener("pointerleave", hideLens);
-    lbFrame.addEventListener("pointerenter", (e) => { if (on) { measure(); track(e); } });
+    lbFrame.addEventListener("pointerenter", (e) => {
+      if (on) { measure(); track(e); return; }
+      // 放大镜关闭时：首次进入弹出引导提示（跟随光标位置）
+      if (magHintDone || !magHint) return;
+      magHintDone = true;
+      magHint.style.left = `${e.clientX}px`;
+      magHint.style.top = `${e.clientY}px`;
+      magHint.classList.add("show");
+      clearTimeout(magHintT);
+      magHintT = setTimeout(hideMagHint, 2800);
+    });
+    lbFrame.addEventListener("pointerdown", hideMagHint, { passive: true });
     window.addEventListener("resize", () => { if (on) measure(); });
     lbImg.addEventListener("load", () => { if (on) measure(); });
 
@@ -952,7 +971,7 @@
       let lbIndex = i;
       if (hasImg) {
         lbIndex = gallery.length;
-        gallery.push({ src: w.src, cap: `${w.title} / ${w.fandom}` });
+        gallery.push({ src: w.src, full: w.full, cap: `${w.title} / ${w.fandom}` });
       }
       return cardHTML({ title: `${w.title} / ${w.fandom}`, src: w.src }, fileId, "fan", lbIndex);
     }).join("");

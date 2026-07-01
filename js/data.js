@@ -19,6 +19,8 @@ const SITE = {
    作品集（主页）— 每个 project 一个滚动条
    state 可选: "ACTIVE" | "ONGOING" | "ARCHIVED"
    ------------------------------------------------------------ */
+// 顺序 = 显示顺序 = id 顺序。src = 列表缩略图(快)；full = 灯箱原图(高清)。
+// 注：SILENT BELL 的图实体仍在 p03/ 文件夹（避免重传），显示编号为 P-02。
 const PROJECTS = [
   {
     id: "P-01",
@@ -28,44 +30,28 @@ const PROJECTS = [
     medium: "CHARACTER / PROP / ENVIRONMENT",
     state: "ACTIVE",
     works: [
-      { title: "WEAPON DESIGN",                src: "assets/works/p01/11-prop-3.jpg?v=2",         featured: true, w: 1920, h: 1080 },
-      { title: "CHARACTER LINEUP",            src: "assets/works/p01/03-lineup.jpg?v=2",         w: 1920, h: 1080 },
-      { title: "UNIT Y — SKETCHES",           src: "assets/works/p01/04-unit-y.jpg?v=2",         w: 1920, h: 1080 },
-      { title: "UNIT Z — SKETCHES",           src: "assets/works/p01/05-unit-z.jpg?v=2",         w: 1920, h: 1080 },
-      { title: "UNIT Z — TURNAROUND",         src: "assets/works/p01/06-turnaround.jpg?v=2",     w: 1920, h: 1080 },
-      { title: "PROP DESIGN",                 src: "assets/works/p01/08-prop-design.jpg?v=2",    w: 1920, h: 1080 },
-      { title: "PROP 01 — WHITE ECHO",        src: "assets/works/p01/09-white-echo.jpg?v=2",     w: 1920, h: 1080 },
-      { title: "PROP 02 — ABYSSAL ECHO",      src: "assets/works/p01/10-abyssal-echo.jpg?v=2",   w: 1920, h: 1080 },
-      { title: "PROP 03 + VFX",               src: "assets/works/p01/12-prop-3-vfx.jpg?v=2",     w: 1920, h: 1080 },
-      { title: "ENVIRONMENT — CONCEPT ART",   src: "assets/works/p01/13-env-concept.jpg?v=2",    w: 1920, h: 1080 },
-      { title: "ENVIRONMENT — CONCEPT ART 2", src: "assets/works/p01/13b-env-concept-2.jpg?v=2", w: 1920, h: 1222 },
-      { title: "ENVIRONMENT — DESIGN",        src: "assets/works/p01/14-env-blueprint.jpg?v=2",  w: 1920, h: 1080 },
-      { title: "STYLE FRAME",                 src: "assets/works/p01/15-style-frame.jpg?v=2",    w: 1920, h: 1080 },
+      { title: "WEAPON DESIGN",                src: "assets/works/p01/thumb/01-weapon.jpg",        full: "assets/works/p01/01-weapon.jpg",        featured: true, w: 4800, h: 2700 },
+      { title: "CHARACTER LINEUP",             src: "assets/works/p01/thumb/02-lineup.jpg",        full: "assets/works/p01/02-lineup.jpg",        w: 4800, h: 2700 },
+      { title: "UNIT Y — SKETCHES",            src: "assets/works/p01/thumb/03-unit-y.jpg",        full: "assets/works/p01/03-unit-y.jpg",        w: 4800, h: 2700 },
+      { title: "UNIT Z — SKETCHES",            src: "assets/works/p01/thumb/04-unit-z.jpg",        full: "assets/works/p01/04-unit-z.jpg",        w: 4800, h: 2700 },
+      { title: "UNIT Z — TURNAROUND",          src: "assets/works/p01/thumb/05-turnaround.jpg",    full: "assets/works/p01/05-turnaround.jpg",    w: 4800, h: 2700 },
+      { title: "PROP DESIGN",                  src: "assets/works/p01/thumb/06-prop-design.jpg",   full: "assets/works/p01/06-prop-design.jpg",   w: 6400, h: 3600 },
+      { title: "PROP 01 — WHITE ECHO",         src: "assets/works/p01/thumb/07-prop-1.jpg",        full: "assets/works/p01/07-prop-1.jpg",        w: 6400, h: 3600 },
+      { title: "PROP 02 — ABYSSAL ECHO",       src: "assets/works/p01/thumb/08-prop-2.jpg",        full: "assets/works/p01/08-prop-2.jpg",        w: 6400, h: 3600 },
+      { title: "PROP 03 + VFX",                src: "assets/works/p01/thumb/09-vfx.jpg",           full: "assets/works/p01/09-vfx.jpg",           w: 6400, h: 3600 },
+      { title: "ENVIRONMENT — CONCEPT ART",    src: "assets/works/p01/thumb/10-env-concept.jpg",   full: "assets/works/p01/10-env-concept.jpg",   w: 4800, h: 2700 },
+      { title: "ENVIRONMENT — CONCEPT ART 2",  src: "assets/works/p01/thumb/11-env-concept-2.jpg", full: "assets/works/p01/11-env-concept-2.jpg", w: 4400, h: 2800 },
+      { title: "ENVIRONMENT — DESIGN",         src: "assets/works/p01/thumb/12-env-design.jpg",    full: "assets/works/p01/12-env-design.jpg",    w: 4800, h: 2700 },
+      { title: "STYLE FRAME",                  src: "assets/works/p01/thumb/13-style-frame.jpg",   full: "assets/works/p01/13-style-frame.jpg",   w: 4800, h: 2700 },
     ],
   },
   {
     id: "P-02",
-    title: "CREATURE DESIGN",
-    ja: "クリーチャーデザイン",
-    year: "SPRING 2026",
-    medium: "CHARACTER DESIGN · WORLDBUILDING",
-    state: "ACTIVE",
-    works: [
-      { title: "BAIZE — BOOK SPREAD", src: "assets/works/p02/02-baize-spread.jpg", featured: true, w: 1920, h: 1242 },
-      { title: "BAIZE — CHARACTER SHEET",  src: "assets/works/p02/01-baize.jpg", w: 1920, h: 1242 },
-      { title: "LEPTAILURUS PAVONINUS",    src: "assets/works/p02/03-leptailurus.jpg", w: 1920, h: 1242 },
-      { title: "OVIS CAMELOPARDALIS",      src: "assets/works/p02/04-ovis.jpg", w: 1920, h: 1242 },
-      { title: "RHINOLAGUS CAMPANULA",     src: "assets/works/p02/05-rhinolagus.jpg", w: 1920, h: 1242 },
-    ],
-  },
-  {
-    id: "P-03",
     title: "SILENT BELL",
     ja: "サイレントベル",
     year: "SPRING 2026",
     medium: "CHARACTER / ENVIRONMENT / PROP",
     state: "ACTIVE",
-    // src = 列表缩略图(快)；full = 灯箱原图(高清)。灯箱会先显缩略图再无缝换成 full。
     works: [
       { title: "CHARACTER LINEUP",              src: "assets/works/p03/thumb/01-lineup.jpg",           full: "assets/works/p03/01-lineup.jpg",           featured: true, w: 4800, h: 2700 },
       { title: "SULI — CHARACTER",              src: "assets/works/p03/thumb/02-suli.jpg",             full: "assets/works/p03/02-suli.jpg",             w: 4800, h: 2700 },
@@ -78,6 +64,21 @@ const PROJECTS = [
       { title: "FUNCTIONAL PROP",               src: "assets/works/p03/thumb/09-functional-prop.jpg",  full: "assets/works/p03/09-functional-prop.jpg",  w: 4800, h: 2700 },
       { title: "CONCEPT ART",                   src: "assets/works/p03/thumb/10-concept-art.jpg",      full: "assets/works/p03/10-concept-art.jpg",      w: 6400, h: 3600 },
       { title: "CONCEPT ART 2",                 src: "assets/works/p03/thumb/11-concept-art-2.jpg",    full: "assets/works/p03/11-concept-art-2.jpg",    w: 6400, h: 3600 },
+    ],
+  },
+  {
+    id: "P-03",
+    title: "CREATURE DESIGN",
+    ja: "クリーチャーデザイン",
+    year: "SPRING 2026",
+    medium: "CHARACTER DESIGN · WORLDBUILDING",
+    state: "ACTIVE",
+    works: [
+      { title: "BAIZE — BOOK SPREAD",     src: "assets/works/p02/thumb/01-baize-spread.jpg", full: "assets/works/p02/01-baize-spread.jpg", featured: true, w: 6800, h: 4400 },
+      { title: "BAIZE — CHARACTER SHEET", src: "assets/works/p02/thumb/02-baize.jpg",        full: "assets/works/p02/02-baize.jpg",        w: 6800, h: 4400 },
+      { title: "LEPTAILURUS PAVONINUS",   src: "assets/works/p02/thumb/03-leptailurus.jpg",  full: "assets/works/p02/03-leptailurus.jpg",  w: 6800, h: 4400 },
+      { title: "OVIS CAMELOPARDALIS",     src: "assets/works/p02/thumb/04-ovis.jpg",         full: "assets/works/p02/04-ovis.jpg",         w: 6800, h: 4400 },
+      { title: "RHINOLAGUS CAMPANULA",    src: "assets/works/p02/thumb/05-rhinolagus.jpg",   full: "assets/works/p02/05-rhinolagus.jpg",   w: 6800, h: 4400 },
     ],
   },
 ];
@@ -108,18 +109,16 @@ const SKETCHES = {
    ✳ 注意：fandom 名字会原样显示在页面上，发布前记得把
      FANDOM A/B/C 换成真实的圈名。
    ------------------------------------------------------------ */
+// src = 列表缩略图；full = 灯箱原图。fandom 会生成筛选按钮。
 const FANART = [
-  { title: "FA_001", fandom: "FANDOM A", src: "" },
-  { title: "FA_002", fandom: "FANDOM A", src: "" },
-  { title: "FA_003", fandom: "FANDOM B", src: "" },
-  { title: "FA_004", fandom: "FANDOM B", src: "" },
-  { title: "FA_005", fandom: "FANDOM C", src: "" },
-  { title: "FA_006", fandom: "FANDOM A", src: "" },
-  { title: "FA_007", fandom: "FANDOM C", src: "" },
-  { title: "FA_008", fandom: "FANDOM B", src: "" },
-  { title: "CM_001", fandom: "COMMISSION", src: "" },
-  { title: "CM_002", fandom: "COMMISSION", src: "" },
-  { title: "CM_003", fandom: "COMMISSION", src: "" },
+  { title: "DAYS OF RAINBOW",     fandom: "SKY",        src: "assets/works/fanart/thumb/01-sky-rainbow.jpg",      full: "assets/works/fanart/01-sky-rainbow.jpg" },
+  { title: "DAYS OF RAINBOW II",  fandom: "SKY",        src: "assets/works/fanart/thumb/02-sky-rainbow-2.jpg",    full: "assets/works/fanart/02-sky-rainbow-2.jpg" },
+  { title: "SEASON OF MIGRATION", fandom: "SKY",        src: "assets/works/fanart/thumb/03-sky-migration.jpg",    full: "assets/works/fanart/03-sky-migration.jpg" },
+  { title: "SKY — FANART",        fandom: "SKY",        src: "assets/works/fanart/thumb/04-sky-fanart.jpg",       full: "assets/works/fanart/04-sky-fanart.jpg" },
+  { title: "6TH ANNIVERSARY",     fandom: "SKY",        src: "assets/works/fanart/thumb/05-sky-6anniv.jpg",       full: "assets/works/fanart/05-sky-6anniv.jpg" },
+  { title: "UNIT Z — POSTER",     fandom: "ORIGINAL",   src: "assets/works/fanart/thumb/06-unitz-poster.jpg",     full: "assets/works/fanart/06-unitz-poster.jpg" },
+  { title: "ANGEL",               fandom: "COMMISSION", src: "assets/works/fanart/thumb/07-commission-angel.jpg", full: "assets/works/fanart/07-commission-angel.jpg" },
+  { title: "UNTITLED",            fandom: "COMMISSION", src: "assets/works/fanart/thumb/08-untitled.jpg",         full: "assets/works/fanart/08-untitled.jpg" },
 ];
 
 /* ------------------------------------------------------------

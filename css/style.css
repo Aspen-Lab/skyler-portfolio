@@ -1031,7 +1031,7 @@ footer .ast { color: var(--ink-dim); }
    内层 .lens-glass 承担玻璃质感与出现/消失动画 */
 .lens {
   position: absolute; top: 0; left: 0; z-index: 3;
-  width: 520px; height: 520px;
+  width: 360px; height: 360px;
   pointer-events: none;
   will-change: transform;
 }
@@ -1059,19 +1059,57 @@ footer .ast { color: var(--ink-dim); }
   content: ""; position: absolute; inset: 0; border-radius: 50%;
   background: radial-gradient(60% 45% at 32% 22%, rgba(255, 255, 255, 0.13), transparent 70%);
 }
-/* 倍率小注：镜片下缘 */
-.lens-tag {
-  position: absolute; left: 50%; bottom: -22px;
-  transform: translateX(-50%) translateY(-4px);
-  font-size: 9px; letter-spacing: 0.18em;
-  color: var(--ink-dim);
-  opacity: 0;
+/* 环绕式机能 HUD：刻度点环 + 顶部倍率弧 + 四角括号 + 倍率读数 */
+.lens-hud {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; overflow: visible;
+  opacity: 0; transform: scale(0.9);
   transition:
-    opacity 0.25s ease 0.05s,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
+    opacity 0.22s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.hud-ring { fill: none; stroke: rgba(237, 237, 237, 0.45); stroke-width: 0.8; }
+.hud-tickring {
+  fill: none; stroke: rgba(237, 237, 237, 0.34); stroke-width: 3.4;
+  stroke-dasharray: 0.5 6.2; stroke-linecap: round;
+}
+.hud-arc-track { fill: none; stroke: rgba(237, 237, 237, 0.16); stroke-width: 2.4; stroke-linecap: round; }
+.hud-arc {
+  fill: none; stroke: var(--acid); stroke-width: 2.6; stroke-linecap: round;
+  stroke-dasharray: 100; stroke-dashoffset: 62.5; /* 初始 3.5× */
+  filter: drop-shadow(0 0 2.5px rgba(237, 237, 237, 0.55));
+  transition: stroke-dashoffset 0.12s ease;
+}
+.hud-cross line { stroke: rgba(237, 237, 237, 0.55); stroke-width: 1.4; }
+.hud-brackets path { fill: none; stroke: var(--acid); stroke-width: 2; }
+.hud-end { fill: rgba(237, 237, 237, 0.62); font: 700 8px "IBM Plex Mono", monospace; letter-spacing: 0.04em; }
+.hud-readout { fill: rgba(8, 8, 8, 0.7); stroke: rgba(237, 237, 237, 0.28); stroke-width: 0.8; }
+.hud-zoom { fill: var(--acid); font: 700 15px "IBM Plex Mono", monospace; letter-spacing: 0.01em; }
+.hud-label { fill: rgba(237, 237, 237, 0.4); font: 700 6px "IBM Plex Mono", monospace; letter-spacing: 0.34em; }
 .lens.show .lens-glass { opacity: 1; transform: scale(1); }
-.lens.show .lens-tag { opacity: 1; transform: translateX(-50%) translateY(0); }
+.lens.show .lens-hud { opacity: 1; transform: scale(1); }
+
+/* 首次进入灯箱的放大镜引导：跟随光标出现的小提示 */
+.lb-maghint {
+  position: fixed; top: 0; left: 0; z-index: 6;
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 11px;
+  background: rgba(10, 10, 10, 0.82);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(237, 237, 237, 0.22);
+  border-radius: 999px;
+  color: var(--acid);
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transform: translate(14px, 14px) scale(0.96);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lb-maghint svg { display: block; }
+.lb-maghint.show { opacity: 1; transform: translate(14px, 14px) scale(1); }
+@media (max-width: 860px) { .lb-maghint { display: none; } }
 
 /* ---------- 灯箱 HUD chrome：与作品集同语言，全部常显 ---------- */
 /* 顶部条：文件名 ✳ 计数 ✳ 关闭 */
