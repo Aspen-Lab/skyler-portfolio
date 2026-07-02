@@ -362,13 +362,32 @@
   }
 
   /* ---------- card builder ---------- */
+  /* ---------- 图片懒加载：img[data-src] 近视口才真正加载 ---------- */
+  const lazyIO = "IntersectionObserver" in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          const img = en.target;
+          if (img.dataset.src) { img.src = img.dataset.src; img.removeAttribute("data-src"); }
+          img.classList.remove("lazyimg");
+          lazyIO.unobserve(img);
+        });
+      }, { rootMargin: "200px 400px" })   // 竖向提前 200px、横向(marquee)提前 400px
+    : null;
+  function observeLazy(root) {
+    const imgs = $$("img[data-src]", root || document);
+    if (!lazyIO) { imgs.forEach((i) => { i.src = i.dataset.src; i.removeAttribute("data-src"); }); return; }
+    imgs.forEach((i) => lazyIO.observe(i));
+  }
+
   function cardHTML(work, fileId, lbGroup, lbIndex, eager) {
     const hasImg = work.src && String(work.src).trim() !== "";
     const dims = work.w && work.h ? ` width="${Number(work.w)}" height="${Number(work.h)}"` : "";
-    const load = eager ? ` loading="eager" fetchpriority="high"` : ` loading="lazy"`;
-    const inner = hasImg
-      ? `<img src="${esc(work.src)}" alt="${esc(work.title)}"${dims} decoding="async"${load} />`
-      : phHTML(lbIndex, fileId);
+    // 首屏可见的图直接加载；其余用 data-src + IntersectionObserver 懒加载（近视口才拉）
+    const imgTag = eager
+      ? `<img src="${esc(work.src)}" alt="${esc(work.title)}"${dims} decoding="async" loading="eager" fetchpriority="high" />`
+      : `<img data-src="${esc(work.src)}" alt="${esc(work.title)}"${dims} decoding="async" class="lazyimg" />`;
+    const inner = hasImg ? imgTag : phHTML(lbIndex, fileId);
     const linkAttrs = hasImg
       ? ` tabindex="0" role="button" aria-label="View ${esc(work.title)}" data-lb-group="${esc(lbGroup)}" data-lb-index="${lbIndex}"`
       : "";
@@ -785,6 +804,7 @@
     }
     // 恒速 ~30px/s
     track.style.setProperty("--dur", `${Math.max(28, Math.round(half.offsetWidth / 30))}s`);
+    observeLazy(track);   // 复制出来的克隆图也挂懒加载
     return true;
   }
   function setupMarquees() {
@@ -809,6 +829,7 @@
         $$("[tabindex]", clone).forEach((el) => el.removeAttribute("tabindex"));
         track.appendChild(clone);
         track.dataset.dup = "1";
+        observeLazy(track);   // 克隆图懒加载
       }
 
       let down = false, paused = false, idleT = 0, onView = true;
@@ -962,6 +983,8 @@
       }, 200);
     }, true);
 
+    observeLazy(wrap);   // 挂懒加载：仅近视口的缩略图才真正下载
+
     // stats（FILES = 作品集 + fanart/委托，整站文件数）
     const files = PROJECTS.reduce((n, p) => n + p.works.length, 0) + FANART.length;
     const sf = $("#statFiles"), sp = $("#statProjects");
@@ -1000,6 +1023,7 @@
       return cardHTML({ title: `${w.title} / ${w.fandom}`, src: w.src }, fileId, "fan", lbIndex);
     }).join("");
     galleries["fan"] = gallery;
+    observeLazy(grid);   // fanart 缩略图懒加载
     // 筛选结果播报给 SR
     const st = $("#fanartStatus");
     if (st) st.textContent = fanFilter === "ALL" ? `All · ${list.length} works` : `${fanFilter} · ${list.length} works`;
