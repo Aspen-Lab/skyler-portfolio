@@ -84,25 +84,6 @@ const PROJECTS = [
 ];
 
 /* ------------------------------------------------------------
-   SKETCH ARCHIVE — ARCHIVE 页上半部分（速写/习作/WIP）
-   ✳ 和别处一样：src 留空 ("") 显示占位图。
-   ------------------------------------------------------------ */
-const SKETCHES = {
-  ja: "スケッチアーカイブ",
-  year: "2023 — 2026",
-  medium: "SKETCH / STUDY / WIP",
-  works: [
-    { title: "SKETCH_01", src: "" },
-    { title: "SKETCH_02", src: "" },
-    { title: "SKETCH_03", src: "" },
-    { title: "SKETCH_04", src: "" },
-    { title: "SKETCH_05", src: "" },
-    { title: "SKETCH_06", src: "" },
-    { title: "SKETCH_07", src: "" },
-  ],
-};
-
-/* ------------------------------------------------------------
    FAN ART & COMMISSION — ARCHIVE 页下半部分
    ✳ fandom 是作品所属的圈子/标签，会自动生成筛选按钮；
      委托作品用 fandom: "COMMISSION"。

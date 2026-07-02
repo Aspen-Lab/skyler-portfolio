@@ -916,8 +916,8 @@
       }, 200);
     }, true);
 
-    // stats（FILES = 作品集 + 速写档案 + fanart/委托，整站文件数）
-    const files = PROJECTS.reduce((n, p) => n + p.works.length, 0) + SKETCHES.works.length + FANART.length;
+    // stats（FILES = 作品集 + fanart/委托，整站文件数）
+    const files = PROJECTS.reduce((n, p) => n + p.works.length, 0) + FANART.length;
     const sf = $("#statFiles"), sp = $("#statProjects");
     if (sf) sf.textContent = pad2(files);
     if (sp) sp.textContent = pad2(PROJECTS.length);
@@ -935,28 +935,6 @@
     t.innerHTML = seq.repeat(4); // 偶数份 → translateX(-50%) 落在整数倍上无缝；4 份覆盖 ~2.7k 宽屏
   }
 
-  /* ---------- sketch archive（ARCHIVE 页上半部分） ---------- */
-  function renderSketches() {
-    const grid = $("#sketchGrid");
-    if (!grid) return;
-    const gallery = [];
-    grid.innerHTML = SKETCHES.works.map((w, i) => {
-      const fileId = `SK-${pad2(i + 1)}`;
-      const hasImg = w.src && String(w.src).trim() !== "";
-      let lbIndex = i;
-      if (hasImg) {
-        lbIndex = gallery.length;
-        gallery.push({ src: w.src, cap: `${w.title} / SKETCH ARCHIVE` });
-      }
-      return cardHTML(w, fileId, "sk", lbIndex);
-    }).join("");
-    galleries["sk"] = gallery;
-    const ja = $("#sketchJa");
-    if (ja) ja.textContent = SKETCHES.ja || "";
-    const meta = $("#sketchMeta");
-    if (meta) meta.innerHTML =
-      `<span>${esc(SKETCHES.year)}</span><span>${AST}</span><span>${esc(SKETCHES.medium)}</span><span>${AST}</span><span>${pad2(SKETCHES.works.length)} FILES</span>`;
-  }
 
   /* ---------- fan art & commission（ARCHIVE 页下半部分） ---------- */
   let fanFilter = "ALL";
@@ -1319,7 +1297,6 @@
   applySite();
   renderProjects();
   renderTicker();
-  renderSketches();
   renderFanartFilters();
   renderFanart();
   renderAbout();
