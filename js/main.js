@@ -557,17 +557,19 @@
     let on = false, raf = 0, rect = null, visible = false;
     let cx = 0, cy = 0, tx = 0, ty = 0;
 
+    const lensSrc = $("#lbLensSrc");
     const measure = () => {
       rect = lbImg.getBoundingClientRect();
-      if (glass) {
-        glass.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
-        glass.style.backgroundSize = `${rect.width * Z}px ${rect.height * Z}px`;
+      if (lensSrc) {
+        const want = lbImg.currentSrc || lbImg.src;
+        if (lensSrc.src !== want) lensSrc.src = want;  // 只在换图时重设，避免重复加载
+        lensSrc.style.width = `${rect.width * Z}px`;    // 高度 auto 保持比例；仅缩放时触发
       }
     };
-    // transform 定位（合成器，不触发布局）；镜内画面与镜片同源同步
+    // 全部用 transform 定位（GPU 合成，不重绘）：镜片 + 镜内放大画面同步平移
     const place = () => {
       lens.style.transform = `translate3d(${cx - R}px, ${cy - R}px, 0)`;
-      if (glass) glass.style.backgroundPosition = `${R - cx * Z}px ${R - cy * Z}px`;
+      if (lensSrc) lensSrc.style.transform = `translate3d(${R - cx * Z}px, ${R - cy * Z}px, 0)`;
     };
     const step = () => {
       // 0.55：紧贴光标的"光标感"，只留一丝重量

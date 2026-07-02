@@ -1052,12 +1052,20 @@ footer .ast { color: var(--ink-dim); }
     opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  will-change: background-position;
+  will-change: transform, opacity;
 }
-/* 玻璃球面高光 */
+/* 镜内放大画面：绝对定位的原图，用 transform 平移（GPU 合成，无重绘） */
+.lens-src {
+  position: absolute; top: 0; left: 0;
+  max-width: none; height: auto;
+  will-change: transform;
+  -webkit-user-drag: none; user-select: none; pointer-events: none;
+}
+/* 玻璃球面高光（盖在放大画面之上） */
 .lens-glass::after {
   content: ""; position: absolute; inset: 0; border-radius: 50%;
   background: radial-gradient(60% 45% at 32% 22%, rgba(255, 255, 255, 0.13), transparent 70%);
+  z-index: 1;
 }
 /* 环绕式机能 HUD：刻度点环 + 顶部倍率弧 + 四角括号 + 倍率读数 */
 .lens-hud {
