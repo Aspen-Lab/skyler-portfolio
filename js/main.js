@@ -410,19 +410,58 @@
   }
   let lbTransitioning = false;
   let lbFullToken = 0;
-  // 渐进升级：当前显示的是缩略图(it.src)，后台预载原图(it.full)，
-  // 加载完且仍停在同一张时无缝换成高清。token 防止快速翻页时换错图。
-  function upgradeToFull(it) {
+  let lbObjURL = null;     // 当前原图的 blob URL，切图/关闭时释放
+  let lbLoadTimer = 0;
+  const stillOn = (it) => {
+    const items = galleries[lbState.group];
+    return items && items[lbState.index] === it;
+  };
+  function showLoadingBar(frac, txt) {
+    const el = $("#lbLoading"); if (!el) return;
+    el.classList.add("show");
+    const fill = $("#lbLoadingFill"); if (fill) fill.style.width = `${Math.round(frac * 100)}%`;
+    const t = $("#lbLoadingText"); if (t && txt) t.textContent = txt;
+  }
+  function hideLoadingBar() {
+    clearTimeout(lbLoadTimer);
+    const el = $("#lbLoading"); if (el) el.classList.remove("show");
+  }
+  // 渐进升级：先显缩略图(it.src)，再用 fetch 带进度加载原图(it.full)，
+  // 完成且仍停在同一张时无缝换上。token 防止快速翻页换错图。
+  async function upgradeToFull(it) {
     if (!it.full || it.full === it.src) return;
     const token = ++lbFullToken;
-    const pre = new Image();
-    pre.onload = () => {
-      if (token !== lbFullToken) return;        // 已翻到别的图，放弃
-      const cur = galleries[lbState.group] && galleries[lbState.group][lbState.index];
-      if (cur !== it) return;
-      lbImg.src = it.full;                       // 同尺寸显示，换源即变清晰
-    };
-    pre.src = it.full;
+    hideLoadingBar();
+    // 延迟 180ms 再显示进度条：缓存命中时秒回，不闪
+    clearTimeout(lbLoadTimer);
+    lbLoadTimer = setTimeout(() => { if (token === lbFullToken) showLoadingBar(0, "LOADING"); }, 180);
+    try {
+      const resp = await fetch(it.full);
+      if (token !== lbFullToken || !resp.ok || !resp.body) throw 0;
+      const total = +(resp.headers.get("content-length") || 0);
+      const reader = resp.body.getReader();
+      const chunks = []; let received = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (token !== lbFullToken) { try { reader.cancel(); } catch (e) {} return; }
+        chunks.push(value); received += value.length;
+        if (total) {
+          const pct = received / total;
+          showLoadingBar(pct, `LOADING ${Math.round(pct * 100)}% · ${(received / 1048576).toFixed(1)}/${(total / 1048576).toFixed(1)}MB`);
+        }
+      }
+      if (token !== lbFullToken || !stillOn(it)) { hideLoadingBar(); return; }
+      const url = URL.createObjectURL(new Blob(chunks));
+      if (lbObjURL) URL.revokeObjectURL(lbObjURL);
+      lbObjURL = url;
+      lbImg.src = url;              // 换成原图；同尺寸显示，变清晰
+      hideLoadingBar();
+    } catch (e) {
+      if (token !== lbFullToken) return;
+      hideLoadingBar();
+      if (stillOn(it)) lbImg.src = it.full;   // 回退：让浏览器自己加载
+    }
   }
   function lbRender(instant, dir = 1) {
     const items = galleries[lbState.group];
@@ -488,8 +527,13 @@
     const f = lbState.lastFocus;
     if (f && f.isConnected && f.offsetParent !== null) f.focus({ preventScroll: true });
     else { const t = $(".tab.is-active"); if (t) t.focus({ preventScroll: true }); }
+    lbFullToken++;            // 中止进行中的原图下载
+    hideLoadingBar();
     clearTimeout(lbHideT);
-    lbHideT = setTimeout(() => { lb.hidden = true; lbImg.src = ""; }, 240);
+    lbHideT = setTimeout(() => {
+      lb.hidden = true; lbImg.src = "";
+      if (lbObjURL) { URL.revokeObjectURL(lbObjURL); lbObjURL = null; }
+    }, 240);
   }
   if (lb) {
     $(".lb-close", lb).addEventListener("click", lbClose);
