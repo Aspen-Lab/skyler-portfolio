@@ -107,26 +107,26 @@ const FANART = [
    ------------------------------------------------------------ */
 const ABOUT = {
   avatar: "assets/avatar.jpg",
-  // 主简介（英文，页面主要内容）
+  // 主简介（英文，页面主要内容）— 讲个人与兴趣，不重复下方 work experience 里的 Garena
   bio:
-    "Illustration student with a concentration in Concept Design, passionate about character design and narrative-driven visual storytelling for games. Experienced in concept art production for live-service mobile titles at Garena, with strengths in style adaptation, iterative visual development, and cross-team collaboration.",
+    "Illustration student with a concentration in Concept Design — happiest inventing characters and the worlds they live in. I love creature design, drawing fan art for the games I grew up with, and painting in watercolor when I step away from the screen.",
   // 简介下方的日文装饰行
   bioDeco: "キャラクターデザイン ✳ ビジュアルストーリーテリング ✳ コンセプトアート",
 
   // bio 里要点亮的关键短语（必须与 bio 原文逐字一致；亮白显示，其余文字灰）
   bioHighlights: [
     "Concept Design",
-    "character design",
-    "narrative-driven visual storytelling",
-    "Garena",
+    "inventing characters",
+    "creature design",
+    "watercolor",
   ],
 
   // About 页数据带：大字焦点块（n 大字 / label 小注），3–4 个最佳
   highlights: [
-    { n: "GARENA",  label: "FREE FIRE · AOV — SHIPPED" },
-    { n: "TGC",     label: "SKY 6TH ANNIV. OFFICIAL ART" },
-    { n: "1ST ×1",  label: "BEYOND THE DOT · 2024" },
-    { n: "TOP 3%",  label: "GPA · 8 SEMESTERS" },
+    { n: "GARENA",       label: "FREE FIRE · AOV — SHIPPED" },
+    { n: "TGC",          label: "SKY 6TH ANNIV. OFFICIAL ART" },
+    { n: "1ST×1 2ND×2",  label: "SCAD BEYOND THE DOT · 2024" },
+    { n: "TOP 3%",       label: "GPA · 8 SEMESTERS" },
   ],
 
   // 经历：period / company / role / tag(小徽章) / note(一行简述，可留空)

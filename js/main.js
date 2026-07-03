@@ -1024,6 +1024,8 @@
     }).join("");
     galleries["fan"] = gallery;
     observeLazy(grid);   // fanart 缩略图懒加载
+    const fm = $("#fanMeta");
+    if (fm) fm.innerHTML = `<span>${new Set(FANART.map((w) => w.fandom)).size} TAGS</span><span>${AST}</span><span>${pad2(FANART.length)} FILES</span>`;
     // 筛选结果播报给 SR
     const st = $("#fanartStatus");
     if (st) st.textContent = fanFilter === "ALL" ? `All · ${list.length} works` : `${fanFilter} · ${list.length} works`;

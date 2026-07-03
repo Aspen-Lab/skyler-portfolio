@@ -495,7 +495,9 @@ body.hero-ready .pill .pill-outline {
 .track.rev { animation-name: marquee-rev; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes marquee-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-.strip:hover .track, .strip:focus-within .track,
+/* 注：不含 :focus-within —— 否则灯箱 ESC 后焦点回到卡片会让 marquee 永久暂停。
+   键盘导航由 .kb 类单独切成滚动模式，不依赖 focus。 */
+.strip:hover .track,
 .strip.is-paused .track, .strip.is-offview .track { animation-play-state: paused; }
 
 /* 键盘焦点模式：停掉位移，改为可滚动容器，保证焦点卡片可见 */
@@ -627,13 +629,20 @@ body.hero-ready .pill .pill-outline {
   border: 1px solid var(--line-dim); border-radius: 99px;
   padding: 2px 10px; font-size: 9.5px; color: var(--ink-dim);
 }
+/* 与 .p-title / .arc-title 统一：Archivo 展示体（继承 body 的 --disp） */
 .view-title {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: clamp(26px, 2.6vw, 44px);
-  letter-spacing: 0.14em;
-  line-height: 1.1; text-transform: uppercase;
+  font-weight: 900; font-stretch: 118%;
+  font-size: clamp(28px, 5.4vw, 58px);
+  letter-spacing: 0.005em;
+  line-height: 1; text-transform: uppercase;
 }
+/* archive 工具行：筛选左、计数右 */
+.fan-tools {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  margin-top: clamp(24px, 4vh, 40px); margin-bottom: 18px;
+}
+.fan-tools .arc-meta { margin: 0; width: auto; }
 .vh-sub {
   margin-top: 14px;
   font-size: 11px; letter-spacing: 0.14em; color: var(--ink-dim);
@@ -804,14 +813,14 @@ body.hero-ready .pill .pill-outline {
 
 /* bio = 这一页的视觉主角：display 字阶 + 灰底亮词混排 */
 .bio-main {
-  font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif; font-weight: 300;
+  font-family: var(--disp); font-weight: 300;
   font-size: clamp(20px, 2.4vw, 34px);
-  line-height: 1.45; letter-spacing: 0.005em;
+  line-height: 1.5; letter-spacing: 0.002em;
   color: var(--ink-dim);
   max-width: 1100px;
   text-wrap: pretty;
 }
-.bio-main .hi { font-style: normal; font-weight: 600; color: var(--ink); }
+.bio-main .hi { font-style: normal; font-weight: 700; color: var(--ink); }
 .bio-deco {
   margin-top: 16px;
   font-family: var(--jp); font-weight: 300;

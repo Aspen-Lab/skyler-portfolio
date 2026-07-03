@@ -17,8 +17,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20fill='%23060807'/%3E%3Ctext%20x='16'%20y='24'%20font-size='22'%20text-anchor='middle'%20fill='%23EDEFE8'%3E%E2%9C%B3%EF%B8%8E%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;600&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=23" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=24" />
 </head>
 <body>
 
@@ -49,7 +49,7 @@
     <a class="brand mono" href="#portfolio"><span class="spin-ast">&#x2733;&#xFE0E;</span> <span id="brandName">SKYLER</span></a>
     <nav class="tabs" aria-label="Main navigation">
       <a class="tab mono is-active" href="#portfolio" data-view="portfolio" aria-current="page"><span class="t-num">01</span> PORTFOLIO</a>
-      <a class="tab mono" href="#fanart" data-view="fanart"><span class="t-num">02</span> ARCHIVE</a>
+      <a class="tab mono" href="#fanart" data-view="fanart"><span class="t-num">02</span> COMMISSION&nbsp;+&nbsp;FANART</a>
       <a class="tab mono" href="#about" data-view="about"><span class="t-num">03</span> ABOUT&nbsp;ME</a>
     </nav>
     <div class="bar-meta mono" aria-hidden="true">
@@ -142,21 +142,17 @@
         <div class="vh-readout mono" aria-hidden="true">
           <span>MODULE-F2</span><span class="chip-idle">LOADED</span>
         </div>
-        <h1 class="view-title" data-scramble>ARCHIVE</h1>
-        <p class="vh-sub mono">FAN ART &#x2733;&#xFE0E; COMMISSION &#x2733;&#xFE0E; <span class="jp" lang="ja">ファンアート＆コミッション</span></p>
+        <h1 class="view-title" data-scramble>COMMISSION + FAN ART</h1>
+        <p class="vh-sub mono">CLIENT WORK &#x2733;&#xFE0E; FANART &#x2733;&#xFE0E; <span class="jp" lang="ja">コミッション＆ファンアート</span></p>
       </div>
 
-      <!-- A-01 / FAN ART & COMMISSION -->
-      <div class="arc-sec">
-        <header class="arc-head">
-          <span class="arc-index mono">[A-01]</span>
-          <h2 class="arc-title" data-scramble-io>FAN ART &amp; COMMISSION<span class="arc-ja jp" lang="ja">ファンアート＆コミッション</span></h2>
-          <div class="arc-meta mono" id="fanMeta"><!-- rendered --></div>
-        </header>
+      <!-- 直接展示作品：筛选 + 网格（专注作品） -->
+      <div class="fan-tools">
         <div class="filterbar mono" id="fanartFilters" role="group" aria-label="Filter by fandom"></div>
-        <p class="sr-only" id="fanartStatus" role="status"></p>
-        <div class="fan-grid" id="fanartGrid"><!-- rendered --></div>
+        <span class="arc-meta mono" id="fanMeta" aria-hidden="true"></span>
       </div>
+      <p class="sr-only" id="fanartStatus" role="status"></p>
+      <div class="fan-grid" id="fanartGrid"><!-- rendered --></div>
     </section>
 
     <!-- ======== VIEW: ABOUT ======== -->
@@ -308,7 +304,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=23"></script>
-  <script src="js/main.js?v=23"></script>
+  <script src="js/data.js?v=24"></script>
+  <script src="js/main.js?v=24"></script>
 </body>
 </html>
