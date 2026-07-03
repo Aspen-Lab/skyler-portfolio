@@ -124,7 +124,6 @@ const ABOUT = {
   // About 页数据带：大字焦点块（n 大字 / label 小注），3–4 个最佳
   highlights: [
     { n: "GARENA",       label: "FREE FIRE · AOV — SHIPPED" },
-    { n: "TGC",          label: "SKY 6TH ANNIV. OFFICIAL ART" },
     { n: "1ST×1 2ND×2",  label: "SCAD BEYOND THE DOT · 2024" },
     { n: "TOP 3%",       label: "GPA · 8 SEMESTERS" },
   ],
