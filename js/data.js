@@ -109,16 +109,16 @@ const ABOUT = {
   avatar: "assets/avatar.jpg",
   // 主简介（英文，页面主要内容）— 讲个人与兴趣，不重复下方 work experience 里的 Garena
   bio:
-    "Illustration student with a concentration in Concept Design — happiest inventing characters and the worlds they live in. I love creature design, drawing fan art for the games I grew up with, and painting in watercolor when I step away from the screen.",
+    "Illustration student with a concentration in Concept Design — I design characters, creatures, props, and the worlds they live in, from original game IPs to fan art for the games I grew up loving. Happiest when a design carries a story.",
   // 简介下方的日文装饰行
   bioDeco: "キャラクターデザイン ✳ ビジュアルストーリーテリング ✳ コンセプトアート",
 
   // bio 里要点亮的关键短语（必须与 bio 原文逐字一致；亮白显示，其余文字灰）
   bioHighlights: [
     "Concept Design",
-    "inventing characters",
-    "creature design",
-    "watercolor",
+    "characters, creatures, props",
+    "original game IPs",
+    "carries a story",
   ],
 
   // About 页数据带：大字焦点块（n 大字 / label 小注），3–4 个最佳
