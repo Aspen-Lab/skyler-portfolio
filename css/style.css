@@ -242,7 +242,7 @@ a, button, .card.is-link, #lbImg {
 
 /* ---------- hero ---------- */
 .hero {
-  padding: clamp(20px, 3.5vh, 36px) 0 16px;
+  padding: clamp(12px, 2.2vh, 22px) 0 10px;
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 520px);
@@ -261,7 +261,7 @@ a, button, .card.is-link, #lbImg {
   display: flex; gap: 22px; flex-wrap: wrap;
   font-size: 11px; letter-spacing: 0.14em;
   color: var(--ink-dim);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .hero-readout em { font-style: normal; color: var(--acid); animation: blink 2.2s steps(2) infinite; }
 /* REC 呼吸点：readout 行尾的录制指示 */
@@ -556,14 +556,20 @@ body.hero-ready .pill .pill-outline {
 }
 .card .frame {
   border-radius: var(--radius);
-  background: #111111;
   position: relative;
   height: clamp(170px, 26vh, 250px);
-  border: 1px solid var(--line-dim);
-  background: var(--bg-2);
+  /* 无 1px 硬边框：用面(tint)定义边界，hover 提亮一档 */
+  background: rgba(255, 255, 255, 0.045);
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.25s;
+  transition: background-color 0.25s;
+}
+/* hover 底缘 acid 扫描线 */
+.card .frame::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--acid);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card img {
   height: 100%; width: auto; display: block;
@@ -572,23 +578,34 @@ body.hero-ready .pill .pill-outline {
   transition: filter 0.3s, transform 0.45s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .card.is-link { cursor: crosshair; }
-.card.is-link:hover .frame, .card.is-link:focus-visible .frame { border-color: var(--line); }
+.card.is-link:hover .frame, .card.is-link:focus-visible .frame { background: rgba(255, 255, 255, 0.08); }
+.card.is-link:hover .frame::after, .card.is-link:focus-visible .frame::after { transform: scaleX(1); }
 .card.is-link:hover img { filter: saturate(1.05); transform: scale(1.03); }
 .card:focus-visible { outline: 1px solid var(--acid); outline-offset: 3px; }
 
 .card figcaption {
-  display: flex; justify-content: space-between; gap: 14px;
-  margin-top: 7px;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  margin-top: 8px;
   font-size: 10px; letter-spacing: 0.12em;
   color: var(--ink-dim);
 }
+/* 标题带小方块标记，白一档；编号退后 */
+.card figcaption span:first-child { color: var(--ink); }
+.card figcaption span:first-child::before {
+  content: ""; display: inline-block;
+  width: 5px; height: 5px; margin-right: 7px;
+  background: var(--ink-soft);
+  vertical-align: 1px;
+  transition: background-color 0.25s;
+}
+.card.is-link:hover figcaption span:first-child::before { background: var(--acid); }
 .card figcaption .fid { color: var(--ink-soft); }
 
-/* corner brackets */
+/* corner brackets：卡片上常显(低透明)，hover 提亮 —— 给卡片一点"形状" */
 .corner {
   position: absolute; width: 10px; height: 10px;
   border: 0 solid var(--line);
-  opacity: 0; transition: opacity 0.2s, transform 0.25s;
+  opacity: 0.45; transition: opacity 0.2s, transform 0.25s;
   pointer-events: none;
 }
 .c-tl { top: -1px; left: -1px; border-top-width: 1.5px; border-left-width: 1.5px; border-top-left-radius: var(--radius); }
@@ -1360,18 +1377,21 @@ footer .ast { color: var(--ink-dim); }
 }
 
 /* ---------- responsive ---------- */
-/* 中屏就切单列：双列时 SECAL72(不可折行)在 ~860-1180px 会溢出左列压到 pill 上 */
-@media (max-width: 1180px) {
+/* 中屏保持左右双列，但标题字号收敛 + pill 列收窄，防 SECAL72(不可折行)溢出压 pill */
+@media (max-width: 1280px) {
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(260px, 420px); }
+  .hero-title { font-size: clamp(40px, 7vw, 96px); }
+}
+@media (max-width: 860px) {
+  .bar-meta .ver { display: none; }
+  /* 窄屏才单列堆叠 */
   .hero {
     grid-template-columns: 1fr;
     grid-template-areas: "readout" "title" "cred" "tags" "pill" "stats";
   }
-  .pill-box { justify-self: start; margin-top: 16px; max-width: 640px; }
+  .pill-box { justify-self: start; margin-top: 14px; max-width: 640px; }
   .pill-hint { text-align: left; }
   .hero-stats { justify-self: start; justify-content: flex-start; }
-}
-@media (max-width: 860px) {
-  .bar-meta .ver { display: none; }
   .about-grid { grid-template-columns: minmax(0, 1fr); }
   .about-card { position: static; max-width: min(420px, 100%); }
   .p-meta { justify-content: flex-start; }

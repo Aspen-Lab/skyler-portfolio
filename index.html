@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=27" />
+  <link rel="stylesheet" href="css/style.css?v=28" />
 </head>
 <body>
 
@@ -97,7 +97,8 @@
                 <path d="M0 0 L10 5 L0 10 z" class="fillw" stroke="none" />
               </marker>
             </defs>
-            <rect x="6" y="10" width="748" height="130" rx="65" class="ln pill-outline" />
+            <!-- 外框形状随状态切换(JS 替换 d)：胶囊/切角/六边/直角 -->
+            <path id="pillOutline" d="M71 10 H689 A65 65 0 0 1 689 140 H71 A65 65 0 0 1 71 10 Z" pathLength="1660" class="ln pill-outline" />
             <g id="pillStage">
               <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)" />
               <text x="180" y="53" class="svgmono">NODE</text>
@@ -305,7 +306,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=27"></script>
-  <script src="js/main.js?v=27"></script>
+  <script src="js/data.js?v=28"></script>
+  <script src="js/main.js?v=28"></script>
 </body>
 </html>

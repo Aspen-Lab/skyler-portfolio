@@ -215,9 +215,18 @@
     const rot = (cx, cy, dur, rev) => REDUCED ? "" :
       `<animateTransform attributeName="transform" type="rotate" from="${rev ? 360 : 0} ${cx} ${cy}" to="${rev ? 0 : 360} ${cx} ${cy}" dur="${dur}s" repeatCount="indefinite"/>`;
 
+    // 每态一个外框形状：胶囊 / 切角 / 六边 / 直角（pathLength 统一，入场描画动画不受周长影响）
+    const OUTLINES = {
+      capsule: "M71 10 H689 A65 65 0 0 1 689 140 H71 A65 65 0 0 1 71 10 Z",
+      cut:     "M30 10 H730 L754 34 V116 L730 140 H30 L6 116 V34 Z",
+      hex:     "M46 10 H714 L754 75 L714 140 H46 L6 75 Z",
+      rect:    "M6 10 H754 V140 H6 Z",
+    };
+
     const PILL_STATES = [
       { // 01 — IDENT / 在读状态（参考图1布局）
         aria: "SCAD Illustration, Concept Design concentration, 2023–2026",
+        outline: OUTLINES.capsule,
         svg: `
           <line x1="120" y1="48" x2="168" y2="48" class="ln flow" marker-end="url(#arr)"/>
           <text x="180" y="53" class="svgmono">NODE</text>
@@ -236,6 +245,7 @@
       },
       { // 02 — SIGNAL：滚动波形监视（纯装饰，简历事实在 About 页）
         aria: "Decorative readout: signal waveform monitor",
+        outline: OUTLINES.cut,
         svg: `
           <defs><clipPath id="wvclip"><rect x="246" y="36" width="322" height="78"/></clipPath></defs>
           <text x="58" y="50" class="svgmono svgdim">CH-02 · FEED</text>
@@ -249,6 +259,7 @@
       },
       { // 03 — RADAR：近距扫描（纯装饰）
         aria: "Decorative readout: proximity radar sweep",
+        outline: OUTLINES.hex,
         svg: `
           <text x="58" y="50" class="svgmono svgdim">CH-03 · SCAN</text>
           <text x="58" y="104" class="svgbig">RADAR</text>
@@ -266,6 +277,7 @@
       },
       { // 04 — COORD：遥测坐标 + 漂移标记（纯装饰）
         aria: "Decorative readout: telemetry coordinates",
+        outline: OUTLINES.rect,
         svg: `
           <text x="58" y="50" class="svgmono svgdim">CH-04 · TRACK</text>
           <text x="58" y="104" class="svgbig">COORD</text>
@@ -291,6 +303,8 @@
       const st = PILL_STATES[pillIdx];
       const apply = () => {
         stage.innerHTML = st.svg;
+        const ol = $("#pillOutline");
+        if (ol && st.outline) ol.setAttribute("d", st.outline);   // 外框形状随状态变
         pillBtn.setAttribute("aria-label", `${st.aria} — click to cycle (${pillIdx + 1}/4)`);
         if (pillHint) pillHint.textContent = `TAP · 0${pillIdx + 1}/04`;
         // aria-label 变更 VoiceOver 不播报，用 live region 主动播
