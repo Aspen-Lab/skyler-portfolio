@@ -258,10 +258,22 @@ a, button, .card.is-link, #lbImg {
 .hero-title { grid-area: title; align-self: end; }
 .hero-tags { grid-area: tags; align-self: center; }
 .hero-readout {
-  display: flex; gap: 22px; flex-wrap: wrap;
-  font-size: 11px; letter-spacing: 0.14em;
+  display: flex; align-items: stretch; flex-wrap: wrap;
+  font-size: 10.5px; letter-spacing: 0.14em;
   color: var(--ink-dim);
-  margin-bottom: 10px;
+  margin-bottom: 18px;
+  /* 结构化系统条：面分区，不用 1px 硬框 */
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 3px;
+  overflow: hidden;
+  width: fit-content;
+}
+.ro-cell { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; }
+.ro-cell + .ro-cell { box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.07); }
+.ro-id { color: var(--ink); }
+.ro-id::before {
+  content: ""; width: 6px; height: 6px;
+  background: var(--acid);
 }
 .hero-readout em { font-style: normal; color: var(--acid); animation: blink 2.2s steps(2) infinite; }
 /* REC 呼吸点：readout 行尾的录制指示 */
@@ -299,9 +311,18 @@ a, button, .card.is-link, #lbImg {
   .hero-title .hollow {
     color: transparent;
     -webkit-text-stroke: 2px var(--ink);
+    /* 错版偏移层：淡描边重影，右下 */
+    text-shadow: 6px 5px 0 rgba(237, 237, 237, 0.14);
   }
 }
-.hero-title .solid { color: var(--ink); }
+/* 实体字：立面渐变（顶亮底沉）+ 错版重影，给字一点"材质" */
+.hero-title .solid {
+  color: var(--ink);
+  background: linear-gradient(180deg, #ffffff 46%, #9e9e9e 118%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 6px 5px 0 rgba(237, 237, 237, 0.1);
+}
 
 
 /* —— 学历强调行：方块标记 + 打字机光标 —— */
@@ -329,9 +350,20 @@ a, button, .card.is-link, #lbImg {
 
 .hero-tags {
   display: flex; gap: clamp(14px, 4vw, 44px); flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
   font-size: 11px; letter-spacing: 0.12em;
   color: var(--ink-dim);
+  position: relative;
+}
+/* 标注行上缘：图纸基线 + 左端落点 */
+.hero-tags::before {
+  content: ""; position: absolute; top: 0; left: 0; right: clamp(0px, 8vw, 120px);
+  height: 1px; background: var(--line-dim);
+}
+.hero-tags::after {
+  content: ""; position: absolute; top: -2px; left: 0;
+  width: 5px; height: 5px; background: var(--ink-soft);
 }
 .tag-line { position: relative; padding-left: 18px; }
 .tag-line::before {
@@ -411,9 +443,14 @@ body.hero-ready .pill .pill-outline {
   grid-area: stats;
   justify-self: end; align-self: center;
   display: flex; gap: clamp(14px, 2vw, 28px); flex-wrap: wrap;
-  justify-content: flex-end;
-  margin-top: 12px;
+  justify-content: flex-end; align-items: center;
+  margin-top: 16px;
+  padding: 8px 16px;
   font-size: 11px; letter-spacing: 0.12em; color: var(--ink-dim);
+  /* 底部数据条：与顶部系统条呼应，面板夹住 hero 形成结构 */
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 3px;
+  width: fit-content; justify-self: end;
 }
 .hero-stats em { font-style: normal; color: var(--ink); }
 
