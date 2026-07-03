@@ -264,6 +264,24 @@ a, button, .card.is-link, #lbImg {
   margin-bottom: 14px;
 }
 .hero-readout em { font-style: normal; color: var(--acid); animation: blink 2.2s steps(2) infinite; }
+/* REC 呼吸点：readout 行尾的录制指示 */
+.ro-rec { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-soft); }
+.ro-rec i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--acid);
+  animation: blink 1.4s steps(2) infinite;
+}
+/* 右缘竖直刻度尺：呼应机能仪表（纯装饰） */
+.hero::before {
+  content: ""; position: absolute; top: 8px; right: 0;
+  width: 9px; height: clamp(70px, 12vh, 120px);
+  background:
+    repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 9px) right / 5px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 45px) right / 9px 100% no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+}
+@media (max-width: 640px) { .hero::before { display: none; } }
 
 .hero-title {
   font-family: var(--disp);
@@ -1342,16 +1360,18 @@ footer .ast { color: var(--ink-dim); }
 }
 
 /* ---------- responsive ---------- */
-@media (max-width: 860px) {
-  .bar-meta .ver { display: none; }
-  /* hero 回到单列堆叠 */
+/* 中屏就切单列：双列时 SECAL72(不可折行)在 ~860-1180px 会溢出左列压到 pill 上 */
+@media (max-width: 1180px) {
   .hero {
     grid-template-columns: 1fr;
     grid-template-areas: "readout" "title" "cred" "tags" "pill" "stats";
   }
-  .pill-box { justify-self: start; margin-top: 16px; }
+  .pill-box { justify-self: start; margin-top: 16px; max-width: 640px; }
   .pill-hint { text-align: left; }
   .hero-stats { justify-self: start; justify-content: flex-start; }
+}
+@media (max-width: 860px) {
+  .bar-meta .ver { display: none; }
   .about-grid { grid-template-columns: minmax(0, 1fr); }
   .about-card { position: static; max-width: min(420px, 100%); }
   .p-meta { justify-content: flex-start; }

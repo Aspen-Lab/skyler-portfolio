@@ -234,51 +234,52 @@
           <line x1="600" y1="116" x2="392" y2="116" class="ln flow" marker-end="url(#arr)"/>
           <text x="180" y="121" class="svgmono" id="pillLoss">PACKET LOSS: 0.3%</text>`,
       },
-      { // 02 — GARENA 实习（参考图2 ECHO 布局）
-        aria: "Garena concept art internship: Free Fire and Arena of Valor, Jul–Sep 2025",
+      { // 02 — SIGNAL：滚动波形监视（纯装饰，简历事实在 About 页）
+        aria: "Decorative readout: signal waveform monitor",
         svg: `
-          <g class="fillw">
-            <rect x="86" y="36" width="8" height="4"/><rect x="80" y="44" width="20" height="4"/>
-            <rect x="74" y="52" width="32" height="4"/><rect x="66" y="60" width="48" height="4"/>
-            <rect x="58" y="68" width="64" height="4"/>
-          </g>
-          <text x="58" y="110" class="svgbig">GARENA</text>
-          <text x="246" y="52" class="svgmono">CONCEPT ARTIST — INTERNSHIP</text>
-          <text x="246" y="84" class="svgmono">TARGET: FREE FIRE · ARENA OF VALOR</text>
-          <text x="246" y="112" class="svgmono svgdim">STATE: SHIPPED — JUL→SEP 2025</text>
-          <circle cx="660" cy="52" r="15" class="ln"/>
-          <line x1="645" y1="52" x2="675" y2="52" class="ln"/>
-          <line x1="660" y1="37" x2="660" y2="67" class="ln"/>
-          <circle cx="660" cy="96" r="15" class="ln dotted">${rot(660, 96, 7, true)}</circle>`,
+          <defs><clipPath id="wvclip"><rect x="246" y="36" width="322" height="78"/></clipPath></defs>
+          <text x="58" y="50" class="svgmono svgdim">CH-02 · FEED</text>
+          <text x="58" y="104" class="svgbig">SIGNAL</text>
+          <g clip-path="url(#wvclip)"><g transform="translate(250,76)">
+            <polyline class="ln" points="0,0 18,-16 36,0 54,10 72,0 90,-24 108,0 126,14 144,0 162,-8 180,0 198,-20 216,0 234,12 252,0 270,-26 288,0 306,8 324,0 342,-16 360,0 378,-16 396,0 414,10 432,0 450,-24 468,0 486,14 504,0 522,-8 540,0 558,-20 576,0 594,12 612,0 630,-26 648,0 666,8 684,0 702,-16 720,0"/>
+            ${REDUCED ? "" : `<animateTransform attributeName="transform" type="translate" additive="sum" values="0 0; -360 0" dur="8s" repeatCount="indefinite"/>`}
+          </g></g>
+          <text x="592" y="60" class="svgmono">PEAK 0.92</text>
+          <text x="592" y="92" class="svgmono svgdim">NOISE .03</text>`,
       },
-      { // 03 — Sky 光·遇 官方插画（参考图3 STATIC 布局）
-        aria: "thatgamecompany Sky: Children of the Light 6th-anniversary official illustration, Jun 2025",
+      { // 03 — RADAR：近距扫描（纯装饰）
+        aria: "Decorative readout: proximity radar sweep",
         svg: `
-          <circle cx="76" cy="46" r="14" class="ln"/><text x="76" y="51" text-anchor="middle" class="svgmono">T</text>
-          <circle cx="110" cy="46" r="14" class="ln"/><text x="110" y="51" text-anchor="middle" class="svgmono">G</text>
-          <circle cx="144" cy="46" r="14" class="ln"/><text x="144" y="51" text-anchor="middle" class="svgmono">C</text>
-          <text x="58" y="104" class="svgbig">SKY</text>
-          <text x="58" y="124" class="svgmono svgdim">CHILDREN OF THE LIGHT</text>
-          <text x="246" y="52" class="svgmono">OFFICIAL ILLUSTRATOR</text>
-          <text x="246" y="84" class="svgmono">TARGET: 6TH ANNIVERSARY ART</text>
-          <text x="246" y="112" class="svgmono svgdim">STATE: PUBLISHED — JUN 2025</text>
-          <circle cx="660" cy="75" r="24" class="ln"/>
-          <g><line x1="660" y1="75" x2="660" y2="56" class="ln"/>${rot(660, 75, 12)}</g>`,
+          <text x="58" y="50" class="svgmono svgdim">CH-03 · SCAN</text>
+          <text x="58" y="104" class="svgbig">RADAR</text>
+          <circle cx="400" cy="75" r="46" class="ln"/>
+          <circle cx="400" cy="75" r="30" class="ln dotted"/>
+          <circle cx="400" cy="75" r="14" class="ln"/>
+          <line x1="354" y1="75" x2="446" y2="75" class="ln svgdim"/>
+          <line x1="400" y1="29" x2="400" y2="121" class="ln svgdim"/>
+          <g><line x1="400" y1="75" x2="446" y2="75" class="ln"/>${rot(400, 75, 5)}</g>
+          <circle cx="382" cy="58" r="3.5" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.1;1" dur="1.6s" repeatCount="indefinite"/>`}</circle>
+          <circle cx="421" cy="92" r="3.5" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.1;1" dur="2.3s" begin="0.5s" repeatCount="indefinite"/>`}</circle>
+          <circle cx="410" cy="49" r="3.5" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.1;1" dur="1.9s" begin="1s" repeatCount="indefinite"/>`}</circle>
+          <text x="520" y="60" class="svgmono">CONTACTS 03</text>
+          <text x="520" y="92" class="svgmono svgdim">RANGE 4.6KM</text>`,
       },
-      { // 04 — 奖项（参考图4 SECTOR 布局）
-        aria: "Beyond the Dot: one 1st prize, two 2nd prizes; SCAD merit scholarship, top 3% GPA",
+      { // 04 — COORD：遥测坐标 + 漂移标记（纯装饰）
+        aria: "Decorative readout: telemetry coordinates",
         svg: `
-          <rect x="58" y="40" width="70" height="70" rx="10" class="ln"/>
-          <circle cx="80" cy="62" r="3.5" class="fillw"/><circle cx="106" cy="58" r="3.5" class="ln"/>
-          <circle cx="93" cy="76" r="3.5" class="fillw"/><circle cx="78" cy="92" r="3.5" class="ln"/>
-          <circle cx="106" cy="90" r="3.5" class="fillw"/>
-          <rect x="146" y="40" width="70" height="70" rx="18" class="ln"/>
-          <path d="M181 53 L188 68 L203 75 L188 82 L181 97 L174 82 L159 75 L174 68 Z" class="fillw"/>
-          <text x="246" y="50" class="svgmono">SECTOR A — BEYOND THE DOT</text>
-          <text x="246" y="70" class="svgmono svgdim">1ST ×1 · 2ND ×2 — SCAD 2024</text>
-          <text x="246" y="98" class="svgmono">SECTOR B — MERIT SCHOLARSHIP</text>
-          <text x="246" y="118" class="svgmono svgdim">TOP 3% GPA · 8 SEMESTERS</text>
-          <circle cx="660" cy="75" r="22" class="ln dotted">${rot(660, 75, 9)}</circle>`,
+          <text x="58" y="50" class="svgmono svgdim">CH-04 · TRACK</text>
+          <text x="58" y="104" class="svgbig">COORD</text>
+          <path d="M300 50 V38 H312" class="ln"/><path d="M462 38 H480 V50" class="ln"/>
+          <path d="M480 100 V112 H468" class="ln"/><path d="M312 112 H300 V100" class="ln"/>
+          <line x1="384" y1="75" x2="396" y2="75" class="ln"/>
+          <line x1="390" y1="69" x2="390" y2="81" class="ln"/>
+          <rect x="308" y="70" width="6" height="6" class="fillw">${REDUCED ? "" : `<animateTransform attributeName="transform" type="translate" values="0 0; 96 22; 40 -18; 130 6; 0 0" dur="12s" repeatCount="indefinite"/>`}</rect>
+          <text x="560" y="52" class="svgmono">X +132.44</text>
+          <text x="560" y="80" class="svgmono">Y -007.19</text>
+          <text x="560" y="108" class="svgmono svgdim">Z +004.02</text>
+          <rect x="690" y="44" width="7" height="7" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.15;1" dur="1.4s" repeatCount="indefinite"/>`}</rect>
+          <rect x="690" y="70" width="7" height="7" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.15;1" dur="1.4s" begin="0.45s" repeatCount="indefinite"/>`}</rect>
+          <rect x="690" y="96" width="7" height="7" class="fillw">${REDUCED ? "" : `<animate attributeName="opacity" values="1;0.15;1" dur="1.4s" begin="0.9s" repeatCount="indefinite"/>`}</rect>`,
       },
     ];
 
