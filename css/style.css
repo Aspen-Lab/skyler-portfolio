@@ -1382,7 +1382,8 @@ footer .ast { color: var(--ink-dim); }
   color: var(--ink-dim);
   white-space: nowrap;
 }
-@media (max-width: 860px) { .lb-hint { display: none; } }
+/* 手机：桌面镜片控件无用武之地，隐藏；hint 换成按住提示（JS 设文案） */
+@media (max-width: 860px) { .lb-loupe { display: none; } }
 .lb-progress {
   flex: 1; height: 2px;
   background: var(--ink-faint);
@@ -1414,63 +1415,31 @@ footer .ast { color: var(--ink-dim); }
   .lb-navbtn { width: 46px; height: 46px; }
 }
 
-/* ---------- 手机：上方正方形 = 按住图片处的放大视图（mapping） ---------- */
+/* ---------- 手机：图片直接全屏，按住 = 全屏放大检视 ---------- */
 .lb-zoomview { display: none; }
 .lb-zoomrect { display: none; }
 @media (max-width: 860px) {
-  #lightbox {
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 58px 0 64px;
-  }
-  /* 放大视图方块：面板质感，按住下图即点亮 */
+  /* 检视全屏化：平时完全不占位，按住图片时铺满整个视口 */
   .lb-zoomview {
-    display: flex; align-items: center; justify-content: center;
-    width: min(86vw, 36vh);
-    width: min(86vw, 36dvh); /* iOS: vh 含浏览器 chrome，dvh 才是可视高度 */
-    aspect-ratio: 1 / 1;
-    flex: none;
-    border-radius: var(--radius);
-    background-color: var(--srf-1);
-    background-repeat: no-repeat;
-    border: 1px solid var(--srf-line);
-    overflow: hidden;
-    position: relative;
-  }
-  .zv-hint {
-    font-size: 9.5px; letter-spacing: 0.16em;
-    color: var(--ink-dim);
-    text-align: center; padding: 0 18px;
-    transition: opacity 0.2s;
-  }
-  .lb-zoomview.live .zv-hint { opacity: 0; }
-  .lb-zoomview.live { border-color: rgba(237, 237, 237, 0.35); }
-  /* 图上取景框：标记放大区域（mapping 关系） */
-  .lb-zoomrect {
     display: block;
-    position: absolute; top: 0; left: 0; z-index: 2;
-    border: 1.5px solid var(--ink);
-    border-radius: 4px;
-    box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.25);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    will-change: transform;
+    position: fixed; inset: 0; z-index: 20;
+    background-color: rgba(4, 4, 4, 0.98);
+    background-repeat: no-repeat;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.12s ease;
   }
-  .lb-zoomrect.live { opacity: 1; }
-  /* 图片：在剩余空间居中（贴底会在横图时留出中部空洞） */
+  .lb-zoomview.live { opacity: 1; }
+  .zv-hint { display: none; }
+  /* 图片：吃满可视区（竖图≈全屏）；dvh = iOS 实际可视高度 */
   .lb-stage {
-    flex: 1; min-height: 0; width: 100%;
+    width: 100%;
     display: flex; align-items: center; justify-content: center;
-    padding: 10px 12px 12px;
+    padding: 0 12px;
   }
   .lb-frame { max-height: 100%; }
-  /* 高度预算 = 视口 − 顶/底 HUD − 放大方块实际尺寸(min 与其定义一致) − 间距
-     双声明：老浏览器用 vh，支持 dvh 的（iOS 16+/现代浏览器）用可视高度 */
-  #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 58px - 64px - min(86vw, 36vh) - 44px); }
-  #lbImg { max-height: calc(100dvh - 58px - 64px - min(86vw, 36dvh) - 44px); }
-  /* 翻页按钮：缩小贴底，避开放大视图 */
+  #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 136px); }
+  #lbImg { max-height: calc(100dvh - 136px); }
+  /* 翻页按钮：缩小贴底热区 */
   .lb-prev, .lb-next { top: auto; bottom: 64px; height: 30vh; width: 54px; }
   .lb-navbtn { width: 40px; height: 40px; }
 }

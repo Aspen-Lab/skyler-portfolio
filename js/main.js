@@ -1323,10 +1323,14 @@
       const fx = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
       const fy = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
       const vw = view.clientWidth, vh = view.clientHeight;
+      // 倍率至少铺满全屏（横图 3× 不够高时自动加倍），平移 clamp 防露黑边
+      const mz = Math.max(MZ, vw / rect.width, vh / rect.height);
+      const bw = rect.width * mz, bh = rect.height * mz;
+      const px = Math.min(0, Math.max(vw - bw, vw / 2 - fx * bw));
+      const py = Math.min(0, Math.max(vh - bh, vh / 2 - fy * bh));
       view.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
-      view.style.backgroundSize = `${rect.width * MZ}px ${rect.height * MZ}px`;
-      view.style.backgroundPosition =
-        `${vw / 2 - fx * rect.width * MZ}px ${vh / 2 - fy * rect.height * MZ}px`;
+      view.style.backgroundSize = `${bw}px ${bh}px`;
+      view.style.backgroundPosition = `${px}px ${py}px`;
       view.classList.add("live");
       if (zrect) {
         // 取景框：上方方块对应的图上区域
@@ -1344,6 +1348,7 @@
       if (tracking) {
         tracking = false;
         lbZoomOn = false; // 恢复滑动翻页
+        view.classList.remove("live"); // 检视是全屏覆盖：松手立即收起
         if (zrect) zrect.classList.remove("live");
       }
     };
@@ -1379,7 +1384,11 @@
 
     // 换图 / 关闭时复位
     const _r = lbRender;
-    lbRender = function (...a) { resetView(); _r(...a); };
+    lbRender = function (...a) {
+      resetView(); _r(...a);
+      // 放在 _r 之后：桌面 loupe 模块会在渲染链里写入自己的 hint 文案
+      if (isMobile()) { const hint = $("#lbHint"); if (hint) hint.textContent = "PRESS & HOLD IMAGE TO INSPECT"; }
+    };
     const _c = lbClose;
     lbClose = function () { resetView(); _c(); };
   })();
