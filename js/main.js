@@ -418,6 +418,8 @@
   const lb = $("#lightbox");
   const lbImg = $("#lbImg");
   const lbCap = $("#lbCap");
+  // 长按取景是自定义手势：禁掉系统长按菜单（iOS 复制/存储、Android contextmenu）
+  if (lb) lb.addEventListener("contextmenu", (e) => e.preventDefault());
   const galleries = {}; // group -> [{src, cap}]
   let lbState = { group: null, index: 0, lastFocus: null };
   let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
@@ -1177,12 +1179,43 @@
     const ll = $("#linkList");
     if (ll) {
       ll.innerHTML = ABOUT.links.map((l) => {
+        // copy 类型：纯文本 + COPY 按钮（不做超链接）
+        if (l.copy) {
+          return `<button class="link-copy" type="button" data-copy="${esc(l.copy)}" aria-label="Copy ${esc(l.copy)}">` +
+            `<span class="lc-label">${esc(l.label)}</span>` +
+            `<span class="lc-value">${esc(l.copy)}</span>` +
+            `<span class="lc-act" aria-hidden="true">COPY</span></button>`;
+        }
         const u = String(l.url || "").trim();
         if (!u || u === "#") {
           return `<span class="dead" title="Link coming soon">${esc(l.label)}</span>`;
         }
         return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(l.label)}</a>`;
       }).join("");
+      $$(".link-copy", ll).forEach((b) => {
+        let t = 0;
+        b.addEventListener("click", async () => {
+          const text = b.dataset.copy;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            // 非安全上下文/老浏览器回退
+            const ta = document.createElement("textarea");
+            ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand("copy"); } catch { /* 放弃：文本本身可见可手动选 */ }
+            ta.remove();
+          }
+          b.classList.add("copied");
+          const act = $(".lc-act", b);
+          if (act) act.textContent = "COPIED ✓";
+          clearTimeout(t);
+          t = setTimeout(() => {
+            b.classList.remove("copied");
+            if (act) act.textContent = "COPY";
+          }, 1500);
+        });
+      });
     }
   }
 

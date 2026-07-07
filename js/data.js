@@ -192,12 +192,14 @@ const ABOUT = {
     "CLIP STUDIO PAINT",
     "WATERCOLOR",
   ],
-  // 链接：url 填完整网址（https:// 开头）；E-MAIL 改成 mailto:你的邮箱
+  // 链接：url 填完整网址（https:// 开头）
   // url 留 "#" 或留空会显示成灰色不可点击的占位；不用的链接整行删掉
+  // copy 字段 = 不做超链接，显示文本 + COPY 按钮（邮箱防爬虫、防误点唤起邮件客户端）
   links: [
     { label: "ARTSTATION", url: "https://www.artstation.com/secal72" },
     { label: "INSTAGRAM", url: "https://www.instagram.com/secal_072" },
-    { label: "小红书 RED", url: "#" },
-    { label: "E-MAIL", url: "mailto:secal72art@gmail.com" },
+    { label: "REDNOTE 小红书", url: "https://www.rednote.com/user/profile/66a3dfa9000000001d0224ab?xsec_token=AB-0tNYUvvXxyWQcM7oPvX8HLr_NHpF1Ssvln30Cqy40k%3D&xsec_source=pc_search" },
+    { label: "LINKEDIN", url: "https://www.linkedin.com/in/skyler-pan-935161367/" },
+    { label: "E-MAIL", copy: "secal72art@gmail.com" },
   ],
 };

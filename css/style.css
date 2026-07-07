@@ -635,6 +635,10 @@ body.hero-ready .pill .pill-outline {
   height: 100%; width: auto; display: block;
   max-width: 70vw; object-fit: cover;
   filter: saturate(0.92);
+  /* 1% 上探：吃掉图与 frame 圆角裁切之间的亚像素缝
+     （iOS/高 DPR 下缝隙透出深色底 = 偶发的"黑色道道"） */
+  transform: scale(1.01);
+  -webkit-touch-callout: none;
   transition: filter 0.3s, transform 0.45s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .card.is-link { cursor: crosshair; }
@@ -1068,6 +1072,30 @@ body.hero-ready .pill .pill-outline {
 .links a:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .links a:hover::after { color: var(--bg); }
 .links a:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
+/* 邮箱：纯文本 + COPY（不做超链接） */
+.links .link-copy {
+  appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--srf-1);
+  border: 1px solid var(--srf-line);
+  color: var(--ink);
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+  padding: 8px 12px 8px 18px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.links .link-copy .lc-label { color: var(--ink-dim); }
+.links .link-copy .lc-act {
+  font-size: 9.5px; letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  border: 1px solid var(--srf-line); border-radius: 2px;
+  padding: 3px 9px;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.links .link-copy:hover { border-color: var(--line); }
+.links .link-copy:hover .lc-act { color: var(--ink); border-color: var(--line); }
+.links .link-copy.copied .lc-act { color: var(--bg); background: var(--acid); border-color: var(--acid); }
+.links .link-copy:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
 
 /* ---------- reveal on scroll ----------
    --d（内联变量）= 交错延迟，渲染时按序号注入 */
@@ -1127,7 +1155,9 @@ footer .ast { color: var(--ink-dim); }
 #lbImg {
   max-width: 88vw; max-height: calc(100vh - 150px);
   display: block;
-  -webkit-user-drag: none; user-select: none;
+  -webkit-user-drag: none; user-select: none; -webkit-user-select: none;
+  /* 按住取景是自定义手势：禁 iOS 系统长按呼出（拷贝/存储图像） */
+  -webkit-touch-callout: none;
   transition: opacity 0.18s ease;
   cursor: zoom-in;
   will-change: transform, opacity;
@@ -1397,7 +1427,7 @@ footer .ast { color: var(--ink-dim); }
   /* 放大视图方块：面板质感，按住下图即点亮 */
   .lb-zoomview {
     display: flex; align-items: center; justify-content: center;
-    width: min(82vw, 34vh);
+    width: min(86vw, 36vh);
     aspect-ratio: 1 / 1;
     flex: none;
     border-radius: var(--radius);
@@ -1428,14 +1458,15 @@ footer .ast { color: var(--ink-dim); }
     will-change: transform;
   }
   .lb-zoomrect.live { opacity: 1; }
-  /* 图片：占据剩余空间并贴底显示 */
+  /* 图片：在剩余空间居中（贴底会在横图时留出中部空洞） */
   .lb-stage {
     flex: 1; min-height: 0; width: 100%;
-    display: flex; align-items: flex-end; justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 10px 12px 12px;
   }
   .lb-frame { max-height: 100%; }
-  #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 58px - 34vh - 120px); }
+  /* 高度预算 = 视口 − 顶/底 HUD − 放大方块实际尺寸(min 与其定义一致) − 间距 */
+  #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 58px - 64px - min(86vw, 36vh) - 44px); }
   /* 翻页按钮：缩小贴底，避开放大视图 */
   .lb-prev, .lb-next { top: auto; bottom: 64px; height: 30vh; width: 54px; }
   .lb-navbtn { width: 40px; height: 40px; }
@@ -1526,8 +1557,8 @@ footer .ast { color: var(--ink-dim); }
   }
   .pill-scroll::-webkit-scrollbar { display: none; }
   .pill { min-width: 560px; }
-  /* 灯箱：箭头为固定边缘热区，无需换行；caption 允许折行 */
-  #lbImg { max-height: 68vh; max-width: 92vw; }
+  /* 灯箱：caption 允许折行（图片尺寸预算统一在 860 断点，
+     这里不再覆盖 —— 68vh 老规则曾把竖图撑出舞台被 frame 裁掉） */
   #lbCap {
     bottom: 14px; font-size: 9px;
     max-width: 86vw; white-space: normal; text-align: center;
