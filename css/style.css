@@ -1428,6 +1428,7 @@ footer .ast { color: var(--ink-dim); }
   .lb-zoomview {
     display: flex; align-items: center; justify-content: center;
     width: min(86vw, 36vh);
+    width: min(86vw, 36dvh); /* iOS: vh 含浏览器 chrome，dvh 才是可视高度 */
     aspect-ratio: 1 / 1;
     flex: none;
     border-radius: var(--radius);
@@ -1465,8 +1466,10 @@ footer .ast { color: var(--ink-dim); }
     padding: 10px 12px 12px;
   }
   .lb-frame { max-height: 100%; }
-  /* 高度预算 = 视口 − 顶/底 HUD − 放大方块实际尺寸(min 与其定义一致) − 间距 */
+  /* 高度预算 = 视口 − 顶/底 HUD − 放大方块实际尺寸(min 与其定义一致) − 间距
+     双声明：老浏览器用 vh，支持 dvh 的（iOS 16+/现代浏览器）用可视高度 */
   #lbImg { max-width: calc(100vw - 24px); max-height: calc(100vh - 58px - 64px - min(86vw, 36vh) - 44px); }
+  #lbImg { max-height: calc(100dvh - 58px - 64px - min(86vw, 36dvh) - 44px); }
   /* 翻页按钮：缩小贴底，避开放大视图 */
   .lb-prev, .lb-next { top: auto; bottom: 64px; height: 30vh; width: 54px; }
   .lb-navbtn { width: 40px; height: 40px; }
