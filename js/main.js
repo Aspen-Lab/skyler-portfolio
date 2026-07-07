@@ -1020,12 +1020,19 @@
   }
 
 
-  /* ---------- fan art & commission（ARCHIVE 页下半部分） ---------- */
+  /* ---------- archive（fan art / commission / original） ---------- */
   let fanFilter = "ALL";
+  // 筛选维度是作品类型 cat（一个维度）；圈名 fandom 只留在卡片标注里
+  function fanCats() {
+    const counts = new Map();
+    FANART.forEach((w) => counts.set(w.cat, (counts.get(w.cat) || 0) + 1));
+    // 数量多的在前，同数保持数据顺序
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cat, n]) => ({ cat, n }));
+  }
   function renderFanart() {
     const grid = $("#fanartGrid");
     if (!grid) return;
-    const list = FANART.filter((w) => fanFilter === "ALL" || w.fandom === fanFilter);
+    const list = FANART.filter((w) => fanFilter === "ALL" || w.cat === fanFilter);
     const gallery = [];
     grid.innerHTML = list.map((w, i) => {
       const fileId = `FA-${pad2(i + 1)}`;
@@ -1038,16 +1045,19 @@
       return cardHTML({ title: `${w.title} / ${w.fandom}`, src: w.src }, fileId, "fan", lbIndex);
     }).join("");
     galleries["fan"] = gallery;
-    observeLazy(grid);   // fanart 缩略图懒加载
+    observeLazy(grid);   // 缩略图懒加载
+    // 右侧计数跟随当前筛选：ALL 显示总量+组数，筛选中显示 n/total
     const fm = $("#fanMeta");
-    if (fm) fm.innerHTML = `<span>${new Set(FANART.map((w) => w.fandom)).size} TAGS</span><span>${AST}</span><span>${pad2(FANART.length)} FILES</span>`;
+    if (fm) fm.innerHTML = fanFilter === "ALL"
+      ? `<span>${pad2(FANART.length)} FILES</span><span>${AST}</span><span>${fanCats().length} SETS</span>`
+      : `<span>${esc(fanFilter)}</span><span>${AST}</span><span>${pad2(list.length)}/${pad2(FANART.length)} FILES</span>`;
     // 筛选结果播报给 SR
     const st = $("#fanartStatus");
     if (st) st.textContent = fanFilter === "ALL" ? `All · ${list.length} works` : `${fanFilter} · ${list.length} works`;
   }
-  // hash 参数 → 筛选状态（#fanart/FANDOM%20B 深链接、前进后退）
+  // hash 参数 → 筛选状态（#fanart/FAN%20ART 深链接、前进后退）
   function syncFanFilter(param) {
-    const valid = new Set(FANART.map((w) => w.fandom));
+    const valid = new Set(FANART.map((w) => w.cat));
     const next = param && valid.has(param) ? param : "ALL";
     if (next === fanFilter) return;
     fanFilter = next;
@@ -1064,13 +1074,13 @@
   function renderFanartFilters() {
     const bar = $("#fanartFilters");
     if (!bar) return;
-    const fandoms = ["ALL", ...new Set(FANART.map((w) => w.fandom))];
-    const meta = $("#fanMeta");
-    if (meta) meta.innerHTML =
-      `<span>${fandoms.length - 1} TAGS</span><span>${AST}</span><span>${pad2(FANART.length)} FILES</span>`;
-    bar.innerHTML = fandoms.map((f) =>
-      `<button class="fbtn${f === fanFilter ? " is-on" : ""}" aria-pressed="${f === fanFilter}" data-f="${esc(f)}">${esc(f)}</button>`
-    ).join("");
+    const cats = [{ cat: "ALL", n: FANART.length }, ...fanCats()];
+    bar.innerHTML =
+      `<span class="fbar-label" aria-hidden="true">FILTER //</span>` +
+      cats.map(({ cat, n }) =>
+        `<button class="fbtn${cat === fanFilter ? " is-on" : ""}" aria-pressed="${cat === fanFilter}" data-f="${esc(cat)}">` +
+        `<span class="f-name">${esc(cat)}</span><span class="f-count">${pad2(n)}</span></button>`
+      ).join("");
     $$(".fbtn", bar).forEach((b) =>
       b.addEventListener("click", () => {
         fanFilter = b.dataset.f;

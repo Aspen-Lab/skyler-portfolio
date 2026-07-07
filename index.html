@@ -14,11 +14,11 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20fill='%23060807'/%3E%3Ctext%20x='16'%20y='24'%20font-size='22'%20text-anchor='middle'%20fill='%23EDEFE8'%3E%E2%9C%B3%EF%B8%8E%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=30" />
+  <link rel="stylesheet" href="css/style.css?v=38" />
 </head>
 <body>
 
@@ -46,10 +46,10 @@
 
   <!-- ======== NARROW TOP BAR (切换栏) ======== -->
   <header id="topbar">
-    <a class="brand mono" href="#portfolio"><span class="spin-ast">&#x2733;&#xFE0E;</span> <span id="brandName">SKYLER</span></a>
+    <a class="brand mono" href="#portfolio"><img class="brand-mark" src="assets/logo-mark.svg" alt="" width="770" height="620" /> <span id="brandName" class="sr-only">SKYLER</span></a>
     <nav class="tabs" aria-label="Main navigation">
       <a class="tab mono is-active" href="#portfolio" data-view="portfolio" aria-current="page"><span class="t-num">01</span> PORTFOLIO</a>
-      <a class="tab mono" href="#fanart" data-view="fanart"><span class="t-num">02</span> COMMISSION&nbsp;+&nbsp;FANART</a>
+      <a class="tab mono" href="#fanart" data-view="fanart"><span class="t-num">02</span> ARCHIVE</a>
       <a class="tab mono" href="#about" data-view="about"><span class="t-num">03</span> ABOUT&nbsp;ME</a>
     </nav>
     <div class="bar-meta mono" aria-hidden="true">
@@ -69,6 +69,12 @@
           <span class="ro-cell ro-id">SYS-01 · VISUAL ARCHIVE</span>
           <span class="ro-cell">STATE <em>PROCESSING</em></span>
           <span class="ro-cell ro-rec"><i></i>REC</span>
+        </div>
+
+        <!-- 右上遥测：与左上系统条对角呼应（SAV = SCAD 萨凡纳坐标，CH 07 同 About） -->
+        <div class="hero-side mono" aria-hidden="true">
+          <span class="hs-line hs-coord">SAV &middot; 32.0809 N / 081.0912 W</span>
+          <span class="hs-line hs-up">UPLINK: SCAD &#x2733;&#xFE0E; CH 07</span>
         </div>
 
         <h1 class="hero-title" id="heroTitle">
@@ -120,13 +126,6 @@
           <span class="pill-hint mono" id="pillHint" aria-hidden="true">TAP &middot; 01/04</span>
           <span class="sr-only" id="pillLive" aria-live="polite"></span>
         </div>
-
-        <div class="hero-stats mono">
-          <span>FILES: <em id="statFiles">00</em></span>
-          <span>PROJECTS: <em id="statProjects">00</em></span>
-          <span>ROLE: <em>CONCEPT ARTIST</em></span>
-          <span aria-hidden="true">SIGNAL: <em id="statSignal">STRONG</em></span>
-        </div>
       </div>
 
       <!-- ticker -->
@@ -137,19 +136,19 @@
       <div id="projects"><!-- rendered by main.js --></div>
     </section>
 
-    <!-- ======== VIEW: ARCHIVE (fan art & commission) ======== -->
-    <section id="view-fanart" class="view" aria-label="Fan art &amp; commission">
+    <!-- ======== VIEW: ARCHIVE (fan art / commission / original) ======== -->
+    <section id="view-fanart" class="view" aria-label="Archive">
       <div class="view-head">
         <div class="vh-readout mono" aria-hidden="true">
           <span>MODULE-F2</span><span class="chip-idle">LOADED</span>
         </div>
-        <h1 class="view-title" data-scramble>COMMISSION + FAN ART</h1>
-        <p class="vh-sub mono">CLIENT WORK &#x2733;&#xFE0E; FANART &#x2733;&#xFE0E; <span class="jp" lang="ja">コミッション＆ファンアート</span></p>
+        <h1 class="view-title" data-scramble>ARCHIVE</h1>
+        <p class="vh-sub mono">FAN ART &#x2733;&#xFE0E; COMMISSION &#x2733;&#xFE0E; <span class="jp" lang="ja">アーカイブ</span></p>
       </div>
 
       <!-- 直接展示作品：筛选 + 网格（专注作品） -->
       <div class="fan-tools">
-        <div class="filterbar mono" id="fanartFilters" role="group" aria-label="Filter by fandom"></div>
+        <div class="filterbar mono" id="fanartFilters" role="group" aria-label="Filter by category"></div>
         <span class="arc-meta mono" id="fanMeta" aria-hidden="true"></span>
       </div>
       <p class="sr-only" id="fanartStatus" role="status"></p>
@@ -305,7 +304,7 @@
     </div>
   </div>
 
-  <script src="js/data.js?v=30"></script>
-  <script src="js/main.js?v=30"></script>
+  <script src="js/data.js?v=38"></script>
+  <script src="js/main.js?v=38"></script>
 </body>
 </html>

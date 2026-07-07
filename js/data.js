@@ -85,22 +85,25 @@ const PROJECTS = [
 ];
 
 /* ------------------------------------------------------------
-   FAN ART & COMMISSION — ARCHIVE 页下半部分
-   ✳ fandom 是作品所属的圈子/标签，会自动生成筛选按钮；
-     委托作品用 fandom: "COMMISSION"。
-   ✳ 注意：fandom 名字会原样显示在页面上，发布前记得把
-     FANDOM A/B/C 换成真实的圈名。
+   ARCHIVE 页 — fan art / commission / original 杂档
+   ✳ cat 是作品类型（FAN ART / COMMISSION / ORIGINAL），
+     筛选按钮按 cat 生成 —— 一个维度，不和圈名混在一起。
+   ✳ fandom 是作品所属的圈子/IP（SKY 等），只出现在
+     卡片标注里；commission/original 没有圈子就留同名。
    ------------------------------------------------------------ */
-// src = 列表缩略图；full = 灯箱原图。fandom 会生成筛选按钮。
+// src = 列表缩略图；full = 灯箱原图。cat 会生成筛选按钮。
 const FANART = [
-  { title: "DAYS OF RAINBOW",     fandom: "SKY",        src: "assets/works/fanart/thumb/01-sky-rainbow.jpg",      full: "assets/works/fanart/01-sky-rainbow.jpg" },
-  { title: "DAYS OF RAINBOW II",  fandom: "SKY",        src: "assets/works/fanart/thumb/02-sky-rainbow-2.jpg",    full: "assets/works/fanart/02-sky-rainbow-2.jpg" },
-  { title: "SEASON OF MIGRATION", fandom: "SKY",        src: "assets/works/fanart/thumb/03-sky-migration.jpg",    full: "assets/works/fanart/03-sky-migration.jpg" },
-  { title: "SKY — FANART",        fandom: "SKY",        src: "assets/works/fanart/thumb/04-sky-fanart.jpg",       full: "assets/works/fanart/04-sky-fanart.jpg" },
-  { title: "6TH ANNIVERSARY",     fandom: "SKY",        src: "assets/works/fanart/thumb/05-sky-6anniv.jpg",       full: "assets/works/fanart/05-sky-6anniv.jpg" },
-  { title: "UNIT Z — POSTER",     fandom: "ORIGINAL",   src: "assets/works/fanart/thumb/06-unitz-poster.jpg",     full: "assets/works/fanart/06-unitz-poster.jpg" },
-  { title: "ANGEL",               fandom: "COMMISSION", src: "assets/works/fanart/thumb/07-commission-angel.jpg", full: "assets/works/fanart/07-commission-angel.jpg" },
-  { title: "UNTITLED",            fandom: "COMMISSION", src: "assets/works/fanart/thumb/08-untitled.jpg",         full: "assets/works/fanart/08-untitled.jpg" },
+  { title: "DAYS OF RAINBOW",     cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/01-sky-rainbow.jpg",      full: "assets/works/fanart/01-sky-rainbow.jpg" },
+  { title: "DAYS OF RAINBOW II",  cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/02-sky-rainbow-2.jpg",    full: "assets/works/fanart/02-sky-rainbow-2.jpg" },
+  { title: "SEASON OF MIGRATION", cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/03-sky-migration.jpg",    full: "assets/works/fanart/03-sky-migration.jpg" },
+  { title: "SKY — FANART",        cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/04-sky-fanart.jpg",       full: "assets/works/fanart/04-sky-fanart.jpg" },
+  { title: "6TH ANNIVERSARY",     cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/05-sky-6anniv.jpg",       full: "assets/works/fanart/05-sky-6anniv.jpg" },
+  { title: "OREO",                cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/11-sky-oreo.jpg",         full: "assets/works/fanart/11-sky-oreo.jpg" },
+  { title: "WING",                cat: "FAN ART",    fandom: "SKY FANART",       src: "assets/works/fanart/thumb/08-untitled.jpg",         full: "assets/works/fanart/08-untitled.jpg" },
+  { title: "UNIT Z — POSTER",     cat: "ORIGINAL",   fandom: "ORIGINAL",   src: "assets/works/fanart/thumb/06-unitz-poster.jpg",     full: "assets/works/fanart/06-unitz-poster.jpg" },
+  { title: "COLOR STUDY I",       cat: "ORIGINAL",   fandom: "ORIGINAL",   src: "assets/works/fanart/thumb/09-study-window.jpg",     full: "assets/works/fanart/09-study-window.jpg" },
+  { title: "COLOR STUDY II",      cat: "ORIGINAL",   fandom: "ORIGINAL",   src: "assets/works/fanart/thumb/10-study-green.jpg",      full: "assets/works/fanart/10-study-green.jpg" },
+  { title: "ANGEL",               cat: "COMMISSION", fandom: "COMMISSION", src: "assets/works/fanart/thumb/07-commission-angel.jpg", full: "assets/works/fanart/07-commission-angel.jpg" },
 ];
 
 /* ------------------------------------------------------------
@@ -110,16 +113,16 @@ const ABOUT = {
   avatar: "assets/avatar.jpg",
   // 主简介（英文，页面主要内容）— 讲个人与兴趣，不重复下方 work experience 里的 Garena
   bio:
-    "Illustration student with a concentration in Concept Design — I design characters, creatures, props, and the worlds they live in, from original game IPs to fan art for the games I grew up loving. Happiest when a design carries a story.",
+    "Skyler, also known as SECAL72, is an illustrator and concept artist specializing in visual development for games and animation. Their work focuses on creating imagery environments, creatures, and narrative-driven worlds that blend design with storytelling. They strive to create designs that are not only visually engaging but also leave a lasting emotional impression.",
   // 简介下方的日文装饰行
   bioDeco: "キャラクターデザイン ✳ ビジュアルストーリーテリング ✳ コンセプトアート",
 
   // bio 里要点亮的关键短语（必须与 bio 原文逐字一致；亮白显示，其余文字灰）
   bioHighlights: [
-    "Concept Design",
-    "characters, creatures, props",
-    "original game IPs",
-    "carries a story",
+    "illustrator and concept artist",
+    "visual development",
+    "narrative-driven worlds",
+    "lasting emotional impression",
   ],
 
   // About 页数据带：大字焦点块（n 大字 / label 小注），3–4 个最佳
