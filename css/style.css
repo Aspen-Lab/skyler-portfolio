@@ -1136,7 +1136,10 @@ footer .ast { color: var(--ink-dim); }
 #lightbox.is-open { opacity: 1; }
 #lightbox[hidden] { display: none; }
 
-.lb-stage { touch-action: pan-y; }
+/* 手势全由 JS 接管（swipe 翻页 / 按住检视）。pan-y 会让浏览器把
+   带竖向分量的手势抢走并 pointercancel —— 斜着滑就翻不了页、
+   检视中手指一漂就被打断。灯箱内也没有可竖向滚动的东西。 */
+.lb-stage { touch-action: none; }
 .lb-frame {
   position: relative; display: inline-block;
   border-radius: var(--radius);

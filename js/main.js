@@ -444,7 +444,8 @@
     document.body.style.overflow = "hidden";
     $(".lb-close", lb).focus();
   }
-  let lbTransitioning = false;
+  let lbSwapT = 0;       // 未完成的换图定时器：新一次翻页/关闭时取消
+  let lbRenderSeq = 0;   // 渲染序号：只有最新一次换图允许落地
   let lbFullToken = 0;
   let lbObjURL = null;     // 当前原图的 blob URL，切图/关闭时释放
   let lbLoadTimer = 0;
@@ -508,29 +509,31 @@
     const pf = $("#lbProgressFill");
     if (pf) pf.style.width = `${((lbState.index + 1) / items.length) * 100}%`;
     lbFullToken++;                               // 让上一张未完成的升级作废
+    const seq = ++lbRenderSeq;
+    clearTimeout(lbSwapT);                       // 上一次换图还没落地就作废
     if (instant) {
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       lbImg.style.opacity = "1";
       lbImg.style.transform = "";
-      lbTransitioning = false;
       upgradeToFull(it);
       return;
     }
-    // 正常加载过渡：淡出 → 换图 → 淡入
-    lbTransitioning = true;
+    // 正常加载过渡：淡出 → 换图 → 淡入。
+    // 不再用"过渡中丢弃翻页"的锁 —— 连续快速滑动每一下都响应，
+    // seq 保证乱序的 load 回调不会把旧图/旧透明度写回来。
     lbImg.style.transition = "opacity 0.18s ease";
     lbImg.style.transform = "";
     lbImg.style.opacity = "0";
     const swap = () => {
+      if (seq !== lbRenderSeq) return;
       lbImg.src = it.src;
       lbImg.alt = it.cap;
       let entered = false;
       const enter = () => {
-        if (entered) return;
+        if (entered || seq !== lbRenderSeq) return;
         entered = true;
         lbImg.style.opacity = "1";
-        setTimeout(() => { lbTransitioning = false; }, 200);
         upgradeToFull(it);                       // 缩略图淡入后再升级高清
       };
       if (lbImg.complete) enter();
@@ -539,10 +542,9 @@
         lbImg.addEventListener("error", enter, { once: true });
       }
     };
-    setTimeout(swap, 170);
+    lbSwapT = setTimeout(swap, 170);
   }
   function lbNav(dir) {
-    if (lbTransitioning) return;
     const items = galleries[lbState.group];
     if (!items) return;
     let i = lbState.index;
@@ -564,6 +566,8 @@
     if (f && f.isConnected && f.offsetParent !== null) f.focus({ preventScroll: true });
     else { const t = $(".tab.is-active"); if (t) t.focus({ preventScroll: true }); }
     lbFullToken++;            // 中止进行中的原图下载
+    lbRenderSeq++;            // 作废未落地的换图，防止关闭后旧 swap 再写 src
+    clearTimeout(lbSwapT);
     hideLoadingBar();
     clearTimeout(lbHideT);
     lbHideT = setTimeout(() => {
@@ -833,7 +837,11 @@
 
   /* ---------- 触屏自动滚动 ----------
      桌面用 CSS transform marquee；触屏改成原生 overflow-x 滑动 + 这里的慢速
-     scrollLeft 自增，保留手动滑动的同时也会自己走。手指一碰即停，松手 1.5s 后续。
+     scrollLeft 自增，保留手动滑动的同时也会自己走。
+     暂停判定用 touch 事件而不是 pointer 事件：浏览器接管滚动手势后
+     pointerup 不会再来（只有 pointercancel），touchend 却始终会派发。
+     手指还按着 / 滚动未静止（含惯性）期间绝不写 scrollLeft ——
+     iOS 上手势进行中写 scrollLeft 会直接杀掉当前手势，表现为拖不动、卡住。
      复制一份内容做无缝循环；离屏 / 不在作品页时不滚，省电。 */
   function setupTouchAutoScroll() {
     $$("#projects .strip").forEach((strip) => {
@@ -849,13 +857,20 @@
         observeLazy(track);   // 克隆图懒加载
       }
 
-      let down = false, paused = false, idleT = 0, onView = true;
-      const arm = () => { clearTimeout(idleT); idleT = setTimeout(() => { paused = false; }, 1500); };
-      strip.addEventListener("pointerdown", () => { down = true; paused = true; clearTimeout(idleT); }, { passive: true });
-      const release = () => { down = false; arm(); };
-      strip.addEventListener("pointerup", release, { passive: true });
-      strip.addEventListener("pointercancel", release, { passive: true });
-      strip.addEventListener("scroll", () => { if (!down) arm(); }, { passive: true });
+      let touches = 0, lastInput = 0, progUntil = 0, onView = true;
+      strip.addEventListener("touchstart", (e) => {
+        touches = e.touches.length; lastInput = performance.now();
+      }, { passive: true });
+      const endTouch = (e) => {
+        touches = e.touches.length; lastInput = performance.now();
+      };
+      strip.addEventListener("touchend", endTouch, { passive: true });
+      strip.addEventListener("touchcancel", endTouch, { passive: true });
+      // 用户滚动（手指拖 / 惯性）都会进这里；自动滚动自己触发的 scroll
+      // 靠 progUntil 时间窗排除，否则会把自己当成用户输入而自杀
+      strip.addEventListener("scroll", () => {
+        if (performance.now() > progUntil) lastInput = performance.now();
+      }, { passive: true });
 
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(
@@ -867,7 +882,9 @@
       let last = 0;
       const tick = (t) => {
         const dt = last ? t - last : 0; last = t;
-        if (!paused && onView && dt < 100 && portfolioVisible()) {
+        const idle = touches === 0 && t - lastInput > 1500;
+        if (idle && onView && dt < 100 && portfolioVisible()) {
+          progUntil = t + 80;
           strip.scrollLeft += dt * 0.03;            // ~30px/s，与桌面一致
           const wrap = half.offsetWidth;
           if (wrap > 0 && strip.scrollLeft >= wrap) strip.scrollLeft -= wrap;
@@ -1333,8 +1350,8 @@
       view.style.backgroundPosition = `${px}px ${py}px`;
       view.classList.add("live");
       if (zrect) {
-        // 取景框：上方方块对应的图上区域
-        const rw = vw / MZ, rh = vh / MZ;
+        // 取景框：上方方块对应的图上区域（用实际倍率 mz，MZ 只是下限）
+        const rw = vw / mz, rh = vh / mz;
         const rx = Math.min(rect.width - rw, Math.max(0, fx * rect.width - rw / 2));
         const ry = Math.min(rect.height - rh, Math.max(0, fy * rect.height - rh / 2));
         zrect.style.width = `${rw}px`;
@@ -1347,7 +1364,10 @@
       clearTimeout(holdT);
       if (tracking) {
         tracking = false;
-        lbZoomOn = false; // 恢复滑动翻页
+        // pointerup 从 frame 冒泡到 stage，翻页判定在 stage 上：
+        // 这里同步复位的话，检视时的横向移动会被当成 swipe 翻页。
+        // 延迟到下一拍，让同一事件里 stage 先看到 zoom-on 再复位。
+        setTimeout(() => { lbZoomOn = false; }, 0);
         view.classList.remove("live"); // 检视是全屏覆盖：松手立即收起
         if (zrect) zrect.classList.remove("live");
       }

@@ -43,7 +43,7 @@ const PROJECTS = [
       { title: "ENVIRONMENT — CONCEPT ART",    src: "assets/works/p01/thumb/10-env-concept.jpg",   full: "assets/works/p01/10-env-concept.jpg",   w: 4800, h: 2700 },
       { title: "ENVIRONMENT — CONCEPT ART 2",  src: "assets/works/p01/thumb/11-env-concept-2.jpg", full: "assets/works/p01/11-env-concept-2.jpg", w: 4400, h: 2800 },
       { title: "ENVIRONMENT — DESIGN",         src: "assets/works/p01/thumb/12-env-design.jpg",    full: "assets/works/p01/12-env-design.jpg",    w: 4800, h: 2700 },
-      { title: "STYLE FRAME",                  src: "assets/works/p01/thumb/13-style-frame.jpg",   full: "assets/works/p01/13-style-frame.jpg",   w: 4800, h: 2700 },
+      { title: "STYLE FRAME",                  src: "assets/works/p01/thumb/13-style-frame.jpg",   full: "assets/works/p01/13-style-frame.jpg",   w: 4799, h: 2700 },
     ],
   },
   {
