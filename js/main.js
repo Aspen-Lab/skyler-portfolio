@@ -857,20 +857,21 @@
         observeLazy(track);   // 克隆图懒加载
       }
 
-      let touches = 0, lastInput = 0, progUntil = 0, onView = true;
+      // 手指跟踪：只记"从这条 strip 上开始"的触点 id（touch 事件全程
+      // 派发给起点元素）。不用 e.touches.length —— 那是全屏计数，
+      // 双指缩放时另一根手指不在 strip 上，计数会永久卡在 >0。
+      const fingers = new Set();
+      let lastInput = 0, onView = true;
       strip.addEventListener("touchstart", (e) => {
-        touches = e.touches.length; lastInput = performance.now();
+        for (const t of e.changedTouches) fingers.add(t.identifier);
+        lastInput = performance.now();
       }, { passive: true });
       const endTouch = (e) => {
-        touches = e.touches.length; lastInput = performance.now();
+        for (const t of e.changedTouches) fingers.delete(t.identifier);
+        lastInput = performance.now();
       };
       strip.addEventListener("touchend", endTouch, { passive: true });
       strip.addEventListener("touchcancel", endTouch, { passive: true });
-      // 用户滚动（手指拖 / 惯性）都会进这里；自动滚动自己触发的 scroll
-      // 靠 progUntil 时间窗排除，否则会把自己当成用户输入而自杀
-      strip.addEventListener("scroll", () => {
-        if (performance.now() > progUntil) lastInput = performance.now();
-      }, { passive: true });
 
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(
@@ -879,15 +880,24 @@
         ).observe(strip);
       }
 
-      let last = 0;
+      // 用户滚动检测不监听 scroll 事件：iOS 对程序写入的 scroll 事件
+      // 派发时机不可控，自动滚动会把自己的事件当成用户输入而自我饿死。
+      // 改为每帧比对 scrollLeft 与上一帧位置的漂移（惯性/拖动都会漂移）。
+      // posF 是浮点镜像：每帧 +0.5px 的写入在整数取整的实现下会丢步。
+      let last = 0, posF = -1;
       const tick = (t) => {
         const dt = last ? t - last : 0; last = t;
-        const idle = touches === 0 && t - lastInput > 1500;
+        const cur = strip.scrollLeft;
+        if (posF < 0) posF = cur;
+        if (Math.abs(cur - posF) > 1.5) lastInput = t;   // 不是我们写的移动
+        const idle = fingers.size === 0 && t - lastInput > 1500;
         if (idle && onView && dt < 100 && portfolioVisible()) {
-          progUntil = t + 80;
-          strip.scrollLeft += dt * 0.03;            // ~30px/s，与桌面一致
+          posF += dt * 0.03;                        // ~30px/s，与桌面一致
           const wrap = half.offsetWidth;
-          if (wrap > 0 && strip.scrollLeft >= wrap) strip.scrollLeft -= wrap;
+          if (wrap > 0 && posF >= wrap) posF -= wrap;
+          strip.scrollLeft = posF;
+        } else {
+          posF = cur;                               // 非自动期间跟随实际位置
         }
         requestAnimationFrame(tick);
       };
@@ -1340,11 +1350,13 @@
       const fx = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
       const fy = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
       const vw = view.clientWidth, vh = view.clientHeight;
-      // 倍率至少铺满全屏（横图 3× 不够高时自动加倍），平移 clamp 防露黑边
+      // 倍率至少铺满全屏（横图 3× 不够高时自动加倍），平移 clamp 防露黑边。
+      // 尺寸向上取整 +2px 出血、位置取整：分数像素的 background 在高 DPR
+      // 下取整后可能少画一列，露出底色 = 贴边一条黑色竖线
       const mz = Math.max(MZ, vw / rect.width, vh / rect.height);
-      const bw = rect.width * mz, bh = rect.height * mz;
-      const px = Math.min(0, Math.max(vw - bw, vw / 2 - fx * bw));
-      const py = Math.min(0, Math.max(vh - bh, vh / 2 - fy * bh));
+      const bw = Math.ceil(rect.width * mz) + 2, bh = Math.ceil(rect.height * mz) + 2;
+      const px = Math.round(Math.min(0, Math.max(vw - bw, vw / 2 - fx * bw)));
+      const py = Math.round(Math.min(0, Math.max(vh - bh, vh / 2 - fy * bh)));
       view.style.backgroundImage = `url("${lbImg.currentSrc || lbImg.src}")`;
       view.style.backgroundSize = `${bw}px ${bh}px`;
       view.style.backgroundPosition = `${px}px ${py}px`;

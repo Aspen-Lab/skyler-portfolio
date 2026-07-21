@@ -1144,6 +1144,9 @@ footer .ast { color: var(--ink-dim); }
   position: relative; display: inline-block;
   border-radius: var(--radius);
   overflow: hidden; /* 圆角裁切图片 */
+  /* 与灯箱底色一致：图片是分数像素尺寸、裁切框贴设备像素，
+     高 DPR 下边缘可能漏出 1px 底 —— 底色相同就看不见（黑色竖线来源之一） */
+  background: rgb(4, 4, 4);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
   transform: scale(0.965) translateY(10px);
   opacity: 0;
