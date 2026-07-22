@@ -583,6 +583,12 @@ body.hero-ready .pill .pill-outline {
 .strip.kb::-webkit-scrollbar { display: none; }
 .strip.kb .track { animation: none; }
 
+/* 桌面拖拽检索：拖动期间同样切成滚动容器（位置由 JS 维护） */
+.strip.dragging { overflow-x: auto; scrollbar-width: none; }
+.strip.dragging::-webkit-scrollbar { display: none; }
+.strip.dragging .track { animation: none; }
+.strip.dragging .card img { transition: none; } /* 拖动中不播 hover 缩放，防闪 */
+
 /* 纯触屏：不跑 marquee，作品条直接手动滑动 */
 @media (hover: none) and (pointer: coarse) {
   .track { animation: none; }

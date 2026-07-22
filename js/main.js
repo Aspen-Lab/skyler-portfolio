@@ -422,6 +422,7 @@
   if (lb) lb.addEventListener("contextmenu", (e) => e.preventDefault());
   const galleries = {}; // group -> [{src, cap}]
   let lbState = { group: null, index: 0, lastFocus: null };
+  let lbRestoringFocus = false; // 灯箱关闭还焦点时为真：strip 的 kb 模式要忽略这次 focusin
   let lbZoomOn = false;      // 放大镜状态（swipe 导航需要避让）
   let lbZoomToggle = null;   // 由 zoom 模块赋值：点击图片切换缩放
 
@@ -562,9 +563,13 @@
     ["position", "top", "left", "right", "width", "overflow"].forEach((p) => { document.body.style[p] = ""; });
     // html 有 scroll-behavior:smooth，必须 instant 否则还原会变成滚动动画
     window.scrollTo({ top: lbState.scrollY || 0, left: 0, behavior: "instant" });
+    // ESC 关灯箱是键盘输入，还焦点会命中 :focus-visible，
+    // 误触发 strip 的 kb 模式把 marquee 永久冻住 —— 标记跳过
+    lbRestoringFocus = true;
     const f = lbState.lastFocus;
     if (f && f.isConnected && f.offsetParent !== null) f.focus({ preventScroll: true });
     else { const t = $(".tab.is-active"); if (t) t.focus({ preventScroll: true }); }
+    lbRestoringFocus = false;
     lbFullToken++;            // 中止进行中的原图下载
     lbRenderSeq++;            // 作废未落地的换图，防止关闭后旧 swap 再写 src
     clearTimeout(lbSwapT);
@@ -908,6 +913,78 @@
     const v = $("#view-portfolio");
     return v && v.classList.contains("is-active");
   }
+
+  /* ---------- 桌面拖拽检索 ----------
+     鼠标按住作品条左右拖动翻看。原理：按下时读出 marquee 当前位移，
+     切换成滚动容器并用 scrollLeft 复现同一画面（.dragging 类）；
+     拖动中利用克隆半区做无缝回卷；松手把 scrollLeft 换算回 marquee
+     相位（负 animation-delay），从当前位置无缝续播。 */
+  function setupStripDrag(strip) {
+    const track = $(".track", strip);
+    const half = track && $(".half", track);
+    if (!track || !half) return;
+    let dragging = false, moved = false, startX = 0, startSL = 0;
+    // 原生图片拖拽会抢走 scrub 手势
+    strip.addEventListener("dragstart", (e) => e.preventDefault());
+    strip.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      dragging = true; moved = false;
+      startX = e.clientX;
+      const tr = getComputedStyle(track).transform;
+      const offset = tr && tr !== "none" ? -new DOMMatrixReadOnly(tr).e : 0;
+      strip.classList.add("dragging");    // animation:none + overflow-x:auto
+      // kb（键盘滚动）模式下本来就是 scrollLeft 布局，位置直接沿用
+      if (!REDUCED && !strip.classList.contains("kb")) strip.scrollLeft = offset;
+      startSL = strip.scrollLeft;         // clamp 后的实际落点
+      // 注意：这里不能 setPointerCapture —— capture 会让后续 click
+      // 重定向到 strip 本身，卡片点击（灯箱）就全失效了。
+      // 真正开始拖动（越过阈值）后才在 pointermove 里捕获。
+    });
+    strip.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        try { strip.setPointerCapture(e.pointerId); } catch { /* 老浏览器 */ }
+      }
+      let sl = startSL - dx;
+      const hw = half.offsetWidth;
+      // 有克隆半区（周期 = hw）才能无缝回卷；基准同步平移避免跳变
+      if (hw > 0 && $(".half[aria-hidden]", track)) {
+        if (sl < 30) { sl += hw; startSL += hw; }
+        else if (sl > hw + 30) { sl -= hw; startSL -= hw; }
+      }
+      strip.scrollLeft = sl;
+    });
+    const end = () => {
+      if (!dragging) return;
+      dragging = false;
+      if (!REDUCED && !strip.classList.contains("kb")) {
+        const hw = half.offsetWidth;
+        // 不能读 computed animationDuration：.dragging 的 animation:none
+        // 会把它重置为 0s —— 直接读 fillStrip 写入的 --dur
+        const dur = parseFloat(track.style.getPropertyValue("--dur")) || 60;
+        if (hw > 0) {
+          const frac = (strip.scrollLeft % hw) / hw;
+          const p = track.classList.contains("rev") ? 1 - frac : frac;
+          // 移除 .dragging 会重启动画：负 delay 让新实例直接从相位 p 开始
+          track.style.animationDelay = `${(-p * dur).toFixed(3)}s`;
+        }
+        strip.scrollLeft = 0; // kb / REDUCED 模式保持 scrollLeft 布局，不归零
+      }
+      strip.classList.remove("dragging");
+    };
+    strip.addEventListener("pointerup", end);
+    strip.addEventListener("pointercancel", end);
+    // 兜底：越过阈值前尚未 capture，指针移出条外松手时 strip 收不到
+    // pointerup，.dragging 会卡住冻结 marquee —— window 层必收
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
+    // 拖过就吞掉随之而来的 click：松手不应打开灯箱（捕获期先于 document 委托）
+    strip.addEventListener("click", (e) => {
+      if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
+    }, true);
+  }
   let resizeT = 0;
   window.addEventListener("resize", () => {
     clearTimeout(resizeT);
@@ -978,6 +1055,7 @@
         });
       }
       if (TOUCH) return; // 触屏：条本身可滑动，无需按住暂停/焦点复位
+      setupStripDrag(strip); // 桌面：鼠标按住拖动检索
       let touchT = 0;
       strip.addEventListener("pointerdown", (e) => {
         if (e.pointerType === "mouse") return;
@@ -993,7 +1071,7 @@
       strip.addEventListener("pointercancel", release, { passive: true });
       // Tab 进入：停掉位移动画、把焦点卡片滚进视野；移出后复位
       strip.addEventListener("focusin", (e) => {
-        if (!e.target.matches(":focus-visible")) return;
+        if (lbRestoringFocus || !e.target.matches(":focus-visible")) return;
         strip.classList.add("kb");
         e.target.scrollIntoView({ block: "nearest", inline: "nearest" });
       });
