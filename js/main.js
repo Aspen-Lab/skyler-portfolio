@@ -915,39 +915,43 @@
   }
 
   /* ---------- 桌面拖拽检索 ----------
-     鼠标按住作品条左右拖动翻看。原理：按下时读出 marquee 当前位移，
-     切换成滚动容器并用 scrollLeft 复现同一画面（.dragging 类）；
-     拖动中利用克隆半区做无缝回卷；松手把 scrollLeft 换算回 marquee
-     相位（负 animation-delay），从当前位置无缝续播。 */
+     鼠标按住作品条左右拖动翻看。关键：按下时什么都不做 —— 只有位移越过
+     阈值、确认是"拖动"而非"点击"后，才冻结 marquee 并用 scrollLeft 接管
+     （.dragging 类）。这样轻点（真实鼠标点击常带几 px 抖动）全程零干预，
+     click 照常冒泡去开灯箱；只有真拖动过才吞掉随后的 click。
+     拖动中利用克隆半区无缝回卷；松手把 scrollLeft 换算回 marquee 相位
+     （负 animation-delay），从当前位置无缝续播。 */
   function setupStripDrag(strip) {
     const track = $(".track", strip);
     const half = track && $(".half", track);
     if (!track || !half) return;
-    let dragging = false, moved = false, startX = 0, startSL = 0;
+    const THRESH = 6; // px：小于此位移算点击，不算拖动 —— 别调太小否则吃点击
+    let armed = false, engaged = false, suppressClick = false, startX = 0, startSL = 0;
     // 原生图片拖拽会抢走 scrub 手势
     strip.addEventListener("dragstart", (e) => e.preventDefault());
     strip.addEventListener("pointerdown", (e) => {
       if (e.pointerType !== "mouse" || e.button !== 0) return;
-      dragging = true; moved = false;
+      armed = true; engaged = false; suppressClick = false;
       startX = e.clientX;
-      const tr = getComputedStyle(track).transform;
-      const offset = tr && tr !== "none" ? -new DOMMatrixReadOnly(tr).e : 0;
-      strip.classList.add("dragging");    // animation:none + overflow-x:auto
-      // kb（键盘滚动）模式下本来就是 scrollLeft 布局，位置直接沿用
-      if (!REDUCED && !strip.classList.contains("kb")) strip.scrollLeft = offset;
-      startSL = strip.scrollLeft;         // clamp 后的实际落点
-      // 注意：这里不能 setPointerCapture —— capture 会让后续 click
-      // 重定向到 strip 本身，卡片点击（灯箱）就全失效了。
-      // 真正开始拖动（越过阈值）后才在 pointermove 里捕获。
+      // 此处刻意不冻结 marquee、不动 scrollLeft、不 capture —— 等确认拖动再说
     });
     strip.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      if (!moved && Math.abs(dx) > 4) {
-        moved = true;
+      if (!armed) return;
+      if (!engaged) {
+        if (Math.abs(e.clientX - startX) < THRESH) return; // 还在点击容差内
+        // 越过阈值 → 确认拖动：此刻才接管
+        engaged = true; suppressClick = true;
+        const tr = getComputedStyle(track).transform;
+        const offset = tr && tr !== "none" ? -new DOMMatrixReadOnly(tr).e : 0;
+        strip.classList.add("dragging");    // animation:none + overflow-x:auto
+        // kb（键盘滚动）模式下本来就是 scrollLeft 布局，位置直接沿用
+        if (!REDUCED && !strip.classList.contains("kb")) strip.scrollLeft = offset;
+        startX = e.clientX;                  // 从接管点重新计 dx，避免起步跳变
+        startSL = strip.scrollLeft;          // clamp 后的实际落点
+        // 接管后才 capture：过早 capture 会把 click 重定向到 strip，点不开灯箱
         try { strip.setPointerCapture(e.pointerId); } catch { /* 老浏览器 */ }
       }
-      let sl = startSL - dx;
+      let sl = startSL - (e.clientX - startX);
       const hw = half.offsetWidth;
       // 有克隆半区（周期 = hw）才能无缝回卷；基准同步平移避免跳变
       if (hw > 0 && $(".half[aria-hidden]", track)) {
@@ -957,8 +961,9 @@
       strip.scrollLeft = sl;
     });
     const end = () => {
-      if (!dragging) return;
-      dragging = false;
+      armed = false;
+      if (!engaged) return;                 // 纯点击：全程没接管，直接放行
+      engaged = false;
       if (!REDUCED && !strip.classList.contains("kb")) {
         const hw = half.offsetWidth;
         // 不能读 computed animationDuration：.dragging 的 animation:none
@@ -976,13 +981,13 @@
     };
     strip.addEventListener("pointerup", end);
     strip.addEventListener("pointercancel", end);
-    // 兜底：越过阈值前尚未 capture，指针移出条外松手时 strip 收不到
-    // pointerup，.dragging 会卡住冻结 marquee —— window 层必收
+    // 兜底：指针移出条外松手时 strip 收不到 pointerup，.dragging 会卡住 —— window 必收
     window.addEventListener("pointerup", end);
     window.addEventListener("pointercancel", end);
-    // 拖过就吞掉随之而来的 click：松手不应打开灯箱（捕获期先于 document 委托）
+    // 只有真拖动过才吞掉随后的 click（松手不该开灯箱）；suppressClick 由下次
+    // pointerdown 复位，所以拖动后即使没 click 也不会误伤下一次点击
     strip.addEventListener("click", (e) => {
-      if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
+      if (suppressClick) { e.stopPropagation(); e.preventDefault(); suppressClick = false; }
     }, true);
   }
   let resizeT = 0;
