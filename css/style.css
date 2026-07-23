@@ -549,19 +549,21 @@ body.hero-ready .pill .pill-outline {
 
 /* strip + marquee */
 .strip {
+  --fade: clamp(20px, 6vw, 90px);
   position: relative;
   border-top: 1px solid var(--line-dim);
   border-bottom: 1px solid var(--line-dim);
   padding: 16px 0;
   margin: 0 calc(-1 * var(--pad-x));
   overflow: hidden;
+  /* 左右边缘渐隐：用 mask 作用于元素「可视框」，不随内容滚动。
+     旧方案是两个绝对定位的渐变伪元素(::before/::after) —— 在 overflow-x:auto
+     状态下（手机常态 / 桌面按住拖动 / 键盘滚动），它们会跟着内容一起滚，
+     从贴边遮罩变成一条夹在画面中央、随卡片移动的深色渐隐竖带，
+     就是反复报的「图片中间的黑色竖线」。mask 钉在可视框上，彻底避免。 */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
 }
-.strip::before, .strip::after {
-  content: ""; position: absolute; top: 0; bottom: 0; width: clamp(20px, 6vw, 90px);
-  z-index: 2; pointer-events: none;
-}
-.strip::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
-.strip::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
 
 .track {
   display: flex;
